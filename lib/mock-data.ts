@@ -17,15 +17,27 @@ export const MOCK_WORDS: Word[] = [
       ru: {
         main: 'Дом',
         alternatives: ['Здание', 'Жилище']
+      },
+      uk: {
+        main: 'Будинок',
+        alternatives: ['Будова', 'Житло']
+      },
+      en: {
+        main: 'House',
+        alternatives: ['Building', 'Home']
       }
     },
     content: {
       example_sentence: {
         de: 'Ich wohne in einem großen **Haus**.',
-        ru: 'Я живу в большом доме.'
+        ru: 'Я живу в большом доме.',
+        uk: 'Я живу у великому будинку.',
+        en: 'I live in a big house.'
       },
       etymology: {
         text_ru: 'Слово "Haus" происходит от прагерманского *hūsą, которое означало "укрытие, жилище". Интересно, что родственные слова есть в английском (house), голландском (huis) и скандинавских языках. Изначально это слово обозначало любое защищенное пространство, где можно укрыться от непогоды.',
+        text_uk: 'Слово "Haus" походить від прагерманського *hūsą, що означало "укриття, житло". Цікаво, що споріднені слова є в англійській (house), нідерландській (huis) та скандинавських мовах. Спочатку це слово означало будь-який захищений простір, де можна сховатися від негоди.',
+        text_en: 'The word "Haus" comes from Proto-Germanic *hūsą, which meant "shelter, dwelling". Interestingly, related words exist in English (house), Dutch (huis), and Scandinavian languages. Originally, this word denoted any protected space where one could take shelter from the weather.',
         root_word: '*hūsą'
       },
       synonyms: ['Gebäude', 'Wohnung'],
@@ -47,15 +59,27 @@ export const MOCK_WORDS: Word[] = [
       ru: {
         main: 'Стол',
         alternatives: ['Столик']
+      },
+      uk: {
+        main: 'Стіл',
+        alternatives: ['Столик']
+      },
+      en: {
+        main: 'Table',
+        alternatives: ['Desk']
       }
     },
     content: {
       example_sentence: {
         de: 'Das Buch liegt auf dem **Tisch**.',
-        ru: 'Книга лежит на столе.'
+        ru: 'Книга лежит на столе.',
+        uk: 'Книга лежить на столі.',
+        en: 'The book is on the table.'
       },
       etymology: {
         text_ru: 'Слово "Tisch" происходит от латинского "discus" (диск, блюдо), которое пришло из древнегреческого δίσκος (diskos). Изначально столы действительно были круглыми, как большие блюда. Со временем форма изменилась, но название осталось.',
+        text_uk: 'Слово "Tisch" походить від латинського "discus" (диск, тарілка), що прийшло з давньогрецького δίσκος (diskos). Спочатку столи справді були круглими, як великі тарілки. З часом форма змінилася, але назва залишилася.',
+        text_en: 'The word "Tisch" comes from Latin "discus" (disc, plate), which came from Ancient Greek δίσκος (diskos). Originally, tables were indeed round, like large plates. Over time, the shape changed, but the name remained.',
         root_word: 'discus'
       },
       synonyms: ['Tafel'],
@@ -77,15 +101,27 @@ export const MOCK_WORDS: Word[] = [
       ru: {
         main: 'Солнце',
         alternatives: []
+      },
+      uk: {
+        main: 'Сонце',
+        alternatives: []
+      },
+      en: {
+        main: 'Sun',
+        alternatives: []
       }
     },
     content: {
       example_sentence: {
         de: 'Die **Sonne** scheint heute hell.',
-        ru: 'Сегодня солнце светит ярко.'
+        ru: 'Сегодня солнце светит ярко.',
+        uk: 'Сьогодні сонце світить яскраво.',
+        en: 'The sun is shining brightly today.'
       },
       etymology: {
         text_ru: 'Слово "Sonne" восходит к прагерманскому *sunnōn, что связано с индоевропейским корнем *sóh₂wl̥ (солнце). Это одно из древнейших слов в германских языках. В мифологии германских народов Солнце часто персонифицировалось как богиня.',
+        text_uk: 'Слово "Sonne" сходить до прагерманського *sunnōn, що пов\'язане з індоєвропейським коренем *sóh₂wl̥ (сонце). Це одне з найдавніших слів у германських мовах. У міфології германських народів Сонце часто персоніфікувалося як богиня.',
+        text_en: 'The word "Sonne" goes back to Proto-Germanic *sunnōn, which is related to the Indo-European root *sóh₂wl̥ (sun). It is one of the oldest words in Germanic languages. In Germanic mythology, the Sun was often personified as a goddess.',
         root_word: '*sunnōn'
       },
       synonyms: ['Sonnenschein (солнечный свет)'],

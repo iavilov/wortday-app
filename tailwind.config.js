@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const { colors, borderRadius, shadows, fontFamily } = require('./constants/design-tokens');
+
 module.exports = {
   // Указываем пути ко всем файлам, где используем классы стилей
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
@@ -6,31 +8,22 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#F3F0FF', // Светло-сиреневый фон
-        surface: '#FFFFFF',    // Белые карточки
-        primary: {
-          DEFAULT: '#2D2B4A',  // Темный текст/кнопки
-          foreground: '#FFFFFF',
-        },
-        accent: {
-          purple: '#8B5CF6',
-          yellow: '#FFB84C', // Для страйков
-          green: '#10B981',
-        },
-        text: {
-          main: '#1F1E2E',
-          muted: '#6B7280',
-        }
+        ...colors,
+        // Alias for backward compatibility
+        'accent-yellow': colors.accent.orange,
+        'accent-purple': colors.accent.purple,
+        'accent-green': colors.accent.green,
+        'text-main': colors.text.main,
+        'text-muted': colors.text.muted,
       },
       borderRadius: {
-        'card': '1.5rem', // 24px
-        'button': '9999px', // Full
+        ...borderRadius,
       },
       boxShadow: {
-        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+        ...shadows,
       },
       fontFamily: {
-        'rubik': ['Rubik', 'sans-serif'],
+        ...fontFamily,
       },
     },
   },

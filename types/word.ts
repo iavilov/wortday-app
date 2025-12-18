@@ -3,6 +3,13 @@
  * Based on Supabase schema from CONTEXT.md
  */
 
+/**
+ * Article color mapping for UI
+ * Der = Blue, Die = Red, Das = Green
+ * Imported from centralized design tokens
+ */
+import { articleColors } from '@/constants/colors';
+
 export type Article = 'der' | 'die' | 'das' | 'none';
 
 export type PartOfSpeech = 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
@@ -16,15 +23,21 @@ export interface Translation {
 
 export interface Translations {
   ru: Translation;
+  uk: Translation;  // Ukrainian
+  en: Translation;  // English
 }
 
 export interface ExampleSentence {
-  de: string;
-  ru: string;
+  de: string;  // German sentence (same for all)
+  ru: string;  // Russian translation
+  uk: string;  // Ukrainian translation
+  en: string;  // English translation
 }
 
 export interface Etymology {
-  text_ru: string;
+  text_ru: string;  // Russian etymology
+  text_uk: string;  // Ukrainian etymology
+  text_en: string;  // English etymology
   root_word?: string;
 }
 
@@ -56,34 +69,4 @@ export interface Word {
   media: WordMedia;
 }
 
-/**
- * Article color mapping for UI
- * Der = Blue, Die = Red, Das = Green
- * Using hex colors for React Native inline styles
- */
-export const ARTICLE_COLORS = {
-  der: {
-    bg: '#DBEAFE',      // blue-100
-    text: '#1D4ED8',    // blue-700
-    border: '#93C5FD',  // blue-300
-    accent: '#3B82F6'
-  },
-  die: {
-    bg: '#FEE2E2',      // red-100
-    text: '#B91C1C',    // red-700
-    border: '#FCA5A5',  // red-300
-    accent: '#EF4444'
-  },
-  das: {
-    bg: '#D1FAE5',      // green-100
-    text: '#047857',    // green-700
-    border: '#6EE7B7',  // green-300
-    accent: '#10B981'
-  },
-  none: {
-    bg: '#F3F4F6',      // gray-100
-    text: '#374151',    // gray-700
-    border: '#D1D5DB',  // gray-300
-    accent: '#6B7280'
-  }
-} as const;
+export const ARTICLE_COLORS = articleColors;
