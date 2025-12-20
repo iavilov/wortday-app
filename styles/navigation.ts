@@ -19,6 +19,7 @@ export const TAB_BAR_SCREEN_OPTIONS = {
     borderTopWidth: 0,
     position: 'absolute' as const,
     bottom: 0,
+    height: 'auto',
     left: 0,
     right: 0,
     width: '100%',
@@ -38,8 +39,6 @@ export const TAB_BAR_SCREEN_OPTIONS = {
       },
       web: {
         boxShadow: '0px -5px 20px rgba(0,0,0,0.05)',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
       } as any,
     }),
   },

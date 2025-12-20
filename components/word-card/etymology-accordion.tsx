@@ -1,11 +1,6 @@
-/**
- * Etymology Accordion Component
- * Collapsible section for etymology information with smooth animations
- */
-
 import { ChevronDown } from 'lucide-react-native';
-import { ReactNode, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ReactNode } from 'react';
+import { LayoutChangeEvent, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -19,61 +14,72 @@ interface EtymologyAccordionProps {
   defaultOpen?: boolean;
 }
 
-export function EtymologyAccordion({ 
-  title, 
-  children, 
-  defaultOpen = false 
+export function EtymologyAccordion({
+  title,
+  children,
+  defaultOpen = false
 }: EtymologyAccordionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  const rotation = useSharedValue(defaultOpen ? 180 : 0);
-  const heightValue = useSharedValue(defaultOpen ? 1 : 0);
+  const height = useSharedValue(0);
+  const contentHeight = useSharedValue(0);
+  const isOpen = useSharedValue(defaultOpen);
 
   const toggleAccordion = () => {
-    setIsOpen(!isOpen);
-    rotation.value = withSpring(isOpen ? 0 : 180, {
-      damping: 15,
-      stiffness: 150,
-    });
-    heightValue.value = withTiming(isOpen ? 0 : 1, {
-      duration: 300,
-    });
+    isOpen.value = !isOpen.value;
+
+    if (isOpen.value) {
+      height.value = withTiming(contentHeight.value, { duration: 300 });
+    } else {
+      height.value = withTiming(0, { duration: 300 });
+    }
   };
 
-  const iconAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
+  const onLayout = (event: LayoutChangeEvent) => {
+    const onLayoutHeight = event.nativeEvent.layout.height;
+    if (onLayoutHeight > 0 && contentHeight.value !== onLayoutHeight) {
+      contentHeight.value = onLayoutHeight;
+      if (isOpen.value) {
+        height.value = withTiming(onLayoutHeight, { duration: 0 });
+      }
+    }
+  };
+
+  const animatedHeightStyle = useAnimatedStyle(() => ({
+    height: height.value,
+    opacity: height.value === 0 ? 0 : 1,
   }));
 
-  const contentAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: heightValue.value,
-    maxHeight: heightValue.value === 0 ? 0 : undefined,
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: withSpring(isOpen.value ? '180deg' : '0deg') }],
   }));
 
   return (
     <View className="w-full">
-      {/* Header - Clickable */}
       <TouchableOpacity
         onPress={toggleAccordion}
         activeOpacity={0.7}
         className="flex-row items-center justify-between py-3"
       >
-        <Text 
+        <Text
           className="text-accent-purple font-bold text-xs uppercase flex-1"
           style={{ fontFamily: 'Rubik_700Bold' }}
         >
           {title}
         </Text>
-        
+
         <Animated.View style={iconAnimatedStyle}>
           <ChevronDown size={18} color="#8B5CF6" strokeWidth={3} />
         </Animated.View>
       </TouchableOpacity>
 
-      {/* Content - Collapsible */}
-      {isOpen && (
-        <Animated.View style={contentAnimatedStyle}>
+      <Animated.View style={[animatedHeightStyle, { overflow: 'hidden' }]}>
+
+        <View
+          onLayout={onLayout}
+          className="w-full absolute top-0 left-0"
+        >
           {children}
-        </Animated.View>
-      )}
+        </View>
+      </Animated.View>
     </View>
   );
 }
