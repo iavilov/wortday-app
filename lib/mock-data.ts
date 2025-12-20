@@ -131,6 +131,70 @@ export const MOCK_WORDS: Word[] = [
       image_path: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&h=600&fit=crop',
       audio_path: 'https://example.com/audio/sonne.mp3' // Placeholder
     }
+  },
+  {
+    id: '4',
+    publish_date: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 days ago
+    word_de: 'laufen',
+    article: null,
+    part_of_speech: 'verb',
+    level: 'A1',
+    translations: {
+      ru: { main: 'Бежать', alternatives: ['Идти пешком'] },
+      uk: { main: 'Бігти', alternatives: ['Йти пішки'] },
+      en: { main: 'Run', alternatives: ['Walk'] }
+    },
+    content: {
+      example_sentence: {
+        de: 'Ich **laufe** jeden Morgen im Park.',
+        ru: 'Я бегаю каждое утро в парке.',
+        uk: 'Я бігаю кожного ранку в парку.',
+        en: 'I run every morning in the park.'
+      },
+      etymology: {
+        text_ru: 'От прагерманского *hlaupaną (прыгать, бежать). Родственно английскому "leap" (прыгать).',
+        text_uk: 'Від прагерманського *hlaupaną (стрибати, бігти). Споріднене з англійським "leap" (стрибати).',
+        text_en: 'From Proto-Germanic *hlaupaną (to jump, run). Cognate with English "leap".',
+        root_word: '*hlaupaną'
+      },
+      notes: 'Неправильный глагол: er läuft.'
+    },
+    media: {
+      image_path: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800&h=600&fit=crop',
+      audio_path: ''
+    }
+  },
+  {
+    id: '5',
+    publish_date: new Date(Date.now() - 345600000).toISOString().split('T')[0], // 4 days ago
+    word_de: 'schnell',
+    article: null,
+    part_of_speech: 'adjective',
+    level: 'A1',
+    translations: {
+      ru: { main: 'Быстрый', alternatives: ['Скорый'] },
+      uk: { main: 'Швидкий', alternatives: [] },
+      en: { main: 'Fast', alternatives: ['Quick'] }
+    },
+    content: {
+      example_sentence: {
+        de: 'Das Auto ist sehr **schnell**.',
+        ru: 'Эта машина очень быстрая.',
+        uk: 'Ця машина дуже швидка.',
+        en: 'The car is very fast.'
+      },
+      etymology: {
+        text_ru: 'От прагерманского *snellaz (активный, смелый, быстрый).',
+        text_uk: 'Від прагерманського *snellaz (активний, сміливий, швидкий).',
+        text_en: 'From Proto-Germanic *snellaz (active, bold, quick).',
+        root_word: '*snellaz'
+      },
+      notes: 'Может использоваться как наречие: Er läuft schnell (Он бежит быстро).'
+    },
+    media: {
+      image_path: 'https://images.unsplash.com/photo-1517521733618-97c772c6962f?w=800&h=600&fit=crop',
+      audio_path: ''
+    }
   }
 ];
 

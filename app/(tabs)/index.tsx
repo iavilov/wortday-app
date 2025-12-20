@@ -39,8 +39,14 @@ export default function Index() {
     );
   }
 
-  const articleColors = ARTICLE_COLORS[todayWord.article];
+  const hasArticle = !!todayWord.article;
+  const articleColors = hasArticle ? ARTICLE_COLORS[todayWord.article!] : null;
   const content = getWordContent(todayWord, translationLanguage);
+
+  // Capitalization rules: Noun -> Capitalized, Verb/Adj -> lowercase
+  const displayWord = todayWord.part_of_speech === 'noun'
+    ? todayWord.word_de // Assume data is correct, or todayWord.word_de.charAt(0).toUpperCase() + ...
+    : todayWord.word_de.toLowerCase();
 
   return (
     <ScreenLayout>
@@ -65,25 +71,27 @@ export default function Index() {
 
             <View className="px-6 pb-4 pt-4">
               <View className="flex-row items-center mb-2">
-                <View
-                  className="px-3 py-1 rounded-full mr-3"
-                  style={{
-                    backgroundColor: articleColors.bg,
-                    borderWidth: 2,
-                    borderColor: articleColors.border
-                  }}>
-                  <Text
-                    className="font-bold text-sm"
+                {hasArticle && articleColors && (
+                  <View
+                    className="px-3 py-1 rounded-full mr-3"
                     style={{
-                      fontFamily: 'Rubik_700Bold',
-                      color: articleColors.text
+                      backgroundColor: articleColors.bg,
+                      borderWidth: 2,
+                      borderColor: articleColors.border
                     }}>
-                    {todayWord.article}
-                  </Text>
-                </View>
+                    <Text
+                      className="font-bold text-sm"
+                      style={{
+                        fontFamily: 'Rubik_700Bold',
+                        color: articleColors.text
+                      }}>
+                      {todayWord.article}
+                    </Text>
+                  </View>
+                )}
                 <Text className="text-primary text-4xl flex-1"
                   style={{ fontFamily: 'Rubik_500Medium' }}>
-                  {todayWord.word_de}
+                  {displayWord}
                 </Text>
               </View>
 

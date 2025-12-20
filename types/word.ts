@@ -10,9 +10,9 @@
  */
 import { articleColors } from '@/constants/colors';
 
-export type Article = 'der' | 'die' | 'das' | 'none';
+export type Article = 'der' | 'die' | 'das' | 'none' | null;
 
-export type PartOfSpeech = 'noun' | 'verb' | 'adjective' | 'adverb' | 'other';
+export type PartOfSpeech = 'noun' | 'verb' | 'adjective';
 
 export type Level = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
