@@ -1,13 +1,7 @@
-/**
- * Theme configuration for React Navigation and tabs
- * Uses centralized design tokens to avoid duplication
- */
-
 import { Platform } from 'react-native';
 import { Colors as DesignTokens } from './design-tokens';
 
-// Use accent purple as tint color
-const tintColorLight = DesignTokens.accentPurple;
+const tintColorLight = DesignTokens.accentPink;
 const tintColorDark = '#fff';
 
 export const Colors = {
@@ -31,13 +25,9 @@ export const Colors = {
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {

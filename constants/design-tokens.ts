@@ -1,101 +1,133 @@
-/**
- * Design Tokens
- * Semantic color names based on their purpose/usage
- * Single source of truth for all colors in the app
- */
+import { palette } from './colors';
 
-import { articleColors, palette } from './colors';
-
-/**
- * Semantic colors for Tailwind and components
- */
-export const colors = {
-  // Background colors
-  background: palette.purple[100],  // Light purple background
-  surface: palette.neutral[0],      // White cards
-
-  // Primary brand color (buttons, main elements)
-  primary: {
-    DEFAULT: palette.purple[900],   // Dark purple
-    foreground: palette.neutral[0], // White text on primary
+export const articleColors = {
+  der: {
+    bg: palette.articleDer,
+    text: palette.ink,
+    border: palette.ink,
+    accent: palette.articleDer,
   },
-
-  // Accent colors for highlights
-  accent: {
-    purple: palette.purple[500],    // Main purple accent
-    orange: palette.orange[500],    // Streak/progress
-    green: palette.green[500],      // Success
+  die: {
+    bg: palette.articleDie,
+    text: palette.ink,
+    border: palette.ink,
+    accent: palette.articleDie,
   },
-
-  // Text colors
-  text: {
-    main: palette.neutral[900],     // Dark text
-    muted: palette.neutral[500],    // Secondary text
+  das: {
+    bg: palette.articleDas,
+    text: palette.ink,
+    border: palette.ink,
+    accent: palette.articleDas,
   },
-
-  // Utility colors
-  gray: {
-    50: palette.neutral[50],
-    100: palette.neutral[100],
-    200: palette.neutral[200],
-    300: palette.neutral[300],
-    500: palette.neutral[500],
+  none: {
+    bg: palette.cardBg,
+    text: palette.ink,
+    border: palette.ink,
+    accent: palette.gray[500],
   },
-};
+} as const;
 
-/**
- * Export for inline styles (React Native components)
- */
+export const transcriptionColor = {
+  bg: palette.gray[100],
+  text: palette.ink,
+} as const;
+
+
 export const Colors = {
-  // Background
-  background: colors.background,
-  surface: colors.surface,
+  background: palette.bgMain,
+  surface: palette.cardBg,
 
-  // Primary
-  primary: colors.primary.DEFAULT,
-  primaryForeground: colors.primary.foreground,
+  primary: palette.primary,
+  primaryForeground: palette.ink,
+  secondary: palette.yellow,
+  secondaryForeground: palette.ink,
 
-  // Accents
-  accentPurple: colors.accent.purple,
-  accentOrange: colors.accent.orange,
-  accentGreen: colors.accent.green,
+  accentYellow: palette.yellow,
+  accentPink: palette.pink,
+  accentBlue: palette.blue,
 
-  // Text
-  textMain: colors.text.main,
-  textMuted: colors.text.muted,
+  textMain: palette.ink,
+  textMuted: palette.gray[600],
+  textInverted: palette.cardBg,
 
-  // Grays
-  gray50: colors.gray[50],
-  gray100: colors.gray[100],
-  gray200: colors.gray[200],
-  gray300: colors.gray[300],
-  gray500: colors.gray[500],
+  border: palette.ink,
 
-  // Article colors (for word cards)
+  gray50: palette.gray[50],
+  gray100: palette.gray[100],
+  gray200: palette.gray[200],
+  gray300: palette.gray[300],
+  gray400: palette.gray[400],
+  gray500: palette.gray[500],
+  gray600: palette.gray[600],
+  gray700: palette.gray[700],
+  gray800: palette.gray[800],
+  gray900: palette.gray[900],
+
   articleColors,
-};
+  transcriptionColor,
+} as const;
 
-/**
- * Border radius tokens
- */
+export const colors = {
+  background: Colors.background,
+  surface: Colors.surface,
+
+  primary: {
+    DEFAULT: Colors.primary,
+    foreground: Colors.primaryForeground,
+  },
+
+  secondary: {
+    DEFAULT: Colors.secondary,
+    foreground: Colors.secondaryForeground,
+  },
+
+  accent: {
+    yellow: Colors.accentYellow,
+    pink: Colors.accentPink,
+    blue: Colors.accentBlue,
+  },
+
+  text: {
+    main: Colors.textMain,
+    muted: Colors.textMuted,
+    inverted: Colors.textInverted,
+  },
+
+  border: {
+    DEFAULT: Colors.border,
+  },
+
+  gray: palette.gray,
+} as const;
+
 export const borderRadius = {
-  card: '1.5rem',   // 24px
-  button: '9999px', // Full rounded
-  xl: '0.75rem',    // 12px
-  lg: '0.5rem',     // 8px
+  brutal: '0.5rem',
+  'brutal-lg': '0.75rem',
+  pill: '9999px',
+  card: '0.75rem',
+  button: '0.5rem',
 };
 
-/**
- * Shadow tokens
- */
+export const borderWidth = {
+  DEFAULT: '2px',
+  '3': '3px',
+  thick: '3px',
+};
+
 export const shadows = {
-  soft: '0 10px 40px -10px rgba(0,0,0,0.08)',
-  card: '0 4px 6px -1px rgba(0,0,0,0.1)',
+  brutal: '4px 4px 0px 0px #121212',
+  'brutal-sm': '2px 2px 0px 0px #121212',
+  'brutal-lg': '6px 6px 0px 0px #121212',
+  'brutal-hover': '6px 6px 0px 0px #121212',
+  'brutal-active': '0px 0px 0px 0px #121212',
 };
 
-/**
- * Font family tokens
- */
+export const backgroundPattern = {
+  backgroundColor: palette.bgMain,
+  backgroundImage: 'radial-gradient(#121212 0.5px, transparent 0.5px)',
+  backgroundSize: '24px 24px',
+};
+
 export const fontFamily = {
   rubik: ['Rubik', 'sans-serif'],
 };

@@ -9,7 +9,7 @@ import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { FlatList, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 type TabType = 'all' | 'favorites';
 
@@ -44,16 +44,27 @@ export default function HistoryScreen() {
       </View>
 
       {/* Tab Navigation */}
-      <View className="flex-row bg-surface rounded-xl p-1 mb-4 shadow-sm border border-gray-100">
+      <View
+        className="flex-row bg-surface rounded-lg p-1.5 mb-6"
+        style={{
+          marginHorizontal: 4,
+          borderWidth: 2,
+          borderColor: Colors.border,
+        }}
+      >
         <TouchableOpacity
           onPress={() => setActiveTab('all')}
-          className={`flex-1 py-2 items-center rounded-lg transition-all ${activeTab === 'all' ? 'bg-primary' : 'bg-transparent'
+          className={`flex-1 py-3 items-center rounded-lg transition-all ${activeTab === 'all' ? 'bg-primary' : 'bg-transparent'
             }`}
+          style={activeTab === 'all' ? {
+            borderWidth: 2,
+            borderColor: Colors.border,
+          } : {}}
         >
           <Text
-            className={`font-bold text-sm ${activeTab === 'all' ? 'text-white' : 'text-text-muted'
+            className={`font-bold text-sm uppercase ${activeTab === 'all' ? 'text-border' : 'text-text-muted'
               }`}
-            style={{ fontFamily: 'Rubik_600SemiBold' }}
+            style={{ fontFamily: 'Rubik_700Bold' }}
           >
             Все слова
           </Text>
@@ -61,13 +72,17 @@ export default function HistoryScreen() {
 
         <TouchableOpacity
           onPress={() => setActiveTab('favorites')}
-          className={`flex-1 py-2 items-center rounded-lg transition-all ${activeTab === 'favorites' ? 'bg-primary' : 'bg-transparent'
+          className={`flex-1 py-3 items-center rounded-lg transition-all ${activeTab === 'favorites' ? 'bg-primary' : 'bg-transparent'
             }`}
+          style={activeTab === 'favorites' ? {
+            borderWidth: 2,
+            borderColor: Colors.border,
+          } : {}}
         >
           <Text
-            className={`font-bold text-sm ${activeTab === 'favorites' ? 'text-white' : 'text-text-muted'
+            className={`font-bold text-sm uppercase ${activeTab === 'favorites' ? 'text-border' : 'text-text-muted'
               }`}
-            style={{ fontFamily: 'Rubik_600SemiBold' }}
+            style={{ fontFamily: 'Rubik_700Bold' }}
           >
             Избранное
           </Text>
@@ -78,7 +93,7 @@ export default function HistoryScreen() {
       <FlatList
         data={displayWords}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 20, paddingHorizontal: 4 }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View className="flex-1 justify-center items-center py-12">
@@ -104,26 +119,16 @@ export default function HistoryScreen() {
           return (
             <TouchableOpacity
               onPress={() => router.push(`/word/${item.id}`)}
-              activeOpacity={0.7}
-              className="bg-surface mb-3 p-4 rounded-2xl flex-row items-center justify-between border border-gray-100"
-              style={Platform.select({
-                ios: {
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.05,
-                  shadowRadius: 8,
-                },
-                android: {
-                  elevation: 2,
-                },
-                web: {
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                }
-              })}
+              activeOpacity={0.8}
+              className="bg-surface mb-3 p-5 rounded-card flex-row items-center justify-between"
+              style={{
+                borderWidth: 3,
+                borderColor: Colors.border,
+              }}
             >
               <View className="flex-1">
                 <Text
-                  className="text-primary text-lg font-bold mb-1"
+                  className="text-text-main text-lg font-bold mb-1"
                   style={{ fontFamily: 'Rubik_700Bold' }}
                 >
                   {hasArticle && articleColors && (
@@ -141,8 +146,14 @@ export default function HistoryScreen() {
                 </Text>
               </View>
 
-              <View className="w-8 h-8 bg-gray-50 rounded-full items-center justify-center">
-                <Text className="text-gray-300 text-sm">→</Text>
+              <View
+                className="w-10 h-10 bg-primary rounded-lg items-center justify-center"
+                style={{
+                  borderWidth: 2,
+                  borderColor: Colors.border,
+                }}
+              >
+                <Text className="text-border text-lg font-bold">→</Text>
               </View>
             </TouchableOpacity>
           );

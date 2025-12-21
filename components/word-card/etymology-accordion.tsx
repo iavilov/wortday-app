@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/design-tokens';
 import { ChevronDown } from 'lucide-react-native';
 import { ReactNode } from 'react';
 import { LayoutChangeEvent, Text, TouchableOpacity, View } from 'react-native';
@@ -60,14 +61,14 @@ export function EtymologyAccordion({
         className="flex-row items-center justify-between py-3"
       >
         <Text
-          className="text-accent-purple font-bold text-xs uppercase flex-1"
+          className="text-accent-yellow font-bold text-xs uppercase flex-1"
           style={{ fontFamily: 'Rubik_700Bold' }}
         >
           {title}
         </Text>
 
         <Animated.View style={iconAnimatedStyle}>
-          <ChevronDown size={18} color="#8B5CF6" strokeWidth={3} />
+          <ChevronDown size={18} color={Colors.accentYellow} strokeWidth={3} />
         </Animated.View>
       </TouchableOpacity>
 

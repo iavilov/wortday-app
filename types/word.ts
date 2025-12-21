@@ -8,7 +8,7 @@
  * Der = Blue, Die = Red, Das = Green
  * Imported from centralized design tokens
  */
-import { articleColors } from '@/constants/colors';
+import { articleColors } from '@/constants/design-tokens';
 
 export type Article = 'der' | 'die' | 'das' | 'none' | null;
 

@@ -1,23 +1,31 @@
 /** @type {import('tailwindcss').Config} */
-const { colors, borderRadius, shadows, fontFamily } = require('./constants/design-tokens');
+const { colors, borderRadius, borderWidth, shadows, fontFamily } = require('./constants/design-tokens');
 
 module.exports = {
-  // Указываем пути ко всем файлам, где используем классы стилей
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
         ...colors,
-        // Alias for backward compatibility
-        'accent-yellow': colors.accent.orange,
-        'accent-purple': colors.accent.purple,
-        'accent-green': colors.accent.green,
+        // User-specified color aliases
+        'bg-main': colors.background,
+        'ink': colors.text.main,
+        'card-bg': colors.surface,
+        'accent-yellow': colors.accent.yellow,
+        'accent-pink': colors.accent.pink,
+        'accent-blue': colors.accent.blue,
+        'article-der': '#93C5FD',
+        'article-die': '#F9A8D4',
+        'article-das': '#86EFAC',
         'text-main': colors.text.main,
         'text-muted': colors.text.muted,
       },
       borderRadius: {
         ...borderRadius,
+      },
+      borderWidth: {
+        ...borderWidth,
       },
       boxShadow: {
         ...shadows,

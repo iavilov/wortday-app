@@ -12,7 +12,7 @@ import { useWordStore } from '@/store/word-store';
 import { ARTICLE_COLORS } from '@/types/word';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Heart } from 'lucide-react-native';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function WordDetailPage() {
@@ -62,17 +62,29 @@ export default function WordDetailPage() {
 
         <Animated.View
           entering={FadeInDown.duration(600)}
-          className="bg-surface w-full max-w-sm rounded-card shadow-soft overflow-hidden">
+          className="bg-surface w-full max-w-sm rounded-card shadow-soft-colored overflow-hidden"
+          style={Platform.select({
+            ios: {
+              shadowColor: '#6C5CE7',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.15,
+              shadowRadius: 20,
+            },
+            android: {
+              elevation: 10,
+            },
+          })}
+        >
 
           <Image
             source={{ uri: word.media.image_path }}
-            className="w-full h-48"
+            className="w-full h-64"
             style={{ backgroundColor: Colors.gray100 }}
             resizeMode="cover"
           />
 
           <View className="px-6 pt-6 pb-2">
-            <Text className="text-accent-purple font-bold tracking-widest uppercase text-xs"
+            <Text className="text-secondary-foreground font-bold tracking-widest uppercase text-xs"
               style={{ fontFamily: 'Rubik_700Bold' }}>
               {word.level} • {word.part_of_speech}
             </Text>
@@ -82,11 +94,9 @@ export default function WordDetailPage() {
             <View className="flex-row items-center mb-2">
               {hasArticle && articleColors && (
                 <View
-                  className="px-3 py-1 rounded-full mr-3"
+                  className="px-4 py-1.5 rounded-full mr-3"
                   style={{
                     backgroundColor: articleColors.bg,
-                    borderWidth: 2,
-                    borderColor: articleColors.border
                   }}>
                   <Text
                     className="font-bold text-sm"
@@ -98,31 +108,31 @@ export default function WordDetailPage() {
                   </Text>
                 </View>
               )}
-              <Text className="text-primary text-4xl font-extrabold flex-1"
-                style={{ fontFamily: 'Rubik_800ExtraBold' }}>
+              <Text className="text-text-main text-4xl flex-1"
+                style={{ fontFamily: 'Rubik_700Bold' }}>
                 {displayWord}
               </Text>
             </View>
 
-            <Text className="text-text-muted text-2xl mt-2"
+            <Text className="text-text-muted text-2xl mt-1"
               style={{ fontFamily: 'Rubik_500Medium' }}>
               {content.translation.main}
             </Text>
           </View>
 
-          <View className="mx-6 mb-6 h-px bg-gray-200" />
+          <View className="mx-6 mb-6 h-px bg-gray-100" />
 
           <View className="px-6 pb-6">
             <Text className="text-text-main font-bold text-xs uppercase mb-3 tracking-wider"
-              style={{ fontFamily: 'Rubik_700Bold' }}>
+              style={{ fontFamily: 'Rubik_700Bold', opacity: 0.5 }}>
               Пример использования
             </Text>
-            <View className="bg-gray-50 p-4 rounded-xl">
-              <Text className="text-text-main text-base mb-2"
-                style={{ fontFamily: 'Rubik_600SemiBold' }}>
+            <View className="bg-gray-50 p-5 rounded-2xl">
+              <Text className="text-text-main text-lg mb-2"
+                style={{ fontFamily: 'Rubik_500Medium', lineHeight: 28 }}>
                 {content.exampleSentence.de}
               </Text>
-              <Text className="text-text-muted text-sm"
+              <Text className="text-text-muted text-base"
                 style={{ fontFamily: 'Rubik_400Regular' }}>
                 {content.exampleSentence.translation}
               </Text>
@@ -131,40 +141,38 @@ export default function WordDetailPage() {
 
           <View className="px-6 pb-6">
             <EtymologyAccordion title="📚 Этимология" defaultOpen={false}>
-              <Text className="text-text-muted text-sm leading-5"
+              <Text className="text-text-muted text-base leading-6"
                 style={{ fontFamily: 'Rubik_400Regular' }}>
                 {content.etymology.text}
               </Text>
               {content.etymology.rootWord && (
-                <Text className="text-text-muted text-xs mt-2 italic"
-                  style={{ fontFamily: 'Rubik_400Regular' }}>
+                <Text className="text-text-muted text-sm mt-3 italic"
+                  style={{ fontFamily: 'Rubik_500Medium' }}>
                   Корень: {content.etymology.rootWord}
                 </Text>
               )}
             </EtymologyAccordion>
           </View>
 
-          <View className="mx-6 mb-4 h-px bg-gray-200" />
-
-          <View className="px-6 pb-6 flex-row items-center justify-center">
+          <View className="px-6 pb-8 flex-row items-center justify-center">
             <TouchableOpacity
               onPress={() => toggleFavorite(word.id)}
               activeOpacity={0.7}
-              className="flex-row items-center px-6 py-3 rounded-full"
+              className="flex-row items-center px-8 py-4 rounded-button shadow-sm"
               style={{
-                backgroundColor: isFavorite(word.id) ? Colors.articleColors.die.bg : Colors.gray100,
+                backgroundColor: isFavorite(word.id) ? Colors.articleColors.die.bg : Colors.primary,
               }}>
               <Heart
-                size={20}
-                color={isFavorite(word.id) ? Colors.articleColors.die.accent : Colors.textMuted}
+                size={24}
+                color={isFavorite(word.id) ? Colors.articleColors.die.accent : '#FFF'}
                 fill={isFavorite(word.id) ? Colors.articleColors.die.accent : 'transparent'}
                 strokeWidth={2.5}
               />
               <Text
-                className="ml-2 font-bold text-sm"
+                className="ml-3 font-bold text-base"
                 style={{
-                  fontFamily: 'Rubik_600SemiBold',
-                  color: isFavorite(word.id) ? Colors.articleColors.die.accent : Colors.textMuted
+                  fontFamily: 'Rubik_700Bold',
+                  color: isFavorite(word.id) ? Colors.articleColors.die.accent : '#FFF'
                 }}>
                 {isFavorite(word.id) ? 'В избранном' : 'В избранное'}
               </Text>

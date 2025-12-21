@@ -9,37 +9,22 @@ export const TAB_BAR_SCREEN_OPTIONS = {
 
   tabBarLabelStyle: {
     fontSize: 10,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     marginBottom: 4,
     fontFamily: Platform.select({ ios: 'System', default: 'sans-serif' }),
   },
 
   tabBarStyle: {
     backgroundColor: Colors.surface,
-    borderTopWidth: 0,
+    borderTopWidth: 3,
+    borderTopColor: Colors.border,
     position: 'absolute' as const,
     bottom: 0,
-    height: 'auto',
+    height: 60,
     left: 0,
     right: 0,
-    width: '100%',
+    width: '100%' as const,
     maxWidth: 480,
     alignSelf: 'center' as const,
-    marginHorizontal: 'auto' as const,
-
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-      },
-      android: {
-        elevation: 8,
-      },
-      web: {
-        boxShadow: '0px -5px 20px rgba(0,0,0,0.05)',
-      } as any,
-    }),
   },
 };
