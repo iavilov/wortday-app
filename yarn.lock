@@ -867,10 +867,10 @@
     "@eslint/core" "^0.17.0"
     levn "^0.4.1"
 
-"@expo-google-fonts/rubik@^0.4.2":
+"@expo-google-fonts/manrope@^0.4.2":
   version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@expo-google-fonts/rubik/-/rubik-0.4.2.tgz#e2ac439e195b2903925f040c66056c91d85b1641"
-  integrity sha512-WJtpQEw4lDKjCVnVIBF9qiZn+BTOB3juWvSchpZ+mnHFFV0gh4PyOvLLJCOMmKVgSj/pzFDtNe4apqexrD0+pA==
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/manrope/-/manrope-0.4.2.tgz#d681e9701eb8df840bcfe893f41008d4d8b00778"
+  integrity sha512-BZsKe8d9BJrVnIQIZcTS7/Kac0TbXnqs/+8EBSiQxrmK6GoCO6eTkmr50D1weIk/EoF20pTmAkpWICnovATr/g==
 
 "@expo/cli@54.0.20":
   version "54.0.20"

@@ -1,45 +1,38 @@
-import { Platform } from 'react-native';
-import { Colors as DesignTokens } from './design-tokens';
+import { Colors as DesignTokens, FontNames } from './design-tokens';
 
 const tintColorLight = DesignTokens.accentPink;
-const tintColorDark = '#fff';
 
-export const Colors = {
-  light: {
-    text: DesignTokens.textMain,
-    background: DesignTokens.background,
-    tint: tintColorLight,
-    icon: DesignTokens.textMuted,
-    tabIconDefault: DesignTokens.textMuted,
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+const sharedColors = {
+  text: DesignTokens.textMain,
+  background: DesignTokens.background,
+  tint: tintColorLight,
+  icon: DesignTokens.textMuted,
+  tabIconDefault: DesignTokens.textMuted,
+  tabIconSelected: tintColorLight,
 };
 
-export const Fonts = Platform.select({
+export const Colors = {
+  light: sharedColors,
+  dark: sharedColors,
+};
+
+export const Fonts = {
   ios: {
-    sans: 'system-ui',
-    serif: 'ui-serif',
-    rounded: 'ui-rounded',
-    mono: 'ui-monospace',
+    sans: FontNames.regular,
+    serif: FontNames.medium,
+    rounded: FontNames.regular,
+    mono: FontNames.regular,
   },
   default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+    sans: FontNames.regular,
+    serif: FontNames.medium,
+    rounded: FontNames.regular,
+    mono: FontNames.regular,
   },
   web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    sans: 'Manrope, sans-serif',
+    serif: 'Manrope, serif',
+    rounded: 'Manrope, sans-serif',
+    mono: 'Manrope, monospace',
   },
-});
+};

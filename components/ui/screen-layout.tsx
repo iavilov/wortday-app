@@ -26,7 +26,7 @@ export function ScreenLayout({
     >
       <DottedBackground>
         <View
-          className={`flex-1 w-full self-center px-4 ${className || ''}`}
+          className={`flex-1 w-full self-center px-6 ${className || ''}`}
           style={[
             {
               maxWidth: 480,

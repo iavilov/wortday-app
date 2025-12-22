@@ -8,7 +8,7 @@
  * Der = Blue, Die = Red, Das = Green
  * Imported from centralized design tokens
  */
-import { articleColors } from '@/constants/design-tokens';
+import { articleColors, partOfSpeechColors } from '@/constants/design-tokens';
 
 export type Article = 'der' | 'die' | 'das' | 'none' | null;
 
@@ -60,6 +60,7 @@ export interface WordMedia {
 export interface Word {
   id: string;
   publish_date: string; // ISO date string
+  transcription_de: string;
   word_de: string;
   article: Article;
   part_of_speech: PartOfSpeech;
@@ -70,3 +71,4 @@ export interface Word {
 }
 
 export const ARTICLE_COLORS = articleColors;
+export const PART_OF_SPEECH_COLORS = partOfSpeechColors;

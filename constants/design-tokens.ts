@@ -28,8 +28,27 @@ export const articleColors = {
 } as const;
 
 export const transcriptionColor = {
-  bg: palette.gray[100],
+  bg: palette.gray[300],
   text: palette.ink,
+} as const;
+
+
+export const partOfSpeechColors = {
+  noun: {
+    bg: palette.blue,
+    text: palette.ink,
+    border: palette.ink,
+  },
+  verb: {
+    bg: palette.yellow,
+    text: palette.ink,
+    border: palette.ink,
+  },
+  adjective: {
+    bg: palette.pink,
+    text: palette.ink,
+    border: palette.ink,
+  },
 } as const;
 
 
@@ -64,6 +83,7 @@ export const Colors = {
   gray900: palette.gray[900],
 
   articleColors,
+  partOfSpeechColors,
   transcriptionColor,
 } as const;
 
@@ -128,6 +148,18 @@ export const backgroundPattern = {
   backgroundSize: '24px 24px',
 };
 
+export const FontNames = {
+  regular: 'Manrope_400Regular',
+  medium: 'Manrope_500Medium',
+  semibold: 'Manrope_600SemiBold',
+  bold: 'Manrope_700Bold',
+  extrabold: 'Manrope_800ExtraBold',
+} as const;
+
 export const fontFamily = {
-  rubik: ['Rubik', 'sans-serif'],
+  'w-regular': [FontNames.regular, 'sans-serif'],
+  'w-medium': [FontNames.medium, 'sans-serif'],
+  'w-semibold': [FontNames.semibold, 'sans-serif'],
+  'w-bold': [FontNames.bold, 'sans-serif'],
+  'w-extrabold': [FontNames.extrabold, 'sans-serif'],
 };

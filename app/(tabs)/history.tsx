@@ -30,14 +30,12 @@ export default function HistoryScreen() {
       {/* Header */}
       <View className="pt-8 pb-4 bg-background">
         <Text
-          className="text-primary text-3xl font-extrabold mb-1"
-          style={{ fontFamily: 'Rubik_800ExtraBold' }}
+          className="text-primary text-3xl font-bold mb-1"
         >
           История
         </Text>
         <Text
-          className="text-text-muted text-sm"
-          style={{ fontFamily: 'Rubik_400Regular' }}
+          className="text-text-muted text-sm font-regular"
         >
           Все изученные слова
         </Text>
@@ -64,7 +62,6 @@ export default function HistoryScreen() {
           <Text
             className={`font-bold text-sm uppercase ${activeTab === 'all' ? 'text-border' : 'text-text-muted'
               }`}
-            style={{ fontFamily: 'Rubik_700Bold' }}
           >
             Все слова
           </Text>
@@ -82,7 +79,6 @@ export default function HistoryScreen() {
           <Text
             className={`font-bold text-sm uppercase ${activeTab === 'favorites' ? 'text-border' : 'text-text-muted'
               }`}
-            style={{ fontFamily: 'Rubik_700Bold' }}
           >
             Избранное
           </Text>
@@ -98,8 +94,7 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           <View className="flex-1 justify-center items-center py-12">
             <Text
-              className="text-text-muted text-center text-base"
-              style={{ fontFamily: 'Rubik_500Medium' }}
+              className="text-text-muted text-center text-base font-medium"
             >
               {activeTab === 'favorites'
                 ? 'Нет избранных слов'
@@ -129,7 +124,6 @@ export default function HistoryScreen() {
               <View className="flex-1">
                 <Text
                   className="text-text-main text-lg font-bold mb-1"
-                  style={{ fontFamily: 'Rubik_700Bold' }}
                 >
                   {hasArticle && articleColors && (
                     <Text style={{ color: articleColors.text }}>
@@ -139,8 +133,7 @@ export default function HistoryScreen() {
                   {displayWord}
                 </Text>
                 <Text
-                  className="text-text-muted text-sm"
-                  style={{ fontFamily: 'Rubik_400Regular' }}
+                  className="text-text-muted text-sm font"
                 >
                   {translation.main}
                 </Text>

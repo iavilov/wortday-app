@@ -26,13 +26,13 @@ export default function WordDetailPage() {
   if (!word) {
     return (
       <View className="flex-1 justify-center items-center bg-background">
-        <Text className="text-text-main text-lg" style={{ fontFamily: 'Rubik_600SemiBold' }}>
+        <Text className="text-text-main text-lg font-semibold">
           Слово не найдено
         </Text>
         <TouchableOpacity
           onPress={() => router.back()}
           className="mt-4 px-6 py-3 bg-primary rounded-button">
-          <Text className="text-white font-bold" style={{ fontFamily: 'Rubik_600SemiBold' }}>
+          <Text className="text-white font-semibold">
             Назад
           </Text>
         </TouchableOpacity>
@@ -55,7 +55,7 @@ export default function WordDetailPage() {
         <TouchableOpacity
           onPress={() => router.back()}
           className="self-start mb-4 px-4 py-2 bg-surface rounded-full shadow-sm">
-          <Text className="text-primary font-bold" style={{ fontFamily: 'Rubik_600SemiBold' }}>
+          <Text className="text-primary font-semibold">
             ← Назад
           </Text>
         </TouchableOpacity>
@@ -84,8 +84,7 @@ export default function WordDetailPage() {
           />
 
           <View className="px-6 pt-6 pb-2">
-            <Text className="text-secondary-foreground font-bold tracking-widest uppercase text-xs"
-              style={{ fontFamily: 'Rubik_700Bold' }}>
+            <Text className="text-secondary-foreground font-bold tracking-widest uppercase text-xs">
               {word.level} • {word.part_of_speech}
             </Text>
           </View>
@@ -101,21 +100,18 @@ export default function WordDetailPage() {
                   <Text
                     className="font-bold text-sm"
                     style={{
-                      fontFamily: 'Rubik_700Bold',
                       color: articleColors.text
                     }}>
                     {word.article}
                   </Text>
                 </View>
               )}
-              <Text className="text-text-main text-4xl flex-1"
-                style={{ fontFamily: 'Rubik_700Bold' }}>
+              <Text className="text-text-main text-4xl flex-1 font-bold">
                 {displayWord}
               </Text>
             </View>
 
-            <Text className="text-text-muted text-2xl mt-1"
-              style={{ fontFamily: 'Rubik_500Medium' }}>
+            <Text className="text-text-muted text-2xl mt-1 font-medium">
               {content.translation.main}
             </Text>
           </View>
@@ -124,16 +120,14 @@ export default function WordDetailPage() {
 
           <View className="px-6 pb-6">
             <Text className="text-text-main font-bold text-xs uppercase mb-3 tracking-wider"
-              style={{ fontFamily: 'Rubik_700Bold', opacity: 0.5 }}>
+              style={{ opacity: 0.5 }}>
               Пример использования
             </Text>
             <View className="bg-gray-50 p-5 rounded-2xl">
-              <Text className="text-text-main text-lg mb-2"
-                style={{ fontFamily: 'Rubik_500Medium', lineHeight: 28 }}>
+              <Text className="text-text-main text-lg mb-2 font-medium">
                 {content.exampleSentence.de}
               </Text>
-              <Text className="text-text-muted text-base"
-                style={{ fontFamily: 'Rubik_400Regular' }}>
+              <Text className="text-text-muted text-base font">
                 {content.exampleSentence.translation}
               </Text>
             </View>
@@ -141,13 +135,11 @@ export default function WordDetailPage() {
 
           <View className="px-6 pb-6">
             <EtymologyAccordion title="📚 Этимология" defaultOpen={false}>
-              <Text className="text-text-muted text-base leading-6"
-                style={{ fontFamily: 'Rubik_400Regular' }}>
+              <Text className="text-text-muted text-base leading-6 font">
                 {content.etymology.text}
               </Text>
               {content.etymology.rootWord && (
-                <Text className="text-text-muted text-sm mt-3 italic"
-                  style={{ fontFamily: 'Rubik_500Medium' }}>
+                <Text className="text-text-muted text-sm mt-3 italic font-medium">
                   Корень: {content.etymology.rootWord}
                 </Text>
               )}
@@ -171,7 +163,6 @@ export default function WordDetailPage() {
               <Text
                 className="ml-3 font-bold text-base"
                 style={{
-                  fontFamily: 'Rubik_700Bold',
                   color: isFavorite(word.id) ? Colors.articleColors.die.accent : '#FFF'
                 }}>
                 {isFavorite(word.id) ? 'В избранном' : 'В избранное'}

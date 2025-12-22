@@ -62,7 +62,6 @@ export function EtymologyAccordion({
       >
         <Text
           className="text-accent-yellow font-bold text-xs uppercase flex-1"
-          style={{ fontFamily: 'Rubik_700Bold' }}
         >
           {title}
         </Text>

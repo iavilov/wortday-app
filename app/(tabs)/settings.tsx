@@ -20,12 +20,10 @@ export default function SettingsScreen() {
     <View className="flex-1 bg-background">
       {/* Header */}
       <View className="pt-12 pb-4 px-6 bg-surface">
-        <Text className="text-primary text-3xl font-extrabold mb-2"
-          style={{ fontFamily: 'Rubik_800ExtraBold' }}>
+        <Text className="text-primary text-3xl font-bold mb-2">
           Настройки
         </Text>
-        <Text className="text-text-muted text-sm"
-          style={{ fontFamily: 'Rubik_400Regular' }}>
+        <Text className="text-text-muted text-sm font-regular">
           Параметры приложения
         </Text>
       </View>
@@ -41,12 +39,10 @@ export default function SettingsScreen() {
             borderColor: Colors.border,
           }}
         >
-          <Text className="text-text-muted text-xs uppercase mb-2 tracking-wider"
-            style={{ fontFamily: 'Rubik_700Bold' }}>
+          <Text className="text-text-muted text-xs uppercase mb-2 tracking-wider font-bold">
             Email
           </Text>
-          <Text className="text-text-main text-base"
-            style={{ fontFamily: 'Rubik_500Medium' }}>
+          <Text className="text-text-main text-base font-medium">
             {userEmail}
           </Text>
         </View>
@@ -59,8 +55,7 @@ export default function SettingsScreen() {
             borderColor: Colors.border,
           }}
         >
-          <Text className="text-text-muted text-xs uppercase mb-3 tracking-wider"
-            style={{ fontFamily: 'Rubik_700Bold' }}>
+          <Text className="text-text-muted text-xs uppercase mb-3 tracking-wider font-bold">
             Язык перевода
           </Text>
 
@@ -72,8 +67,7 @@ export default function SettingsScreen() {
               borderWidth: 2,
               borderColor: Colors.border,
             }}>
-            <Text className="text-border text-base flex-1 font-bold"
-              style={{ fontFamily: 'Rubik_700Bold' }}>
+            <Text className="text-border text-base flex-1 font-bold">
               {selectedLanguage?.nativeName}
             </Text>
             <ChevronDown size={20} color={Colors.border} strokeWidth={3} />
@@ -100,8 +94,7 @@ export default function SettingsScreen() {
               borderColor: Colors.border,
             }}
           >
-            <Text className="text-primary text-xl font-bold mb-4"
-              style={{ fontFamily: 'Rubik_700Bold' }}>
+            <Text className="text-primary text-xl font-bold mb-4">
               Выберите язык
             </Text>
 
@@ -115,12 +108,10 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
                 className="py-4 border-b border-gray-100 flex-row items-center justify-between">
                 <View>
-                  <Text className="text-text-main text-base font-bold mb-1"
-                    style={{ fontFamily: 'Rubik_600SemiBold' }}>
+                  <Text className="text-text-main text-base font-semibold mb-1">
                     {language.nativeName}
                   </Text>
-                  <Text className="text-text-muted text-xs"
-                    style={{ fontFamily: 'Rubik_400Regular' }}>
+                  <Text className="text-text-muted text-xs font">
                     {language.name}
                   </Text>
                 </View>
@@ -146,8 +137,7 @@ export default function SettingsScreen() {
                 borderWidth: 2,
                 borderColor: Colors.border,
               }}>
-              <Text className="text-border font-bold uppercase"
-                style={{ fontFamily: 'Rubik_700Bold' }}>
+              <Text className="text-border font-bold uppercase">
                 Закрыть
               </Text>
             </TouchableOpacity>

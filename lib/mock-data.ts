@@ -1,8 +1,3 @@
-/**
- * Mock data for testing UI (Iterations 1-3)
- * Full Word objects with all fields populated
- */
-
 import { Word } from '@/types/word';
 
 export const MOCK_WORDS: Word[] = [
@@ -11,6 +6,7 @@ export const MOCK_WORDS: Word[] = [
     publish_date: new Date().toISOString().split('T')[0], // Today
     word_de: 'Haus',
     article: 'das',
+    transcription_de: '/haʊs/',
     part_of_speech: 'noun',
     level: 'A1',
     translations: {
@@ -53,6 +49,7 @@ export const MOCK_WORDS: Word[] = [
     publish_date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
     word_de: 'Tisch',
     article: 'der',
+    transcription_de: '/tɪʃ/',
     part_of_speech: 'noun',
     level: 'A1',
     translations: {
@@ -95,6 +92,7 @@ export const MOCK_WORDS: Word[] = [
     publish_date: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
     word_de: 'Sonne',
     article: 'die',
+    transcription_de: '/ˈsonə/',
     part_of_speech: 'noun',
     level: 'A1',
     translations: {
@@ -136,6 +134,7 @@ export const MOCK_WORDS: Word[] = [
     id: '4',
     publish_date: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 days ago
     word_de: 'laufen',
+    transcription_de: '/ˈlaʊ̯fn̩/',
     article: null,
     part_of_speech: 'verb',
     level: 'A1',
@@ -168,6 +167,7 @@ export const MOCK_WORDS: Word[] = [
     id: '5',
     publish_date: new Date(Date.now() - 345600000).toISOString().split('T')[0], // 4 days ago
     word_de: 'schnell',
+    transcription_de: '/ʃnɛl/',
     article: null,
     part_of_speech: 'adjective',
     level: 'A1',
@@ -202,8 +202,8 @@ export const MOCK_WORDS: Word[] = [
  * Get today's word
  */
 export function getTodayWord(): Word | null {
-  const today = new Date().toISOString().split('T')[0];
-  return MOCK_WORDS.find(word => word.publish_date === today) || MOCK_WORDS[0];
+  const today = new Date().toISOString().split('T')[1];
+  return MOCK_WORDS.find(word => word.publish_date === today) || MOCK_WORDS[1];
 }
 
 /**
