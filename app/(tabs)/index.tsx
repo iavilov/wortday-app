@@ -39,8 +39,6 @@ export default function Index() {
     );
   }
 
-  console.log(todayWord);
-
   const hasArticle = !!todayWord.article;
   const articleColors = hasArticle ? ARTICLE_COLORS[todayWord.article!] : null;
   const content = getWordContent(todayWord, translationLanguage);
@@ -67,15 +65,14 @@ export default function Index() {
   return (
     <ScreenLayout>
       <ScrollView
-        className="flex-1"
-        style={{ width: '100%' }}
+        className="flex-1 w-full"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 40,
+          paddingBottom: 80,
           alignItems: 'center'
         }}
       >
-        <View className="flex-row items-center justify-between pt-8 pb-4 w-full max-w-sm">
+        <View className="flex-row items-center justify-between pt-8 pb-10 w-full max-w-sm">
           <View className="flex-col">
             <View
               style={{
@@ -104,7 +101,7 @@ export default function Index() {
               borderWidth: 3,
               borderColor: Colors.border,
               borderRadius: 8,
-              ...createBrutalShadow(4, Colors.border),
+              ...createBrutalShadow(3, Colors.border),
             }}
           >
             <Share2 size={18} color={Colors.border} strokeWidth={3} className="mr-2" />
@@ -116,34 +113,34 @@ export default function Index() {
 
         <Animated.View
           entering={FadeInDown.duration(800).delay(200)}
-          className="w-full max-w-sm mb-6 px-5"
         >
+          {/* Word of the Day Badge */}
           <View
-            className='bg-surface rounded-card p-5 relative'
+            className="absolute -top-4 right-3 px-3 py-1 z-50"
+            style={{
+              backgroundColor: Colors.accentPink,
+              borderWidth: 2,
+              borderColor: Colors.border,
+              ...createBrutalShadow(2, Colors.border),
+              transform: [{ rotate: '3deg' }],
+            }}
+          >
+            <Text className="text-md font-w-extrabold uppercase text-border">
+              Word of the day
+            </Text>
+          </View>
+
+          <View
+            className='bg-surface rounded-card p-5 relative mr-2'
             style={{
               borderWidth: 3,
               borderColor: Colors.border,
-              ...createBrutalShadow(6, Colors.border),
+              ...createBrutalShadow(4, Colors.border),
             }}
           >
-            {/* Word of the Day Badge */}
-            <View
-              className="absolute -top-4 -right-2 px-3 py-1 z-20"
-              style={{
-                backgroundColor: Colors.accentPink,
-                borderWidth: 2,
-                borderColor: Colors.border,
-                ...createBrutalShadow(2, Colors.border),
-                transform: [{ rotate: '3deg' }],
-              }}
-            >
-              <Text className="text-[10px] font-w-extrabold uppercase text-border">
-                Word of the day
-              </Text>
-            </View>
 
             {/* Favorite Button Row */}
-            <View className="flex-row justify-start mb-2">
+            <View className="flex-row justify-start mb-8">
               <TouchableOpacity
                 onPress={() => toggleFavorite(todayWord.id)}
                 activeOpacity={0.7}
@@ -153,7 +150,7 @@ export default function Index() {
                   borderWidth: 2,
                   borderColor: Colors.border,
                   borderRadius: 8,
-                  ...createBrutalShadow(2, Colors.border),
+                  ...createBrutalShadow(3, Colors.border),
                 }}
               >
                 <Heart
@@ -181,7 +178,7 @@ export default function Index() {
                   borderWidth: 2,
                   borderColor: Colors.border,
                   borderRadius: 8,
-                  ...createBrutalShadow(4, Colors.border),
+                  ...createBrutalShadow(3, Colors.border),
                 }}
               >
                 <Volume2 size={24} color={Colors.border} strokeWidth={2.5} />
@@ -190,9 +187,6 @@ export default function Index() {
 
             {/* Transcription & Part of Speech Row */}
             <View className="flex-row items-center flex-wrap gap-2 mb-5">
-
-
-
               {hasArticle && articleColors && (
                 <View
                   className="px-4 py-1 mr-1"
@@ -203,7 +197,7 @@ export default function Index() {
                     ...createBrutalShadow(2, Colors.border),
                   }}>
                   <Text
-                    className="font-w-bold text-sm uppercase"
+                    className="font-w-extrabold text-sm uppercase"
                     style={{
                       color: articleColors.text
                     }}>
@@ -212,9 +206,6 @@ export default function Index() {
 
                 </View>
               )}
-
-
-
               <View
                 className="bg-gray-200 px-2 py-0.5"
                 style={{
@@ -222,24 +213,19 @@ export default function Index() {
                   borderColor: Colors.border,
                 }}
               >
-                <Text className="text-sm font-w-bold text-text-main">
-                  /ˈlaʊ̯fn̩/
+                <Text className="text-xs font-w-bold text-text-main">
+                  {todayWord.transcription_de}
                 </Text>
               </View>
-
-
-
               <View
                 className="px-3 py-1"
                 style={{
                   backgroundColor: PART_OF_SPEECH_COLORS[todayWord.part_of_speech]?.bg || Colors.surface,
-                  borderWidth: 2,
+                  borderWidth: 1,
                   borderColor: Colors.border,
-                  ...createBrutalShadow(2, Colors.border),
-                  transform: [{ rotate: '-2deg' }]
                 }}
               >
-                <Text className="text-[10px] font-w-extrabold text-border uppercase">
+                <Text className="text-xs font-w-bold text-border uppercase">
                   {todayWord.part_of_speech}
                 </Text>
               </View>
@@ -254,79 +240,68 @@ export default function Index() {
             </View>
 
             <View className="h-0.5 w-full bg-border mb-6" />
-
-
-
-
-            <View className="pb-10">
+            <View
+              className="p-5 my-6 relative bg-purple-50"
+              style={{
+                borderWidth: 3,
+                borderColor: Colors.border,
+                ...createBrutalShadow(4, Colors.border),
+              }}
+            >
+              {/* Badge Label */}
               <View
-                className="p-5 mt-4 relative"
+                className="bg-white absolute -top-4 left-4 px-3 py-1 flex-row items-center"
                 style={{
-                  backgroundColor: '#FAF5FF', // bg-purple-50
                   borderWidth: 3,
                   borderColor: Colors.border,
-                  ...createBrutalShadow(4, Colors.border),
                 }}
               >
-                {/* Badge Label */}
                 <View
-                  className="absolute -top-4 left-4 px-3 py-1 flex-row items-center"
+                  className="mr-2"
                   style={{
-                    backgroundColor: Colors.surface,
-                    borderWidth: 3,
+                    width: 8,
+                    height: 8,
+                    backgroundColor: Colors.accentYellow,
+                    borderWidth: 1.5,
                     borderColor: Colors.border,
                   }}
-                >
-                  <View
-                    className="mr-2"
-                    style={{
-                      width: 8,
-                      height: 8,
-                      backgroundColor: Colors.accentYellow,
-                      borderWidth: 1.5,
-                      borderColor: Colors.border,
-                    }}
-                  />
-                  <Text
-                    className="text-[10px] font-w-extrabold text-text-main uppercase tracking-widest"
-                  >
-                    Beispiel
-                  </Text>
-                </View>
-
-                {/* German Sentence */}
+                />
                 <Text
-                  className="text-lg text-text-main font-w-bold leading-7 mt-2"
+                  className="text-[10px] font-w-extrabold text-text-main uppercase tracking-widest"
                 >
-                  {content.exampleSentence.de}
+                  Beispiel
                 </Text>
+              </View>
 
-                {/* Translation */}
-                <View
-                  className="mt-4 pl-3"
-                  style={{
-                    borderLeftWidth: 3,
-                    borderLeftColor: Colors.border,
-                  }}
+              {/* German Sentence */}
+              <Text
+                className="text-lg text-text-main font-w-bold leading-7 mt-2"
+              >
+                {content.exampleSentence.de}
+              </Text>
+
+              {/* Translation */}
+              <View
+                className="mt-4 pl-3"
+                style={{
+                  borderLeftWidth: 3,
+                  borderLeftColor: Colors.border,
+                }}
+              >
+                <Text
+                  className="text-sm text-text-muted font-w-medium italic"
                 >
-                  <Text
-                    className="text-sm text-text-muted font-w-medium italic"
-                  >
-                    {content.exampleSentence.translation}
-                  </Text>
-                </View>
+                  {content.exampleSentence.translation}
+                </Text>
               </View>
             </View>
 
 
-
-
-
+            {/* Etymology */}
             <View className="pb-6">
               <View
-                className="p-5 mt-4 relative"
+                className="bg-green-50 p-5 mt-4 relative"
                 style={{
-                  backgroundColor: '#F0FDF4', // bg-green-50
                   borderWidth: 3,
                   borderColor: Colors.border,
                   ...createBrutalShadow(4, Colors.border),
@@ -334,19 +309,17 @@ export default function Index() {
               >
                 {/* Badge Label */}
                 <View
-                  className="absolute -top-4 left-4 px-3 py-1 flex-row items-center"
+                  className="bg-white absolute -top-4 left-4 px-3 py-1 flex-row items-center"
                   style={{
-                    backgroundColor: Colors.surface,
                     borderWidth: 3,
                     borderColor: Colors.border,
                   }}
                 >
                   <View
-                    className="mr-2"
+                    className="bg-primary mr-2"
                     style={{
                       width: 8,
                       height: 8,
-                      backgroundColor: Colors.primary,
                       borderWidth: 1.5,
                       borderColor: Colors.border,
                     }}
@@ -385,14 +358,8 @@ export default function Index() {
                 )}
               </View>
             </View>
-
-
-
-
           </View>
         </Animated.View >
-
-
       </ScrollView>
     </ScreenLayout>
   );

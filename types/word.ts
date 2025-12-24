@@ -1,20 +1,10 @@
-/**
- * TypeScript interfaces for Word data structure
- * Based on Supabase schema from CONTEXT.md
- */
-
-/**
- * Article color mapping for UI
- * Der = Blue, Die = Red, Das = Green
- * Imported from centralized design tokens
- */
 import { articleColors, partOfSpeechColors } from '@/constants/design-tokens';
 
 export type Article = 'der' | 'die' | 'das' | 'none' | null;
 
 export type PartOfSpeech = 'noun' | 'verb' | 'adjective';
 
-export type Level = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+export type Level = 'beginner' | 'intermediate' | 'advanced';
 
 export interface Translation {
   main: string;

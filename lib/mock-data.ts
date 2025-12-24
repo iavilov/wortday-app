@@ -8,7 +8,7 @@ export const MOCK_WORDS: Word[] = [
     article: 'das',
     transcription_de: '/haʊs/',
     part_of_speech: 'noun',
-    level: 'A1',
+    level: 'beginner',
     translations: {
       ru: {
         main: 'Дом',
@@ -51,7 +51,7 @@ export const MOCK_WORDS: Word[] = [
     article: 'der',
     transcription_de: '/tɪʃ/',
     part_of_speech: 'noun',
-    level: 'A1',
+    level: 'beginner',
     translations: {
       ru: {
         main: 'Стол',
@@ -94,7 +94,7 @@ export const MOCK_WORDS: Word[] = [
     article: 'die',
     transcription_de: '/ˈsonə/',
     part_of_speech: 'noun',
-    level: 'A1',
+    level: 'beginner',
     translations: {
       ru: {
         main: 'Солнце',
@@ -137,7 +137,7 @@ export const MOCK_WORDS: Word[] = [
     transcription_de: '/ˈlaʊ̯fn̩/',
     article: null,
     part_of_speech: 'verb',
-    level: 'A1',
+    level: 'beginner',
     translations: {
       ru: { main: 'Бежать', alternatives: ['Идти пешком'] },
       uk: { main: 'Бігти', alternatives: ['Йти пішки'] },
@@ -170,7 +170,7 @@ export const MOCK_WORDS: Word[] = [
     transcription_de: '/ʃnɛl/',
     article: null,
     part_of_speech: 'adjective',
-    level: 'A1',
+    level: 'beginner',
     translations: {
       ru: { main: 'Быстрый', alternatives: ['Скорый'] },
       uk: { main: 'Швидкий', alternatives: [] },
