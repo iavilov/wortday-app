@@ -10,7 +10,7 @@ import { createBrutalShadow } from '@/utils/platform-styles';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Heart, Share2, Volume2 } from 'lucide-react-native';
 import { ScrollView, Share, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 export default function WordDetailPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -121,9 +121,7 @@ export default function WordDetailPage() {
           </View>
         </View>
 
-        <Animated.View
-          entering={FadeInDown.duration(800)}
-        >
+        <Animated.View>
 
 
           <View

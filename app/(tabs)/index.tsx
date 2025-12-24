@@ -9,7 +9,7 @@ import { createBrutalShadow } from '@/utils/platform-styles';
 import { Heart, Share2, Volume2 } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { ActivityIndicator, ScrollView, Share, Text, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 export default function Index() {
   const { todayWord, isLoading, loadTodayWord, toggleFavorite, isFavorite } = useWordStore();
@@ -110,9 +110,7 @@ export default function Index() {
           </View>
         </View>
 
-        <Animated.View
-          entering={FadeInDown.duration(800).delay(200)}
-        >
+        <Animated.View>
           {/* Word of the Day Badge */}
           <View
             className="absolute -top-4 right-3 px-3 py-1 z-50"
