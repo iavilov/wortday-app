@@ -12,6 +12,8 @@ interface DottedBackgroundProps {
  * Works on both web and native platforms
  */
 export function DottedBackground({ children }: DottedBackgroundProps) {
+    const patternId = React.useId();
+
     return (
         <View style={styles.container}>
             {/* SVG Pattern Background */}
@@ -19,7 +21,7 @@ export function DottedBackground({ children }: DottedBackgroundProps) {
                 <Svg width="100%" height="100%" preserveAspectRatio="none">
                     <Defs>
                         <Pattern
-                            id="dotPattern"
+                            id={patternId}
                             x="0"
                             y="0"
                             width="24"
@@ -32,7 +34,7 @@ export function DottedBackground({ children }: DottedBackgroundProps) {
                     </Defs>
                     {/* Background rectangle with pattern */}
                     <Rect width="100%" height="100%" fill={Colors.background} />
-                    <Rect width="100%" height="100%" fill="url(#dotPattern)" />
+                    <Rect width="100%" height="100%" fill={`url(#${patternId})`} />
                 </Svg>
             </View>
 
