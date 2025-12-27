@@ -5,6 +5,7 @@
 
 import { TranslationLanguage } from '@/types/settings';
 import { Word } from '@/types/word';
+export { t } from '@/constants/translations';
 
 /**
  * Get word translation for specific language
@@ -32,8 +33,10 @@ export function getEtymologyText(word: Word, language: TranslationLanguage) {
  * Convenient function to get everything at once
  */
 export function getWordContent(word: Word, language: TranslationLanguage) {
+  const translation = getWordTranslation(word, language);
   return {
-    translation: getWordTranslation(word, language),
+    translation: translation.main,
+    alternatives: translation.alternatives,
     exampleSentence: {
       de: word.content.example_sentence.de,
       translation: getExampleTranslation(word, language),

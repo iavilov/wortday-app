@@ -15,6 +15,7 @@ export interface Translations {
   ru: Translation;
   uk: Translation;
   en: Translation;
+  de: Translation;
 }
 
 export interface ExampleSentence {
@@ -28,6 +29,7 @@ export interface Etymology {
   text_ru: string;
   text_uk: string;
   text_en: string;
+  text_de: string;
   root_word?: string;
 }
 

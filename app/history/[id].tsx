@@ -1,7 +1,7 @@
 import { BrutalButton } from '@/components/ui/brutal-button';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors } from '@/constants/design-tokens';
-import { getWordContent } from '@/lib/i18n-helpers';
+import { getWordContent, t } from '@/lib/i18n-helpers';
 import { getWordById } from '@/lib/mock-data';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
@@ -31,9 +31,9 @@ export default function WordDetailPage() {
   if (!word) {
     return (
       <ScreenLayout>
-        <View className="flex-1 justify-center items-center bg-background p-6">
+        <div className="flex-1 justify-center items-center bg-background p-6">
           <Text className="text-text-main font-w-semibold text-lg mb-6">
-            Слово не найдено
+            {t('common.notFound', translationLanguage)}
           </Text>
           <TouchableOpacity
             onPress={handleBack}
@@ -48,10 +48,10 @@ export default function WordDetailPage() {
           >
             <ArrowLeft size={20} color={Colors.border} strokeWidth={3} className="mr-2" />
             <Text className="text-border font-w-extrabold uppercase text-sm">
-              Назад
+              {t('history.back', translationLanguage)}
             </Text>
           </TouchableOpacity>
-        </View>
+        </div>
       </ScreenLayout>
     );
   }
@@ -66,13 +66,22 @@ export default function WordDetailPage() {
 
   const publishDate = word.publish_date ? new Date(word.publish_date) : new Date();
   const day = publishDate.getDate();
-  const month = publishDate.toLocaleString('de-DE', { month: 'short' }).toUpperCase().replace('.', '');
+  const locale = translationLanguage === 'en' ? 'en-US' :
+    translationLanguage === 'uk' ? 'uk-UA' :
+      translationLanguage === 'de' ? 'de-DE' : 'ru-RU';
+
+  const month = publishDate.toLocaleString(locale, { month: 'short' }).toUpperCase().replace('.', '');
   const dateString = `${day}. ${month}`;
 
   const onShare = async () => {
     try {
+      const shareTemplate = t('home.shareMessage', translationLanguage);
+      const message = shareTemplate
+        .replace('{word}', displayWord)
+        .replace('{translation}', content.translation);
+
       await Share.share({
-        message: `Wort: ${displayWord} - ${content.translation.main}. Lerne Deutsch mit Vocade!`,
+        message: `${message} 🚀 Vocade`,
       });
     } catch (error) {
       console.error(error);
@@ -111,7 +120,7 @@ export default function WordDetailPage() {
               className="px-2 py-0.5 mb-2 self-end"
             >
               <Text className="text-border font-w-bold uppercase tracking-widest text-[10px]">
-                Datum
+                {t('history.datum', translationLanguage)}
               </Text>
             </View>
             <Text className="text-border text-2xl font-w-extrabold tracking-tight uppercase">
@@ -155,7 +164,7 @@ export default function WordDetailPage() {
               >
                 <Share2 size={18} color={Colors.border} strokeWidth={3} style={{ marginRight: 8 }} />
                 <Text className="text-border font-w-extrabold uppercase text-xs">
-                  Share
+                  {t('home.share', translationLanguage)}
                 </Text>
               </BrutalButton>
             </View>
@@ -228,7 +237,7 @@ export default function WordDetailPage() {
             {/* Translation */}
             <View className="mb-6 pl-4 border-l-4 border-accent-pink">
               <Text className="text-xl text-text-muted font-w-bold italic">
-                {content.translation.main}
+                {content.translation}
               </Text>
             </View>
 
@@ -262,7 +271,7 @@ export default function WordDetailPage() {
                 <Text
                   className="text-[10px] font-w-extrabold text-text-main uppercase tracking-widest"
                 >
-                  Beispiel
+                  {t('home.beispiel', translationLanguage)}
                 </Text>
               </View>
 
@@ -311,18 +320,18 @@ export default function WordDetailPage() {
                   <Text
                     className="text-[10px] font-w-extrabold text-text-main uppercase tracking-widest"
                   >
-                    Etymologie
+                    {t('home.etymologie', translationLanguage)}
                   </Text>
                 </View>
 
                 <Text className="text-sm text-text-main font-w-medium leading-relaxed mt-2">
-                  {content.etymology.text || 'Этимология скоро будет добавлена...'}
+                  {content.etymology.text || t('common.notFound', translationLanguage)}
                 </Text>
 
                 {content.etymology.rootWord && (
                   <View className="mt-4 flex-row items-center">
                     <Text className="text-xs text-text-muted font-w-bold uppercase tracking-wider mr-2">
-                      Корень:
+                      {t('home.root', translationLanguage)}:
                     </Text>
                     <View
                       className="bg-accent-yellow px-2 py-0.5"
