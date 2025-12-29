@@ -146,12 +146,6 @@ export const UI_TRANSLATIONS = {
             en: 'App Language',
             de: 'App-Sprache',
         },
-        languageLevel: {
-            ru: 'Уровень языка',
-            uk: 'Рівень мови',
-            en: 'Language Level',
-            de: 'Sprachniveau',
-        },
         notifications: {
             ru: 'Уведомления',
             uk: 'Сповіщення',
@@ -230,6 +224,18 @@ export const UI_TRANSLATIONS = {
             en: 'Version',
             de: 'Version',
         },
+        level: {
+            ru: 'Уровень обучения',
+            uk: 'Рівень навчання',
+            en: 'Learning Level',
+            de: 'Lernstufe',
+        },
+        levelDescription: {
+            ru: 'Выберите сложность слов',
+            uk: 'Оберіть складність слів',
+            en: 'Choose word difficulty',
+            de: 'Wählen Sie den Schwierigkeitsgrad',
+        },
     },
     common: {
         loading: {
@@ -243,26 +249,6 @@ export const UI_TRANSLATIONS = {
             uk: 'Не знайдено',
             en: 'Not found',
             de: 'Nicht gefunden',
-        },
-        levels: {
-            beginner: {
-                ru: 'Начальный (A1-A2)',
-                uk: 'Початковий (A1-A2)',
-                en: 'Beginner (A1-A2)',
-                de: 'Anfänger (A1-A2)',
-            },
-            intermediate: {
-                ru: 'Средний (B1-B2)',
-                uk: 'Середній (B1-B2)',
-                en: 'Intermediate (B1-B2)',
-                de: 'Mittelstufe (B1-B2)',
-            },
-            advanced: {
-                ru: 'Продвинутый (C1-C2)',
-                uk: 'Просунутий (C1-C2)',
-                en: 'Advanced (C1-C2)',
-                de: 'Fortgeschritten (C1-C2)',
-            },
         },
     },
 } as const;

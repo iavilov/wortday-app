@@ -64,7 +64,7 @@ export default function WordDetailPage() {
     ? word.word_de
     : word.word_de.toLowerCase();
 
-  const publishDate = word.publish_date ? new Date(word.publish_date) : new Date();
+  const publishDate = new Date(); // Текущий день
   const day = publishDate.getDate();
   const locale = translationLanguage === 'en' ? 'en-US' :
     translationLanguage === 'uk' ? 'uk-UA' :

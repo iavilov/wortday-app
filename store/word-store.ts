@@ -36,13 +36,12 @@ export const useWordStore = create<WordStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Small artificial delay for UX feel
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      const { useSettingsStore } = await import('@/store/settings-store');
-      const languageLevel = useSettingsStore.getState().languageLevel;
+      // Get the current level and registration date from settings
+      const { languageLevel, registrationDate } = (await import('@/store/settings-store')).useSettingsStore.getState();
 
-      const word = getTodayWord(languageLevel);
+      const word = getTodayWord(languageLevel, registrationDate);
       set({ todayWord: word, isLoading: false });
 
     } catch (error) {

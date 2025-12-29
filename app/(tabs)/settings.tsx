@@ -3,23 +3,12 @@ import { BrutalDivider } from '@/components/ui/brutal-divider';
 import { BrutalSwitch } from '@/components/ui/brutal-switch';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors } from '@/constants/design-tokens';
-import { t } from '@/lib/i18n-helpers';
+import { t } from '@/constants/translations';
 import { useSettingsStore } from '@/store/settings-store';
-import { LANGUAGE_OPTIONS } from '@/types/settings';
+import { LANGUAGE_OPTIONS, LEVEL_OPTIONS } from '@/types/settings';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
-import {
-  BarChart,
-  ChevronRight,
-  Clock,
-  Gavel,
-  Languages,
-  LogOut,
-  MessageSquare,
-  ShieldCheck,
-  Star,
-  User
-} from 'lucide-react-native';
+import { ChevronRight, Clock, Gavel, Languages, LogOut, MessageSquare, ShieldCheck, Star, TrendingUp, User } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   Linking,
@@ -39,8 +28,7 @@ export default function SettingsScreen() {
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const currentLanguageName = LANGUAGE_OPTIONS.find(opt => opt.code === translationLanguage)?.nativeName || 'Russian';
-
-  const currentLevelLabel = t(`levels.${languageLevel}`, translationLanguage);
+  const currentLevelName = LEVEL_OPTIONS.find(opt => opt.code === languageLevel)?.name[translationLanguage] || 'Beginner';
 
   const onTimeChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || notificationTime;
@@ -59,12 +47,14 @@ export default function SettingsScreen() {
 
   return (
     <ScreenLayout>
+      <View>
+        <Text>Settings</Text>
+      </View>
       <ScrollView
         className="flex-1 w-full"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 60, alignItems: 'center' }}
       >
-        {/* Header */}
         <View className="flex-row items-end justify-between pt-8 pb-10 w-full" style={{ maxWidth: 400 }}>
           <View className="flex-col">
             <View
@@ -92,12 +82,10 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Main Settings Card */}
         <View
           className="bg-white border-3 border-ink rounded-brutal p-5 shadow-brutal w-full mb-8"
           style={{ borderColor: Colors.border, maxWidth: 400 }}
         >
-          {/* Account */}
           <BrutalButton
             onPress={() => router.push('/settings/account')}
             borderRadius={8}
@@ -125,7 +113,6 @@ export default function SettingsScreen() {
 
           <BrutalDivider className="my-8" />
 
-          {/* Language */}
           <BrutalButton
             onPress={() => router.push('/settings/language')}
             borderRadius={8}
@@ -151,12 +138,13 @@ export default function SettingsScreen() {
             </View>
           </BrutalButton>
 
-          {/* Language Level */}
+          <BrutalDivider className="my-8" />
+
           <BrutalButton
             onPress={() => router.push('/settings/level')}
             borderRadius={8}
             borderWidth={2}
-            style={{ width: '100%', marginTop: 12 }}
+            style={{ width: '100%' }}
             contentContainerStyle={{ alignItems: 'stretch' }}
             pressableStyle={{ width: '100%', alignItems: 'stretch', padding: 8 }}
           >
@@ -164,22 +152,21 @@ export default function SettingsScreen() {
               <View className="flex-row items-center flex-1">
                 <View
                   className="w-10 h-10 items-center justify-center rounded-brutal mr-3 border-2"
-                  style={{ backgroundColor: Colors.accentBlue, borderColor: Colors.border }}
+                  style={{ backgroundColor: Colors.accentPink, borderColor: Colors.border }}
                 >
-                  <BarChart size={20} color={Colors.border} strokeWidth={3} />
+                  <TrendingUp size={20} color={Colors.border} strokeWidth={3} />
                 </View>
                 <View>
-                  <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.languageLevel', translationLanguage)}</Text>
-                  <Text className="text-gray-500 text-xs font-medium">{currentLevelLabel}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.level', translationLanguage)}</Text>
+                  <Text className="text-gray-500 text-xs font-medium">{currentLevelName}</Text>
                 </View>
               </View>
               <ChevronRight size={20} color={Colors.border} />
             </View>
           </BrutalButton>
 
-          <BrutalDivider className="my-8" />
+          {Platform.OS !== 'web' && <BrutalDivider className="my-8" />}
 
-          {/* Notifications Toggle - Mobile Only */}
           {Platform.OS !== 'web' && (
             <View className="py-2">
               <View className="flex-row items-center justify-between mb-4">
@@ -193,7 +180,6 @@ export default function SettingsScreen() {
                 />
               </View>
 
-              {/* Time Selection Block */}
               {notificationsEnabled && (
                 <Animated.View
                   entering={FadeInUp.springify().damping(100).stiffness(500)}
@@ -230,7 +216,6 @@ export default function SettingsScreen() {
                 </Animated.View>
               )}
 
-              {/* Native Time Picker (iOS Modal / Android Dialog) */}
               {showTimePicker && notificationsEnabled && (
                 Platform.OS === 'ios' ? (
                   <Modal transparent animationType="slide" visible={showTimePicker}>
@@ -286,7 +271,6 @@ export default function SettingsScreen() {
           )}
         </View>
 
-        {/* Support & Legal Badge */}
         <View className="w-full items-center mb-6" style={{ maxWidth: 400 }}>
           <View className="absolute w-full h-[3px] bg-ink border-t-2 border-dashed top-1/2" style={{ borderColor: Colors.border }} />
           <View
@@ -310,7 +294,6 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Support Options */}
         <View className="flex-col gap-3 w-full mb-8" style={{ maxWidth: 400 }}>
           <BrutalButton
             onPress={() => router.push('/settings/rate')}
@@ -389,7 +372,6 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Logout Button */}
         <BrutalButton
           onPress={handleLogout}
           shadowOffset={0}

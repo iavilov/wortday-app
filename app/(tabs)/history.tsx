@@ -1,10 +1,10 @@
 import { BrutalButton } from '@/components/ui/brutal-button';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors } from '@/constants/design-tokens';
-import { t } from '@/lib/i18n-helpers';
+import { t } from '@/constants/translations';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
-import { Article, ARTICLE_COLORS, PART_OF_SPEECH_COLORS, PartOfSpeech } from '@/types/word';
+import { ARTICLE_COLORS, Article, PART_OF_SPEECH_COLORS, PartOfSpeech } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
 import { ArrowRight, Search } from 'lucide-react-native';
@@ -34,7 +34,6 @@ export default function HistoryScreen() {
           paddingBottom: 80,
         }}
       >
-        {/* Header */}
         <View className="flex-row items-center justify-between pt-8 pb-6 w-full">
           <View className="flex-col">
             <View
@@ -57,7 +56,6 @@ export default function HistoryScreen() {
           </View>
         </View>
 
-        {/* Search Bar */}
         <View className="w-full mb-8 pr-1">
           <View
             style={{
@@ -84,7 +82,6 @@ export default function HistoryScreen() {
           </View>
         </View>
 
-        {/* Tab Navigation */}
         <View className="flex-row gap-3 mb-6 w-full pr-1">
           <BrutalButton
             onPress={() => setActiveTab('all')}
@@ -123,7 +120,6 @@ export default function HistoryScreen() {
           </BrutalButton>
         </View>
 
-        {/* Word List */}
         <FlatList
           data={displayWords}
           keyExtractor={(item) => item.id}
@@ -168,7 +164,6 @@ export default function HistoryScreen() {
                   width: '100%',
                 }}
               >
-                {/* Side Strip */}
                 <View
                   style={{
                     width: 12,

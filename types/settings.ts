@@ -4,23 +4,12 @@
  */
 
 export type TranslationLanguage = 'ru' | 'uk' | 'en' | 'de';
-
 export type LanguageLevel = 'beginner' | 'intermediate' | 'advanced';
 
 export interface LanguageOption {
   code: TranslationLanguage;
   name: string;
   nativeName: string;
-}
-
-export interface LevelOption {
-  id: LanguageLevel;
-  label: {
-    ru: string;
-    uk: string;
-    en: string;
-    de: string;
-  };
 }
 
 export const LANGUAGE_OPTIONS: LanguageOption[] = [
@@ -30,32 +19,42 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'de', name: 'German', nativeName: 'Deutsch' },
 ];
 
+export interface LevelOption {
+  code: LanguageLevel;
+  name: {
+    ru: string;
+    uk: string;
+    en: string;
+    de: string;
+  };
+}
+
 export const LEVEL_OPTIONS: LevelOption[] = [
   {
-    id: 'beginner',
-    label: {
-      ru: 'Начальный (A1-A2)',
-      uk: 'Початковий (A1-A2)',
-      en: 'Beginner (A1-A2)',
-      de: 'Anfänger (A1-A2)',
+    code: 'beginner',
+    name: {
+      ru: 'Начальный',
+      uk: 'Початковий',
+      en: 'Beginner',
+      de: 'Anfänger'
     }
   },
   {
-    id: 'intermediate',
-    label: {
-      ru: 'Средний (B1-B2)',
-      uk: 'Середній (B1-B2)',
-      en: 'Intermediate (B1-B2)',
-      de: 'Mittelstufe (B1-B2)',
+    code: 'intermediate',
+    name: {
+      ru: 'Средний',
+      uk: 'Середній',
+      en: 'Intermediate',
+      de: 'Mittelstufe'
     }
   },
   {
-    id: 'advanced',
-    label: {
-      ru: 'Продвинутый (C1-C2)',
-      uk: 'Просунутий (C1-C2)',
-      en: 'Advanced (C1-C2)',
-      de: 'Fortgeschritten (C1-C2)',
+    code: 'advanced',
+    name: {
+      ru: 'Продвинутый',
+      uk: 'Просунутий',
+      en: 'Advanced',
+      de: 'Fortgeschritten'
     }
   },
 ];
@@ -64,4 +63,5 @@ export interface UserSettings {
   translationLanguage: TranslationLanguage;
   languageLevel: LanguageLevel;
   userEmail: string | null;
+  registrationDate: string | null; // ISO date string для расчета day_offset
 }

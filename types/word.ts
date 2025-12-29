@@ -51,12 +51,12 @@ export interface WordMedia {
  */
 export interface Word {
   id: string;
-  publish_date: string; // ISO date string
+  level: Level; // beginner | intermediate | advanced
+  day_number: number; // 1-365, порядковый день для данного уровня
   transcription_de: string;
   word_de: string;
   article: Article;
   part_of_speech: PartOfSpeech;
-  level: Level;
   translations: Translations;
   content: WordContent;
   media: WordMedia;
