@@ -18,11 +18,11 @@ export function BrutalCard({
 }: BrutalCardProps) {
     return (
         <View
-            className={`bg-surface rounded-card p-5 relative w-full ${className}`}
+            className={`bg-surface rounded-md p-5 relative w-full ${className}`}
             style={[
                 {
                     maxWidth: maxWidth,
-                    borderWidth: 3,
+                    borderWidth: 4,
                     borderColor: Colors.border,
                     ...createBrutalShadow(4, Colors.border),
                 },

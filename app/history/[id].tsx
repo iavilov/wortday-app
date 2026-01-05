@@ -2,6 +2,7 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { BrutalCard } from '@/components/ui/brutal-card';
 import { BrutalWordTitle } from '@/components/ui/brutal-word-title';
 import { ContentContainer } from '@/components/ui/content-container';
+import { HighlightedText } from '@/components/ui/highlighted-text';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors } from '@/constants/design-tokens';
@@ -240,9 +241,11 @@ export default function WordDetailPage() {
                   </Text>
                 </View>
 
-                <Text className="text-lg text-text-main font-w-bold leading-7 mt-2">
-                  {content.exampleSentence.de}
-                </Text>
+                <HighlightedText
+                  text={content.exampleSentence.de}
+                  textClassName="text-xl text-text-main font-w-bold leading-[36px] mt-2"
+                  highlightClassName="text-xl"
+                />
 
                 <View
                   className="mt-4 pl-3"

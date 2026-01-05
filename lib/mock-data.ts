@@ -19,7 +19,7 @@ export const MOCK_WORDS: Word[] = [
     },
     content: {
       example_sentence: {
-        de: 'Ich wohne in einem großen **Haus**.',
+        de: 'Ich wohne in einem großen **Haus**',
         ru: 'Я живу в большом доме.',
         uk: 'Я живу у великому будинку.',
         en: 'I live in a big house.'

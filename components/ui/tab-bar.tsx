@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 82,
         backgroundColor: Colors.surface,
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: Colors.border,
         borderRadius: 12,
         flexDirection: 'row',

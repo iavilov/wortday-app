@@ -2,6 +2,7 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { BrutalCard } from '@/components/ui/brutal-card';
 import { BrutalWordTitle } from '@/components/ui/brutal-word-title';
 import { ContentContainer } from '@/components/ui/content-container';
+import { HighlightedText } from '@/components/ui/highlighted-text';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors } from '@/constants/design-tokens';
@@ -12,8 +13,8 @@ import { useWordStore } from '@/store/word-store';
 import { ARTICLE_COLORS, PART_OF_SPEECH_COLORS } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { Heart, Share2 } from 'lucide-react-native';
-import { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, Share, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Platform, ScrollView, Share, Text, View } from 'react-native';
 
 export default function Index() {
   const { todayWord, isLoading, loadTodayWord, toggleFavorite, isFavorite } = useWordStore();
@@ -95,6 +96,8 @@ export default function Index() {
             <View className="mr-2">
               <BrutalButton
                 onPress={onShare}
+                borderRadius={4}
+                borderWidth={2}
                 contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
                 pressableStyle={{ flexDirection: 'row' }}
               >
@@ -127,11 +130,12 @@ export default function Index() {
               <BrutalButton
                 onPress={() => toggleFavorite(todayWord.id)}
                 borderWidth={2}
-                style={{ width: 40, height: 40 }}
+                borderRadius={25}
+                style={{ width: 44, height: 44 }}
                 contentContainerStyle={{ height: '100%' }}
               >
                 <Heart
-                  size={20}
+                  size={22}
                   color={Colors.border}
                   fill={isFavorite(todayWord.id) ? Colors.border : 'transparent'}
                   strokeWidth={2.5}
@@ -152,6 +156,7 @@ export default function Index() {
                     backgroundColor: articleColors.bg,
                     borderWidth: 3,
                     borderColor: articleColors.border,
+                    ...createBrutalShadow(2, Colors.border),
                   }}>
                   <Text
                     className="font-w-extrabold text-sm uppercase"
@@ -164,13 +169,13 @@ export default function Index() {
                 </View>
               )}
               <View
-                className="bg-gray-200 px-2 py-0.5"
+                className="bg-white px-4 py-1.5"
                 style={{
-                  borderWidth: 1,
+                  borderWidth: 2,
                   borderColor: Colors.border,
                 }}
               >
-                <Text className="text-xs font-w-bold text-text-main">
+                <Text className="text-md font-w-bold text-text-main">
                   {todayWord.transcription_de}
                 </Text>
               </View>
@@ -191,18 +196,22 @@ export default function Index() {
 
             </View>
 
-            <View className="mb-6 pl-4 border-l-4 border-accent-pink">
-              <Text className="text-xl text-text-muted font-w-bold italic">
+            <View className="mb-6">
+              <Text className="text-xl text-text-main font-w-bold">
                 {content.translation}
               </Text>
             </View>
 
             <View className="h-0.5 w-full bg-border mb-6" />
+
             <View
-              className="p-5 my-6 relative bg-purple-50"
+              className="p-5 my-6 relative"
               style={{
                 borderWidth: 2,
                 borderColor: Colors.border,
+                borderRadius: 4,
+                backgroundColor: Colors.gray50,
+
               }}
             >
               <View
@@ -210,18 +219,9 @@ export default function Index() {
                 style={{
                   borderWidth: 2,
                   borderColor: Colors.border,
+                  ...createBrutalShadow(2, Colors.border),
                 }}
               >
-                <View
-                  className="mr-2"
-                  style={{
-                    width: 8,
-                    height: 8,
-                    backgroundColor: Colors.accentYellow,
-                    borderWidth: 1.5,
-                    borderColor: Colors.border,
-                  }}
-                />
                 <Text
                   className="text-[10px] font-w-extrabold text-text-main uppercase tracking-widest"
                 >
@@ -229,21 +229,18 @@ export default function Index() {
                 </Text>
               </View>
 
-              <Text
-                className="text-lg text-text-main font-w-bold leading-7 mt-2"
-              >
-                {content.exampleSentence.de}
-              </Text>
+              <HighlightedText
+                text={content.exampleSentence.de}
+                textClassName="text-xl text-text-main font-w-bold leading-[36px] mt-2"
+                highlightClassName="text-lg"
+              />
 
               <View
-                className="mt-4 pl-3"
-                style={{
-                  borderLeftWidth: 3,
-                  borderLeftColor: Colors.border,
-                }}
+                className="mt-4"
               >
                 <Text
-                  className="text-sm text-text-muted font-w-medium italic"
+                  className="text-[16px] text-text-muted font-w-medium"
+                  style={Platform.OS === 'ios' ? { transform: [{ skewX: '-12deg' }] } : { fontStyle: 'italic' }}
                 >
                   {content.exampleSentence.translation}
                 </Text>
@@ -257,6 +254,8 @@ export default function Index() {
                 style={{
                   borderWidth: 2,
                   borderColor: Colors.border,
+                  borderRadius: 4,
+
                 }}
               >
                 <View
@@ -264,17 +263,10 @@ export default function Index() {
                   style={{
                     borderWidth: 2,
                     borderColor: Colors.border,
+                    ...createBrutalShadow(2, Colors.border),
                   }}
                 >
-                  <View
-                    className="bg-primary mr-2"
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderWidth: 1.5,
-                      borderColor: Colors.border,
-                    }}
-                  />
+
                   <Text
                     className="text-[10px] font-w-extrabold text-text-main uppercase tracking-widest"
                   >

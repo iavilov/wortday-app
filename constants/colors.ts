@@ -2,7 +2,7 @@ export const palette = {
   bgMain: '#FFFAF0',
   cardBg: '#FFFFFF',
   ink: '#121212',
-  primary: '#00E090',
+  primary: '#6BCF7F',
   yellow: '#FFDE00',
   pink: '#FF80BF',
   blue: '#60A5FA',
@@ -10,7 +10,7 @@ export const palette = {
   orange: '#FB923C',
   articleDer: '#93C5FD',
   articleDie: '#F9A8D4',
-  articleDas: '#86EFAC',
+  articleDas: '#6BCF7F',
 
   gray: {
     50: '#FAFAFA',
