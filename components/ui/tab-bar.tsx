@@ -3,29 +3,29 @@ import { createBrutalShadow } from '@/utils/platform-styles';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GalleryVerticalEnd, History, Settings } from 'lucide-react-native';
+import { History, Layers, Settings } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { LayoutChangeEvent, Pressable, StyleSheet, View, ViewStyle } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const [containerWidth, setContainerWidth] = useState(Layout.maxContentWidth);
 
-    // We use padding 16 from styles.container
     const horizontalPadding = 16;
     const contentWidth = containerWidth - (horizontalPadding * 2);
     const tabSpace = contentWidth / state.routes.length;
-    const indicatorWidth = 60;
 
-    const translateX = useSharedValue(horizontalPadding + (tabSpace - indicatorWidth) / 2);
+    const indicatorSize = 40;
+    const indicatorTop = 15; // Centered behind the icon in the 100px container
+
+    const translateX = useSharedValue(horizontalPadding + (tabSpace - indicatorSize) / 2);
 
     useEffect(() => {
         if (containerWidth > 0) {
-            // Calculate center of the active tab
-            const targetX = horizontalPadding + (state.index * tabSpace) + (tabSpace - indicatorWidth) / 2;
+            const targetX = horizontalPadding + (state.index * tabSpace) + (tabSpace - indicatorSize) / 2;
             translateX.value = withSpring(targetX, {
-                damping: 20,
-                stiffness: 150,
+                damping: 100,
+                stiffness: 500,
                 mass: 0.8,
             });
         }
@@ -60,11 +60,15 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                     ]}
                     onLayout={onLayout}
                 >
-                    {/* Sliding Background Indicator */}
                     <Animated.View
                         style={[
                             styles.indicator,
                             indicatorStyle,
+                            {
+                                width: indicatorSize,
+                                height: indicatorSize,
+                                top: indicatorTop,
+                            }
                         ]}
                     />
 
@@ -85,12 +89,16 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                         };
 
                         let Icon;
+                        let label;
                         if (route.name === 'history') {
                             Icon = History;
+                            label = 'HISTORY';
                         } else if (route.name === 'settings') {
                             Icon = Settings;
+                            label = 'SETTINGS';
                         } else {
-                            Icon = GalleryVerticalEnd;
+                            Icon = Layers;
+                            label = 'TODAY';
                         }
 
                         return (
@@ -99,8 +107,9 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                                 onPress={onPress}
                                 style={styles.tabItem}
                             >
-                                <AnimatedIcon
+                                <AnimatedTabContent
                                     Icon={Icon}
+                                    label={label}
                                     isFocused={isFocused}
                                 />
                             </Pressable>
@@ -112,28 +121,33 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     );
 }
 
-// Separate component for animated icon to handle scale
-function AnimatedIcon({ Icon, isFocused }: { Icon: any, isFocused: boolean }) {
-    const scale = useSharedValue(isFocused ? 1.2 : 1);
+// Separate component for animated content
+function AnimatedTabContent({ Icon, label, isFocused }: { Icon: any, label: string, isFocused: boolean }) {
+    const scale = useSharedValue(isFocused ? 1.05 : 1);
+    const opacity = useSharedValue(isFocused ? 1 : 0.6);
 
     useEffect(() => {
-        scale.value = withSpring(isFocused ? 1.2 : 1, {
-            damping: 100,
-            stiffness: 500,
-        });
+        scale.value = withSpring(isFocused ? 1.05 : 1, { damping: 100, stiffness: 500 });
+        opacity.value = withSpring(isFocused ? 1 : 0.6, { damping: 100, stiffness: 500 });
     }, [isFocused]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ scale: scale.value }],
+        opacity: opacity.value,
     }));
 
     return (
-        <Animated.View style={animatedStyle}>
-            <Icon
-                size={22}
-                color={isFocused ? Colors.border : Colors.gray500}
-                strokeWidth={isFocused ? 3 : 2.5}
-            />
+        <Animated.View style={[styles.tabContent, animatedStyle]}>
+            <View style={styles.iconContainer}>
+                <Icon
+                    size={20}
+                    color={Colors.border}
+                    strokeWidth={2.2}
+                />
+            </View>
+            <Text style={styles.label}>
+                {label}
+            </Text>
         </Animated.View>
     );
 }
@@ -144,20 +158,20 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        height: 160, // Covers the bottom area including menu and gap
+        height: 160,
         zIndex: 0,
     } as ViewStyle,
     outerContainer: {
         position: 'absolute',
-        bottom: 40,
-        left: 24,
-        right: 24,
+        bottom: 34,
+        left: 20,
+        right: 20,
         alignItems: 'center',
-        zIndex: 10, // Ensure menu is above the gradient mask
+        zIndex: 10,
     } as ViewStyle,
     container: {
         width: '100%',
-        height: 82,
+        height: 100,
         backgroundColor: Colors.surface,
         borderWidth: 4,
         borderColor: Colors.border,
@@ -165,26 +179,41 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        ...createBrutalShadow(4, Colors.border),
+        ...createBrutalShadow(6, Colors.border),
     } as ViewStyle,
     tabItem: {
         flex: 1,
         height: '100%',
+        zIndex: 1,
+        position: 'relative',
+    } as ViewStyle,
+    tabContent: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 1,
-    } as ViewStyle,
+    },
+    iconContainer: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    label: {
+        fontSize: 10,
+        fontFamily: 'Manrope_800ExtraBold',
+        letterSpacing: 0.5,
+        color: Colors.border,
+        marginTop: 6,
+    },
     indicator: {
         position: 'absolute',
-        left: -3,
-        top: 11,
-        width: 60,
-        height: 54,
         backgroundColor: Colors.primary,
         borderWidth: 2,
         borderColor: Colors.border,
-        borderRadius: 12,
+        borderRadius: 8,
+        left: -4,
         ...createBrutalShadow(2, Colors.border),
         zIndex: 0,
     } as ViewStyle,
 });
+
