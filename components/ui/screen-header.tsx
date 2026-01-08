@@ -38,7 +38,7 @@ export function ScreenHeader({
                     backgroundColor: badgeColor,
                     borderWidth: 2,
                     borderColor: Colors.border,
-                    transform: [{ rotate: '-2deg' }],
+                    // transform: [{ rotate: '-2deg' }],
                     ...createBrutalShadow(2, Colors.border),
                 }}
                 className={`px-2 py-0.5 ${isRight ? 'ml-3' : 'mr-3'}`}

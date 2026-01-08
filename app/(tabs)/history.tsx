@@ -2,15 +2,17 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { ContentContainer } from '@/components/ui/content-container';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
-import { Colors } from '@/constants/design-tokens';
+import { Border, Colors } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import { ARTICLE_COLORS, Article, PART_OF_SPEECH_COLORS } from '@/types/word';
+import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
 import { ArrowRight, Search } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { FlatList, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 type TabType = 'all' | 'favorites';
 
@@ -76,6 +78,7 @@ export default function HistoryScreen() {
             className="flex-1"
             contentContainerStyle={{ paddingVertical: 12, width: '100%' }}
             pressableStyle={{ width: '100%' }}
+            borderRadius={4}
           >
             <Text
               className={`text-xs font-w-extrabold uppercase tracking-wide ${activeTab === 'all' ? 'text-border' : 'text-text-muted'
@@ -84,10 +87,10 @@ export default function HistoryScreen() {
               {t('history.all', translationLanguage)}
             </Text>
             <View
-              className="absolute -top-[4px] right-[3px] bg-white border-2 border-ink w-6 h-6 flex items-center justify-center rounded-full z-10"
+              className="absolute -top-[6px] -right-[-6px] bg-white border-2 border-border h-7 min-w-[28px] items-center justify-center rounded-full z-10 px-1"
               style={{ borderColor: Colors.border }}
             >
-              <Text className="text-[10px] font-w-extrabold">{allWords.length}</Text>
+              <Text className="text-[11px] font-w-extrabold">{allWords.length}</Text>
             </View>
           </BrutalButton>
 
@@ -108,95 +111,105 @@ export default function HistoryScreen() {
         </ContentContainer>
 
         <ContentContainer>
-          <FlatList
-            data={displayWords}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            ListEmptyComponent={
-              <View className="flex-1 justify-center items-center py-12">
-                <Text
-                  className="text-text-muted text-center text-base font-medium"
-                >
-                  {activeTab === 'favorites'
-                    ? t('history.noFavorites', translationLanguage)
-                    : t('history.noHistory', translationLanguage)}
-                </Text>
-              </View>
-            }
-            renderItem={({ item }) => {
-              const translation = item.translations[translationLanguage];
-              const hasArticle = !!item.article;
-
-              let stripColor = Colors.primary;
-              if (hasArticle && item.article && ARTICLE_COLORS[item.article as NonNullable<Article>]) {
-                stripColor = ARTICLE_COLORS[item.article as NonNullable<Article>].bg;
-              } else if (item.part_of_speech && (PART_OF_SPEECH_COLORS as any)[item.part_of_speech]) {
-                stripColor = (PART_OF_SPEECH_COLORS as any)[item.part_of_speech].bg;
+          <Animated.View
+            key={activeTab}
+            entering={FadeInDown.duration(300).springify().damping(100)}
+          >
+            <FlatList
+              data={displayWords}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              ListEmptyComponent={
+                <View className="flex-1 justify-center items-center py-12">
+                  <Text
+                    className="text-text-muted text-center text-base font-medium"
+                  >
+                    {activeTab === 'favorites'
+                      ? t('history.noFavorites', translationLanguage)
+                      : t('history.noHistory', translationLanguage)}
+                  </Text>
+                </View>
               }
+              renderItem={({ item }) => {
+                const translation = item.translations[translationLanguage];
+                const hasArticle = !!item.article;
 
-              const displayWord = item.word_de;
+                let stripColor = Colors.primary;
+                if (hasArticle && item.article && ARTICLE_COLORS[item.article as NonNullable<Article>]) {
+                  stripColor = ARTICLE_COLORS[item.article as NonNullable<Article>].bg;
+                } else if (item.part_of_speech && (PART_OF_SPEECH_COLORS as any)[item.part_of_speech]) {
+                  stripColor = (PART_OF_SPEECH_COLORS as any)[item.part_of_speech].bg;
+                }
 
-              return (
-                <BrutalButton
-                  onPress={() => router.push(`/history/${item.id}`)}
-                  borderWidth={2}
-                  style={{ marginBottom: 16, width: '100%' }}
-                  contentContainerStyle={{ width: '100%' }}
-                  pressableStyle={{
-                    flexDirection: 'row',
-                    alignItems: 'stretch',
-                    width: '100%',
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 12,
-                      backgroundColor: stripColor,
-                      borderRightWidth: 3,
-                      borderRightColor: Colors.border,
+                const displayWord = item.word_de;
+
+                // Abbreviate "adjective" to "ADJ."
+                const rawLabel = item.article || (item.part_of_speech !== 'noun' ? item.part_of_speech : '');
+                const displayLabel = rawLabel?.toLowerCase() === 'adjective' ? 'ADJ.' : rawLabel;
+
+                return (
+                  <BrutalButton
+                    onPress={() => router.push(`/history/${item.id}`)}
+                    borderWidth={Border.primary}
+                    style={{ marginBottom: 16, width: '100%' }}
+                    contentContainerStyle={{ width: '100%' }}
+                    pressableStyle={{
+                      flexDirection: 'row',
+                      alignItems: 'stretch',
+                      width: '100%',
                     }}
-                  />
+                  >
+                    <View
+                      style={{
+                        width: 12,
+                        backgroundColor: stripColor,
+                        borderRightWidth: Border.secondary,
+                        borderRightColor: Colors.border,
+                      }}
+                    />
 
-                  <View className="flex-1 p-4 flex-row items-center justify-between">
-                    <View className="flex-1 mr-2">
-                      <View className="flex-row items-center gap-2 mb-1">
-                        <View
-                          className="px-1.5 py-0.5"
-                          style={{
-                            backgroundColor: stripColor,
-                            borderWidth: 1,
-                            borderColor: Colors.border,
-                            borderRadius: 2
-                          }}
-                        >
-                          <Text className="text-[10px] font-w-extrabold uppercase text-border">
-                            {item.article || (item.part_of_speech !== ('noun' as string) ? item.part_of_speech : '')}
+                    <View className="flex-1 p-4 flex-row items-center justify-between">
+                      <View className="flex-1 mr-2">
+                        <View className="flex-row items-center mb-1">
+                          <View
+                            className="px-1.5 py-0.5 justify-center items-center mr-3"
+                            style={{
+                              backgroundColor: stripColor,
+                              borderWidth: 1.5,
+                              borderColor: Colors.border,
+                              ...createBrutalShadow(2, Colors.border),
+                              width: 52, // Fixed width for alignment
+                            }}
+                          >
+                            <Text className="text-[10px] font-w-extrabold uppercase text-border text-center">
+                              {displayLabel}
+                            </Text>
+                          </View>
+                          <Text className="text-text-main text-xl font-w-extrabold">
+                            {displayWord}
                           </Text>
                         </View>
-                        <Text className="text-text-main text-xl font-w-extrabold">
-                          {displayWord}
+                        <Text className="text-text-main text-base font-w-medium opacity-80">
+                          {translation.main}
                         </Text>
                       </View>
-                      <Text className="text-text-muted text-base font-w-medium italic">
-                        {translation.main}
-                      </Text>
-                    </View>
 
-                    <View
-                      className="w-10 h-10 rounded-full items-center justify-center bg-background"
-                      style={{
-                        borderWidth: 2,
-                        borderColor: Colors.border,
-                      }}
-                    >
-                      <ArrowRight size={20} color={Colors.border} strokeWidth={2.5} />
+                      <View
+                        className="w-10 h-10 rounded-full items-center justify-center bg-background"
+                        style={{
+                          borderWidth: Border.secondary,
+                          borderColor: Colors.border,
+                        }}
+                      >
+                        <ArrowRight size={20} color={Colors.border} strokeWidth={2.5} />
+                      </View>
                     </View>
-                  </View>
-                </BrutalButton>
-              );
-            }}
-          />
+                  </BrutalButton>
+                );
+              }}
+            />
+          </Animated.View>
         </ContentContainer>
 
         <ContentContainer className="flex-row justify-center">

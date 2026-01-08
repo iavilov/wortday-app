@@ -1,4 +1,4 @@
-import { Colors, Layout } from '@/constants/design-tokens';
+import { Border, Colors, Layout } from '@/constants/design-tokens';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import React from 'react';
 import { View, ViewProps } from 'react-native';
@@ -22,7 +22,7 @@ export function BrutalCard({
             style={[
                 {
                     maxWidth: maxWidth,
-                    borderWidth: 4,
+                    borderWidth: Border.primary,
                     borderColor: Colors.border,
                     ...createBrutalShadow(4, Colors.border),
                 },

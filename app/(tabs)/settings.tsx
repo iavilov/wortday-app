@@ -1,24 +1,83 @@
 import { BrutalButton } from '@/components/ui/brutal-button';
-import { BrutalCard } from '@/components/ui/brutal-card';
-import { BrutalDivider } from '@/components/ui/brutal-divider';
-import { BrutalText } from '@/components/ui/brutal-text';
 import { ContentContainer } from '@/components/ui/content-container';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
-import { Colors } from '@/constants/design-tokens';
+import { Border, Colors } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
 import { useSettingsStore } from '@/store/settings-store';
 import { LANGUAGE_OPTIONS, LEVEL_OPTIONS } from '@/types/settings';
+import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
 import { Bell, ChevronRight, Gavel, Languages, LogOut, MessageSquare, ShieldCheck, Star, TrendingUp, User } from 'lucide-react-native';
 import React from 'react';
 import {
   Linking,
   Platform,
+  Pressable,
   ScrollView,
   Text,
   View
 } from 'react-native';
+
+// Settings section item component
+interface SettingItemProps {
+  icon: React.ReactNode;
+  iconBgColor: string;
+  title: string;
+  subtitle?: string;
+  onPress: () => void;
+  showDivider?: boolean;
+}
+
+function SettingItem({ icon, iconBgColor, title, subtitle, onPress, showDivider = true }: SettingItemProps) {
+  return (
+    <>
+      <Pressable
+        onPress={onPress}
+        className="flex-row items-center justify-between py-4 px-4"
+        style={({ pressed }) => ({
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
+        <View className="flex-row items-center flex-1">
+          <View
+            className="w-10 h-10 items-center justify-center mr-3"
+            style={{
+              backgroundColor: iconBgColor,
+              borderWidth: Border.secondary,
+              borderColor: Colors.border,
+              borderRadius: 8,
+            }}
+          >
+            {icon}
+          </View>
+          <View className="flex-1">
+            <Text className="text-border font-w-extrabold text-sm uppercase">
+              {title}
+            </Text>
+            {subtitle && (
+              <Text className="text-text-muted text-xs font-w-medium mt-0.5">
+                {subtitle}
+              </Text>
+            )}
+          </View>
+        </View>
+        <ChevronRight size={20} color={Colors.border} strokeWidth={2.5} />
+      </Pressable>
+      {showDivider && (
+        <View
+          style={{
+            height: 2,
+            borderStyle: 'dashed',
+            borderWidth: 1,
+            borderColor: Colors.border,
+            marginHorizontal: 16,
+          }}
+        />
+      )}
+    </>
+  );
+}
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -45,269 +104,126 @@ export default function SettingsScreen() {
           badgeColor={Colors.primary}
         />
 
-        <ContentContainer>
-          <BrutalCard>
-            <BrutalButton
-              onPress={() => router.push('/settings/account')}
-              borderRadius={8}
-              borderWidth={2}
-              style={{ width: '100%' }}
-              contentContainerStyle={{ alignItems: 'stretch' }}
-              pressableStyle={{ width: '100%', alignItems: 'stretch', padding: 16 }}
-            >
-              <View className="flex-row items-center justify-between w-full">
-                <View className="flex-row items-center flex-1">
-                  <View
-                    className="w-10 h-10 items-center justify-center rounded-brutal mr-3 border-2"
-                    style={{ backgroundColor: '#86EFAC', borderColor: Colors.border }}
-                  >
-                    <User size={20} color={Colors.border} strokeWidth={3} />
-                  </View>
-                  <View>
-                    <BrutalText style={{ fontSize: 13, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.account', translationLanguage)}</BrutalText>
-                    <BrutalText className="text-gray-500 text-xs font-medium">{userEmail}</BrutalText>
-                  </View>
-                </View>
-                <ChevronRight size={20} color={Colors.border} />
-              </View>
-            </BrutalButton>
-
-            <BrutalDivider className="my-6" />
-
-            <BrutalButton
-              onPress={() => router.push('/settings/language')}
-              borderRadius={8}
-              borderWidth={2}
-              style={{ width: '100%' }}
-              contentContainerStyle={{ alignItems: 'stretch' }}
-              pressableStyle={{ width: '100%', alignItems: 'stretch', padding: 16 }}
-            >
-              <View className="flex-row items-center justify-between w-full">
-                <View className="flex-row items-center flex-1">
-                  <View
-                    className="w-10 h-10 items-center justify-center rounded-brutal mr-3 border-2"
-                    style={{ backgroundColor: Colors.accentYellow, borderColor: Colors.border }}
-                  >
-                    <Languages size={20} color={Colors.border} strokeWidth={3} />
-                  </View>
-                  <View>
-                    <BrutalText style={{ fontSize: 13, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.language', translationLanguage)}</BrutalText>
-                    <BrutalText className="text-gray-500 text-xs font-medium">{currentLanguageName}</BrutalText>
-                  </View>
-                </View>
-                <ChevronRight size={20} color={Colors.border} />
-              </View>
-            </BrutalButton>
-
-            <BrutalDivider className="my-6" />
-
-            <BrutalButton
-              onPress={() => router.push('/settings/level')}
-              borderRadius={8}
-              borderWidth={2}
-              style={{ width: '100%' }}
-              contentContainerStyle={{ alignItems: 'stretch' }}
-              pressableStyle={{ width: '100%', alignItems: 'stretch', padding: 16 }}
-            >
-              <View className="flex-row items-center justify-between w-full">
-                <View className="flex-row items-center flex-1">
-                  <View
-                    className="w-10 h-10 items-center justify-center rounded-brutal mr-3 border-2"
-                    style={{ backgroundColor: Colors.accentPink, borderColor: Colors.border }}
-                  >
-                    <TrendingUp size={20} color={Colors.border} strokeWidth={3} />
-                  </View>
-                  <View>
-                    <BrutalText style={{ fontSize: 13, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.level', translationLanguage)}</BrutalText>
-                    <BrutalText className="text-gray-500 text-xs font-medium">{currentLevelName}</BrutalText>
-                  </View>
-                </View>
-                <ChevronRight size={20} color={Colors.border} />
-              </View>
-            </BrutalButton>
-
-            {Platform.OS !== 'web' && <BrutalDivider className="my-6" />}
-
-            {Platform.OS !== 'web' && (
-              <BrutalButton
-                onPress={() => router.push('/settings/notifications')}
-                borderRadius={8}
-                borderWidth={2}
-                style={{ width: '100%' }}
-                contentContainerStyle={{ alignItems: 'stretch' }}
-                pressableStyle={{ width: '100%', alignItems: 'stretch', padding: 16 }}
-              >
-                <View className="flex-row items-center justify-between w-full">
-                  <View className="flex-row items-center flex-1">
-                    <View
-                      className="w-10 h-10 items-center justify-center rounded-brutal mr-3 border-2"
-                      style={{ backgroundColor: Colors.accentBlue, borderColor: Colors.border }}
-                    >
-                      <Bell size={20} color={Colors.border} strokeWidth={3} />
-                    </View>
-                    <View>
-                      <BrutalText style={{ fontSize: 13, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.notifications', translationLanguage)}</BrutalText>
-                      <BrutalText className="text-gray-500 text-xs font-medium">{t('settings.reminders', translationLanguage)}</BrutalText>
-                    </View>
-                  </View>
-                  <ChevronRight size={20} color={Colors.border} />
-                </View>
-              </BrutalButton>
-            )}
-          </BrutalCard>
-        </ContentContainer>
-
-
-
-        <View className="relative w-full items-center my-10">
-          <BrutalDivider className="absolute top-[11px] left-0 right-0" />
+        {/* ACCOUNT Section */}
+        <ContentContainer className="mb-6">
           <View
             style={{
-              backgroundColor: Colors.background,
-              borderWidth: 2,
+              backgroundColor: Colors.surface,
+              borderWidth: Border.primary,
               borderColor: Colors.border,
-              paddingHorizontal: 16,
-              paddingVertical: 4,
-              shadowColor: Colors.border,
-              shadowOffset: { width: 2, height: 2 },
-              shadowOpacity: 1,
-              shadowRadius: 0,
-              zIndex: 10,
+              borderRadius: 12,
+              overflow: 'hidden',
+              ...createBrutalShadow(4, Colors.border),
             }}
           >
-
-            <BrutalText style={{ fontSize: 12, fontWeight: '900', color: Colors.border, textTransform: 'uppercase', letterSpacing: 1 }}>
-              {t('settings.support', translationLanguage)}
-            </BrutalText>
+            <SettingItem
+              icon={<User size={20} color={Colors.border} strokeWidth={2.5} />}
+              iconBgColor="#86EFAC"
+              title={t('settings.account', translationLanguage)}
+              subtitle={userEmail}
+              onPress={() => router.push('/settings/account')}
+            />
+            <SettingItem
+              icon={<Languages size={20} color={Colors.border} strokeWidth={2.5} />}
+              iconBgColor={Colors.accentYellow}
+              title="App Language"
+              subtitle={currentLanguageName}
+              onPress={() => router.push('/settings/language')}
+            />
+            <SettingItem
+              icon={<TrendingUp size={20} color={Colors.border} strokeWidth={2.5} />}
+              iconBgColor={Colors.accentPink}
+              title="Learning Level"
+              subtitle={currentLevelName}
+              onPress={() => router.push('/settings/level')}
+              showDivider={Platform.OS !== 'web'}
+            />
+            {Platform.OS !== 'web' && (
+              <SettingItem
+                icon={<Bell size={20} color={Colors.border} strokeWidth={2.5} />}
+                iconBgColor={Colors.accentBlue}
+                title={t('settings.notifications', translationLanguage)}
+                subtitle="Word of the day reminders"
+                onPress={() => router.push('/settings/notifications')}
+                showDivider={false}
+              />
+            )}
+            {Platform.OS === 'web' && (
+              <View style={{ height: 0 }} />
+            )}
           </View>
-        </View>
-
-        <ContentContainer className="mb-8">
-          <BrutalCard>
-            <BrutalButton
-              onPress={() => router.push('/settings/rate')}
-              borderWidth={2}
-              style={{ width: '100%', marginBottom: 16 }}
-              contentContainerStyle={{ alignItems: 'stretch' }}
-              pressableStyle={{ width: '100%', padding: 16 }}
-            >
-              <View className="flex-row justify-between items-center w-full">
-                <View className="flex-row items-center">
-                  <View
-                    className="w-10 h-10 items-center justify-center rounded-md mr-3 border-2"
-                    style={{ backgroundColor: Colors.accentPink, borderColor: Colors.border }}
-                  >
-                    <Star size={20} color={Colors.border} strokeWidth={3} />
-                  </View>
-                  <View>
-                    <BrutalText style={{ fontSize: 14, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.rate', translationLanguage)}</BrutalText>
-                    <BrutalText className="text-gray-500 text-xs font-medium">Love Vocade? Let us know!</BrutalText>
-                  </View>
-                </View>
-                <ChevronRight size={20} color={Colors.border} />
-              </View>
-            </BrutalButton>
-
-            <BrutalButton
-              onPress={() => router.push('/settings/feedback')}
-              borderWidth={2}
-              style={{ width: '100%', marginBottom: 16 }}
-              contentContainerStyle={{ alignItems: 'stretch' }}
-              pressableStyle={{ width: '100%', padding: 16 }}
-            >
-              <View className="flex-row justify-between items-center w-full">
-                <View className="flex-row items-center">
-                  <View
-                    className="w-10 h-10 items-center justify-center rounded-md mr-3 border-2"
-                    style={{ backgroundColor: '#93C5FD', borderColor: Colors.border }}
-                  >
-                    <MessageSquare size={20} color={Colors.border} strokeWidth={3} />
-                  </View>
-                  <View>
-                    <BrutalText style={{ fontSize: 14, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.feedback', translationLanguage)}</BrutalText>
-                    <BrutalText className="text-gray-500 text-xs font-medium">Report a bug or suggest features</BrutalText>
-                  </View>
-                </View>
-                <ChevronRight size={20} color={Colors.border} />
-              </View>
-            </BrutalButton>
-
-            <BrutalButton
-              onPress={() => Linking.openURL('https://vocade.app/terms')}
-              borderWidth={2}
-              style={{ width: '100%', marginBottom: 16 }}
-              contentContainerStyle={{ alignItems: 'stretch' }}
-              pressableStyle={{ width: '100%', padding: 16 }}
-            >
-              <View className="flex-row justify-between items-center w-full">
-                <View className="flex-row items-center">
-                  <View
-                    className="w-10 h-10 items-center justify-center rounded-md mr-3 border-2"
-                    style={{ backgroundColor: '#FDE68A', borderColor: Colors.border }}
-                  >
-                    <Gavel size={20} color={Colors.border} strokeWidth={3} />
-                  </View>
-                  <View>
-                    <BrutalText style={{ fontSize: 14, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.terms', translationLanguage)}</BrutalText>
-                    <BrutalText className="text-gray-500 text-xs font-medium">{t('settings.termsDescription', translationLanguage)}</BrutalText>
-                  </View>
-                </View>
-                <ChevronRight size={20} color={Colors.border} />
-              </View>
-            </BrutalButton>
-
-            <BrutalButton
-              onPress={() => Linking.openURL('https://vocade.app/privacy')}
-              borderWidth={2}
-              style={{ width: '100%', marginBottom: 0 }}
-              contentContainerStyle={{ alignItems: 'stretch' }}
-              pressableStyle={{ width: '100%', padding: 16 }}
-            >
-              <View className="flex-row justify-between items-center w-full">
-                <View className="flex-row items-center">
-                  <View
-                    className="w-10 h-10 items-center justify-center rounded-md mr-3 border-2"
-                    style={{ backgroundColor: '#86EFAC', borderColor: Colors.border }}
-                  >
-                    <ShieldCheck size={20} color={Colors.border} strokeWidth={3} />
-                  </View>
-                  <View>
-                    <BrutalText style={{ fontSize: 14, fontWeight: '900', color: Colors.border, textTransform: 'uppercase' }}>{t('settings.privacy', translationLanguage)}</BrutalText>
-                    <BrutalText className="text-gray-500 text-xs font-medium">{t('settings.privacyDescription', translationLanguage)}</BrutalText>
-                  </View>
-                </View>
-                <ChevronRight size={20} color={Colors.border} />
-              </View>
-            </BrutalButton>
-
-
-          </BrutalCard>
         </ContentContainer>
 
+        {/* SUPPORT & LEGAL Section */}
+        <ContentContainer className="mb-6">
+          <View
+            style={{
+              backgroundColor: Colors.surface,
+              borderWidth: Border.primary,
+              borderColor: Colors.border,
+              borderRadius: 12,
+              overflow: 'hidden',
+              ...createBrutalShadow(4, Colors.border),
+            }}
+          >
+            <SettingItem
+              icon={<Star size={20} color={Colors.border} strokeWidth={2.5} />}
+              iconBgColor={Colors.accentPink}
+              title="Rate the App"
+              subtitle="Love Vocade? Let us know!"
+              onPress={() => router.push('/settings/rate')}
+            />
+            <SettingItem
+              icon={<MessageSquare size={20} color={Colors.border} strokeWidth={2.5} />}
+              iconBgColor="#93C5FD"
+              title="Feedback"
+              subtitle="Report a bug or suggest features"
+              onPress={() => router.push('/settings/feedback')}
+            />
+            <SettingItem
+              icon={<Gavel size={20} color={Colors.border} strokeWidth={2.5} />}
+              iconBgColor="#FDE68A"
+              title="Terms"
+              subtitle={t('settings.termsDescription', translationLanguage)}
+              onPress={() => Linking.openURL('https://vocade.app/terms')}
+            />
+            <SettingItem
+              icon={<ShieldCheck size={20} color={Colors.border} strokeWidth={2.5} />}
+              iconBgColor="#86EFAC"
+              title="Privacy"
+              subtitle={t('settings.privacyDescription', translationLanguage)}
+              onPress={() => Linking.openURL('https://vocade.app/privacy')}
+              showDivider={false}
+            />
+          </View>
+        </ContentContainer>
+
+        {/* LOG OUT Button */}
         <ContentContainer className="mb-8">
           <BrutalButton
             onPress={handleLogout}
             shadowOffset={0}
-            borderWidth={2}
-            borderColor="#D1D5DB"
+            borderWidth={Border.primary}
+            borderColor={Colors.border}
             backgroundColor="transparent"
             style={{ width: '100%' }}
             contentContainerStyle={{}}
-            pressableStyle={{ padding: 12, width: '100%' }}
+            pressableStyle={{ padding: 14, width: '100%' }}
           >
             <View className="flex-row items-center justify-center">
-              <LogOut size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
-              <BrutalText style={{ fontSize: 14, fontWeight: '900', color: '#9CA3AF', textTransform: 'uppercase' }}>{t('settings.logout', translationLanguage)}</BrutalText>
+              <LogOut size={20} color={Colors.border} strokeWidth={2.5} style={{ marginRight: 8 }} />
+              <Text className="text-border font-w-extrabold text-sm uppercase tracking-wide">
+                {t('settings.logout', translationLanguage)}
+              </Text>
             </View>
           </BrutalButton>
         </ContentContainer>
 
-        <ContentContainer className="mt-8 mb-4 items-center">
-          <View className="border border-dashed border-gray-300 rounded-sm px-3 py-1">
-            <Text style={{ fontSize: 10, fontWeight: '500', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1 }}>
-              {t('settings.version', translationLanguage)} 1.0.4 (Build 42)
-            </Text>
-          </View>
+        {/* Version */}
+        <ContentContainer className="mt-4 mb-4 items-center">
+          <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>
+            {t('settings.version', translationLanguage)} 1.0.4 (Build 42)
+          </Text>
         </ContentContainer>
       </ScrollView>
     </ScreenLayout>

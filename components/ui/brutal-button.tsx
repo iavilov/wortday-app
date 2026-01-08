@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/design-tokens';
+import { Border, Colors } from '@/constants/design-tokens';
 import * as Haptics from 'expo-haptics';
 import React from 'react';
 import { Platform, Pressable, View, ViewStyle } from 'react-native';
@@ -32,8 +32,8 @@ export const BrutalButton = ({
     backgroundColor = Colors.surface,
     activeBackgroundColor = Colors.accentYellow,
     borderColor = Colors.border,
-    borderWidth = 3,
-    borderRadius = 8,
+    borderWidth = Border.primary,
+    borderRadius = 6,
     style,
     contentContainerStyle,
     pressableStyle,

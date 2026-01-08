@@ -1,4 +1,4 @@
-import { Colors, Layout } from '@/constants/design-tokens';
+import { Border, Colors, Layout } from '@/constants/design-tokens';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import * as Haptics from 'expo-haptics';
@@ -11,18 +11,24 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const [containerWidth, setContainerWidth] = useState(Layout.maxContentWidth);
 
-    const horizontalPadding = 16;
-    const contentWidth = containerWidth - (horizontalPadding * 2);
+    const BORDER_WIDTH = 4;
+    const HORIZONTAL_PADDING = 16;
+    const indicatorSize = 50;
+    const indicatorTop = 10;
+
+    // Available width for tabs inside padding AND borders
+    const contentWidth = containerWidth - (2 * BORDER_WIDTH) - (2 * HORIZONTAL_PADDING);
     const tabSpace = contentWidth / state.routes.length;
 
-    const indicatorSize = 40;
-    const indicatorTop = 15; // Centered behind the icon in the 100px container
+    // Starting X position for the first tab icon
+    // (Relative to container's left edge, including border)
+    const startX = BORDER_WIDTH + HORIZONTAL_PADDING;
 
-    const translateX = useSharedValue(horizontalPadding + (tabSpace - indicatorSize) / 2);
+    const translateX = useSharedValue(startX + (tabSpace - indicatorSize) / 2);
 
     useEffect(() => {
         if (containerWidth > 0) {
-            const targetX = horizontalPadding + (state.index * tabSpace) + (tabSpace - indicatorSize) / 2;
+            const targetX = startX + (state.index * tabSpace) + (tabSpace - indicatorSize) / 2;
             translateX.value = withSpring(targetX, {
                 damping: 100,
                 stiffness: 500,
@@ -164,8 +170,8 @@ const styles = StyleSheet.create({
     outerContainer: {
         position: 'absolute',
         bottom: 34,
-        left: 20,
-        right: 20,
+        left: Layout.screenPadding,
+        right: Layout.screenPadding,
         alignItems: 'center',
         zIndex: 10,
     } as ViewStyle,
@@ -173,7 +179,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 100,
         backgroundColor: Colors.surface,
-        borderWidth: 4,
+        borderWidth: Border.primary,
         borderColor: Colors.border,
         borderRadius: 12,
         flexDirection: 'row',
@@ -208,10 +214,10 @@ const styles = StyleSheet.create({
     indicator: {
         position: 'absolute',
         backgroundColor: Colors.primary,
-        borderWidth: 2,
+        borderWidth: Border.secondary,
         borderColor: Colors.border,
         borderRadius: 8,
-        left: -4,
+        left: -3,
         ...createBrutalShadow(2, Colors.border),
         zIndex: 0,
     } as ViewStyle,

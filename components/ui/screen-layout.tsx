@@ -1,3 +1,4 @@
+import { Layout } from '@/constants/design-tokens';
 import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { View, ViewProps } from 'react-native';
@@ -59,7 +60,7 @@ export function ScreenLayout({
                 flex: 1,
                 height: '100%',
                 maxWidth: 480,
-                paddingHorizontal: 24,
+                paddingHorizontal: Layout.screenPadding,
                 width: '100%',
               },
               animatedStyle,

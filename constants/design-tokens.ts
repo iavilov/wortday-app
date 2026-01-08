@@ -143,11 +143,19 @@ export const backgroundPattern = {
   backgroundSize: '24px 24px',
 };
 
+
 export const Layout = {
   maxContentWidth: 432,
   screenPadding: 24,
   cardPadding: 20,
 };
+
+export const Border = {
+  primary: 3,
+  secondary: 2,
+  thin: 1,
+} as const;
+
 
 export const FontNames = {
   regular: 'Manrope_400Regular',
