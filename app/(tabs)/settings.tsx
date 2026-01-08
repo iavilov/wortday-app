@@ -1,4 +1,5 @@
 import { BrutalButton } from '@/components/ui/brutal-button';
+import { BrutalDashedLine } from '@/components/ui/brutal-dashed-line';
 import { ContentContainer } from '@/components/ui/content-container';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
@@ -64,17 +65,7 @@ function SettingItem({ icon, iconBgColor, title, subtitle, onPress, showDivider 
         </View>
         <ChevronRight size={20} color={Colors.border} strokeWidth={2.5} />
       </Pressable>
-      {showDivider && (
-        <View
-          style={{
-            height: 2,
-            borderStyle: 'dashed',
-            borderWidth: 1,
-            borderColor: Colors.border,
-            marginHorizontal: 16,
-          }}
-        />
-      )}
+      {showDivider && <BrutalDashedLine thickness={2} dashArray="6, 6" />}
     </>
   );
 }
