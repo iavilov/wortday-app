@@ -17,6 +17,7 @@ import "../global.css";
 import { Colors } from '@/constants/design-tokens';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { initializeNotifications } from '@/lib/notifications';
+import { setupAuthListener, useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 
@@ -34,6 +35,7 @@ export default function RootLayout() {
 
   const { hasCompletedOnboarding, _hasHydrated: settingsHydrated, hydrate: hydrateSettings } = useSettingsStore();
   const { _hasHydrated: wordHydrated, hydrate: hydrateWords } = useWordStore();
+  const { initialize: initializeAuth, isInitialized: authInitialized } = useAuthStore();
 
   const [fontsLoaded] = useFonts({
     IBMPlexSans_400Regular,
@@ -42,12 +44,13 @@ export default function RootLayout() {
     IBMPlexSans_700Bold,
   });
 
-  // Hydrate stores and initialize notifications on mount
+  // Hydrate stores, initialize auth, and initialize notifications on mount
   useEffect(() => {
     const init = async () => {
       await Promise.all([
         hydrateSettings(),
         hydrateWords(),
+        initializeAuth(),
       ]);
 
       // Initialize notifications (iOS/Android only)
@@ -56,6 +59,14 @@ export default function RootLayout() {
       setIsReady(true);
     };
     init();
+  }, []);
+
+  // Setup auth state listener
+  useEffect(() => {
+    const subscription = setupAuthListener();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Handle navigation after hydration
