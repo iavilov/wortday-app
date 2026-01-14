@@ -281,6 +281,26 @@ export const UI_TRANSLATIONS = {
             de: 'Nicht gefunden',
         },
     },
+    error: {
+        lostInTranslation: {
+            ru: 'Страница не найдена',
+            uk: 'Страница не знайдена',
+            en: 'Page not found',
+            de: 'Seite nicht gefunden',
+        },
+        pageNotFoundDesc: {
+            ru: 'Упс! Мы не можем найти страницу, которую вы ищете. Кажется, она исчезла из нашего словаря.',
+            uk: 'Упс! Ми не можемо знайти сторінку, яку ви шукаєте. Здається, вона зникла з нашого словника.',
+            en: 'Oops! We couldn\'t find the page you\'re looking for. It seems to have vanished from our dictionary.',
+            de: 'Hoppla! Wir konnten die gesuchte Seite nicht finden. Sie scheint aus unserem Wörterbuch verschwunden zu sein.',
+        },
+        goBack: {
+            ru: 'ВЕРНУТЬСЯ ДОМОЙ',
+            uk: 'ПОВЕРНУТИСЯ ДОДОМУ',
+            en: 'GO BACK HOME',
+            de: 'ZURÜCK NACH HAUSE',
+        },
+    },
     notifications: {
         description: {
             ru: 'Получайте напоминание каждый день в выбранное время',
