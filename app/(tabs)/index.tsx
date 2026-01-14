@@ -51,6 +51,7 @@ export default function Index() {
   const content = getWordContent(todayWord, translationLanguage);
 
   const displayWord = todayWord.word_de;
+  console.log(displayWord);
   const dateString = formatDate(new Date(), translationLanguage);
 
   const onShare = async () => {

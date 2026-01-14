@@ -1,5 +1,5 @@
-import { getAllWords, getTodayWord } from '@/lib/mock-data';
 import { storage } from '@/lib/storage';
+import * as wordService from '@/lib/word-service';
 import { Word } from '@/types/word';
 import { create } from 'zustand';
 
@@ -58,12 +58,20 @@ export const useWordStore = create<WordStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-
       // Get the current level and registration date from settings
       const { languageLevel, registrationDate } = (await import('@/store/settings-store')).useSettingsStore.getState();
 
-      const word = getTodayWord(languageLevel, registrationDate);
+      const { word, error } = await wordService.getTodayWord(languageLevel, registrationDate);
+
+      if (error) {
+        set({
+          error,
+          isLoading: false,
+          todayWord: null
+        });
+        return;
+      }
+
       set({ todayWord: word, isLoading: false });
 
     } catch (error) {
@@ -76,7 +84,13 @@ export const useWordStore = create<WordStore>((set, get) => ({
 
   loadAllWords: async () => {
     try {
-      const words = getAllWords();
+      const { words, error } = await wordService.getAllWords();
+
+      if (error) {
+        console.error('Failed to load all words:', error);
+        return;
+      }
+
       set({ allWords: words });
     } catch (error) {
       console.error('Failed to load all words:', error);

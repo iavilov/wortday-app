@@ -5,13 +5,15 @@ import { WordCard } from '@/components/word-card';
 import { Colors } from '@/constants/design-tokens';
 import { formatDate } from '@/lib/date-helpers';
 import { getWordContent, t } from '@/lib/i18n-helpers';
-import { getWordById } from '@/lib/mock-data';
+import * as wordService from '@/lib/word-service';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
+import { Word } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
-import { ScrollView, Share, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Share, Text, TouchableOpacity, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 export default function WordDetailPage() {
@@ -19,8 +21,20 @@ export default function WordDetailPage() {
   const router = useRouter();
   const { translationLanguage } = useSettingsStore();
   const { toggleFavorite, isFavorite } = useWordStore();
+  const [word, setWord] = useState<Word | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const word = getWordById(id as string);
+  useEffect(() => {
+    async function fetchWord() {
+      const { word: fetchedWord, error } = await wordService.getWordById(id as string);
+      if (error) {
+        console.error('Failed to fetch word:', error);
+      }
+      setWord(fetchedWord);
+      setIsLoading(false);
+    }
+    fetchWord();
+  }, [id]);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -29,6 +43,19 @@ export default function WordDetailPage() {
       router.replace('/history');
     }
   };
+
+  if (isLoading) {
+    return (
+      <ScreenLayout>
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text className="text-text-muted mt-4 font-w-medium">
+            {t('common.loading', translationLanguage)}
+          </Text>
+        </View>
+      </ScreenLayout>
+    );
+  }
 
   if (!word) {
     return (
