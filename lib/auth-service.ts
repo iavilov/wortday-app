@@ -8,6 +8,11 @@ import { supabase } from '@/lib/supabase-client';
 import { AppleCredential, SignInData, SignUpData } from '@/types/auth';
 import { Platform } from 'react-native';
 
+// Check if Apple Sign In mock is enabled
+export const isAppleMockEnabled = () => {
+  return process.env.EXPO_PUBLIC_APPLE_SIGN_IN_MOCK === 'true';
+};
+
 // Sign up with email and password
 export async function signUpWithEmail({ email, password, displayName }: SignUpData) {
   const { data, error } = await supabase.auth.signUp({
@@ -46,6 +51,43 @@ export async function signInWithEmail({ email, password }: SignInData) {
 // Sign in with Apple (iOS only)
 // ⚠️ IMPORTANT: fullName is only provided on FIRST sign in!
 export async function signInWithApple(credential: AppleCredential) {
+  // Mock mode for testing without Apple Developer account
+  if (isAppleMockEnabled()) {
+    console.log('[Auth] Apple Sign In MOCK mode enabled');
+    // Simulate Apple Sign In with mock credentials
+    const mockEmail = `mock-apple-${Date.now()}@privaterelay.appleid.com`;
+    const mockPassword = 'mock-apple-password-' + Date.now();
+
+    // Try to sign in first, if fails then sign up
+    const { data: existingUser } = await supabase.auth.signInWithPassword({
+      email: mockEmail,
+      password: mockPassword,
+    });
+
+    if (existingUser.user) {
+      return { user: existingUser.user, error: null };
+    }
+
+    // Sign up with mock credentials
+    const { data, error } = await supabase.auth.signUp({
+      email: mockEmail,
+      password: mockPassword,
+      options: {
+        data: {
+          full_name: 'Mock Apple User',
+        },
+      },
+    });
+
+    if (error) {
+      console.error('[Auth] Mock Apple sign in error:', error);
+      return { user: null, error: error.message };
+    }
+
+    return { user: data.user, error: null };
+  }
+
+  // Real Apple Sign In flow
   if (!credential.identityToken) {
     return { user: null, error: 'No identity token provided' };
   }

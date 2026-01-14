@@ -35,7 +35,7 @@ export default function RootLayout() {
 
   const { hasCompletedOnboarding, _hasHydrated: settingsHydrated, hydrate: hydrateSettings } = useSettingsStore();
   const { _hasHydrated: wordHydrated, hydrate: hydrateWords } = useWordStore();
-  const { initialize: initializeAuth, isInitialized: authInitialized } = useAuthStore();
+  const { initialize: initializeAuth, isInitialized: authInitialized, isAuthenticated } = useAuthStore();
 
   const [fontsLoaded] = useFonts({
     IBMPlexSans_400Regular,
@@ -69,22 +69,44 @@ export default function RootLayout() {
     };
   }, []);
 
-  // Handle navigation after hydration
+  // Handle navigation after hydration (Auth Guard + Onboarding)
   useEffect(() => {
-    if (!isReady || !fontsLoaded || !settingsHydrated || !wordHydrated) {
+    if (!isReady || !fontsLoaded || !settingsHydrated || !wordHydrated || !authInitialized) {
       return;
     }
 
+    const inAuthFlow = segments[0] === 'auth';
     const inOnboarding = segments[0] === 'onboarding';
 
-    if (!hasCompletedOnboarding && !inOnboarding) {
-      router.replace('/onboarding');
-    } else if (hasCompletedOnboarding && inOnboarding) {
+    // Priority 1: Auth Guard (redirect to login if not authenticated)
+    if (!isAuthenticated && !inAuthFlow) {
+      router.replace('/auth/login');
+      SplashScreen.hideAsync();
+      return;
+    }
+
+    // Priority 2: Redirect authenticated users away from auth flow
+    if (isAuthenticated && inAuthFlow) {
       router.replace('/(tabs)');
+      SplashScreen.hideAsync();
+      return;
+    }
+
+    // Priority 3: Onboarding flow (only for authenticated users)
+    if (isAuthenticated && !hasCompletedOnboarding && !inOnboarding) {
+      router.replace('/onboarding');
+      SplashScreen.hideAsync();
+      return;
+    }
+
+    if (isAuthenticated && hasCompletedOnboarding && inOnboarding) {
+      router.replace('/(tabs)');
+      SplashScreen.hideAsync();
+      return;
     }
 
     SplashScreen.hideAsync();
-  }, [isReady, fontsLoaded, settingsHydrated, wordHydrated, hasCompletedOnboarding, segments]);
+  }, [isReady, fontsLoaded, settingsHydrated, wordHydrated, authInitialized, isAuthenticated, hasCompletedOnboarding, segments]);
 
   if (!fontsLoaded || !isReady || !settingsHydrated || !wordHydrated) {
     return (
@@ -98,11 +120,13 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <View style={{ flex: 1, width: '100%', backgroundColor: Colors.background }}>
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="auth/login" options={{ headerShown: false }} />
+          <Stack.Screen name="auth/register" options={{ headerShown: false }} />
+          <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="settings" options={{ headerShown: false }} />
           <Stack.Screen name="history" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/login" options={{ headerShown: false, presentation: 'modal' }} />
         </Stack>
       </View>
       <StatusBar style="auto" />

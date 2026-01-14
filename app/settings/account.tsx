@@ -82,16 +82,28 @@ export default function AccountScreen() {
     const displayEmail = getDisplayEmail(user, profile);
 
     const handleSignOut = async () => {
+        const title = t('account.signOut', translationLanguage);
+        const message = t('account.signOutConfirm', translationLanguage) || 'Are you sure you want to sign out?';
+
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm(`${title}\n\n${message}`);
+            if (confirmed) {
+                await signOut();
+                router.replace('/auth/login');
+            }
+            return;
+        }
+
         Alert.alert(
-            t('account.signOut', translationLanguage),
-            t('account.deleteAccountWarning', translationLanguage).replace('удалит', 'выйдет из'),
+            title,
+            message,
             [
                 { text: t('account.cancel', translationLanguage), style: 'cancel' },
                 {
                     text: t('account.signOut', translationLanguage),
                     onPress: async () => {
                         await signOut();
-                        router.replace('/onboarding');
+                        router.replace('/auth/login');
                     },
                 },
             ]
@@ -99,9 +111,25 @@ export default function AccountScreen() {
     };
 
     const handleDeleteAccount = async () => {
+        const title = t('account.deleteAccountConfirm', translationLanguage);
+        const message = t('account.deleteAccountWarning', translationLanguage);
+
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm(`${title}\n\n${message}`);
+            if (confirmed) {
+                const result = await deleteAccount();
+                if (result.success) {
+                    router.replace('/auth/login');
+                } else {
+                    Alert.alert('Error', result.error || 'Failed to delete account');
+                }
+            }
+            return;
+        }
+
         Alert.alert(
-            t('account.deleteAccountConfirm', translationLanguage),
-            t('account.deleteAccountWarning', translationLanguage),
+            title,
+            message,
             [
                 { text: t('account.cancel', translationLanguage), style: 'cancel' },
                 {
@@ -110,7 +138,7 @@ export default function AccountScreen() {
                     onPress: async () => {
                         const result = await deleteAccount();
                         if (result.success) {
-                            router.replace('/onboarding');
+                            router.replace('/auth/login');
                         } else {
                             Alert.alert('Error', result.error || 'Failed to delete account');
                         }
