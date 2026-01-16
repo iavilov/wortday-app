@@ -19,7 +19,6 @@ expo-env.d.ts
 *.mobileprovision
 # Metro
 .metro-health-check*
-/docs
 # debug
 npm-debug.*
 yarn-debug.*
@@ -36,6 +35,7 @@ yarn-error.*
 .clinerules/
 .idx/
 .vscode/
+.claude/
 
 
 # typescript
