@@ -14,13 +14,13 @@ interface BrutalDashedLineProps {
 /**
  * A Neobrutalist dashed line component using SVG for consistent cross-platform rendering.
  */
-export function BrutalDashedLine({
+export const BrutalDashedLine = ({
     color = Colors.border,
     thickness = 2,
     dashArray = "6, 6",
     style,
     marginHorizontal = 16,
-}: BrutalDashedLineProps) {
+}: BrutalDashedLineProps) => {
     return (
         <View style={[{ height: thickness, marginHorizontal }, style]}>
             <Svg height={thickness} width="100%">

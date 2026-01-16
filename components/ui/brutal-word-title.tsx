@@ -1,5 +1,5 @@
 import { BrutalButton } from '@/components/ui/brutal-button';
-import { Colors } from '@/constants/design-tokens';
+import { Colors, borderRadius } from '@/constants/design-tokens';
 import { Volume2 } from 'lucide-react-native';
 import React from 'react';
 import { Text, View } from 'react-native';
@@ -9,7 +9,7 @@ interface BrutalWordTitleProps {
     onAudioPress?: () => void;
 }
 
-export function BrutalWordTitle({ word, onAudioPress }: BrutalWordTitleProps) {
+export const BrutalWordTitle = ({ word, onAudioPress }: BrutalWordTitleProps) => {
     // Determine font size based on word length to prevent overflow
     const getFontSizeClass = (text: string) => {
         if (text.length > 18) return 'text-xl';
@@ -30,7 +30,7 @@ export function BrutalWordTitle({ word, onAudioPress }: BrutalWordTitleProps) {
             <BrutalButton
                 onPress={onAudioPress}
                 borderWidth={2}
-                borderRadius={25}
+                borderRadius={borderRadius.ROUND}
                 backgroundColor={Colors.accentYellow}
                 style={{ width: 48, height: 48 }}
                 contentContainerStyle={{ height: '100%' }}

@@ -64,6 +64,18 @@ export const UI_TRANSLATIONS = {
             en: 'Word of the day: {word} - {translation}. Learn German with Vocade!',
             de: 'Wort des Tages: {word} - {translation}. Deutsch lernen mit Vocade!',
         },
+        audioComingSoon: {
+            ru: 'Произношение скоро появится',
+            uk: 'Вимова скоро з\'явиться',
+            en: 'Pronunciation coming soon',
+            de: 'Aussprache kommt bald',
+        },
+        audioComingSoonMessage: {
+            ru: 'Функция аудио произношения будет доступна в следующих обновлениях.',
+            uk: 'Функція аудіо вимови буде доступна в наступних оновленнях.',
+            en: 'Audio pronunciation will be available in upcoming releases.',
+            de: 'Audio-Aussprache wird in kommenden Versionen verfügbar sein.',
+        },
     },
     history: {
         search: {

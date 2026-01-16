@@ -21,7 +21,7 @@ interface BrutalTagProps extends ViewProps {
 /**
  * Simple brutalist tag for badges/chips with configurable shadow and sizing.
  */
-export function BrutalTag({
+export const BrutalTag = ({
   text,
   backgroundColor = Colors.surface,
   textColor = Colors.border,
@@ -36,7 +36,7 @@ export function BrutalTag({
   textStyle,
   textClassName = '',
   ...props
-}: BrutalTagProps) {
+}: BrutalTagProps) => {
   return (
     <View
       style={[

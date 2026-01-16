@@ -9,13 +9,13 @@ interface BrutalCardProps extends ViewProps {
     width?: number;
 }
 
-export function BrutalCard({
+export const BrutalCard = ({
     children,
     style,
     className = '',
     maxWidth = Layout.maxContentWidth,
     ...props
-}: BrutalCardProps) {
+}: BrutalCardProps) => {
     return (
         <View
             className={`bg-surface p-5 relative w-full ${className}`}

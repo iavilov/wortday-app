@@ -10,7 +10,7 @@ interface ContentContainerProps extends ViewProps {
  * A reusable container that constrains content to a maximum width
  * and centers it. Used to maintain layout consistency across Web and Mobile.
  */
-export function ContentContainer({ children, style, className = '', ...props }: ContentContainerProps) {
+export const ContentContainer = ({ children, style, className = '', ...props }: ContentContainerProps) => {
     return (
         <View
             className={`w-full px-1 ${className}`}

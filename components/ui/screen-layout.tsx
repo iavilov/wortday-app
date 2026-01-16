@@ -16,26 +16,25 @@ interface ScreenLayoutProps extends ViewProps {
   withBottomPadding?: boolean;
 }
 
-export function ScreenLayout({
+export const ScreenLayout = ({
   children,
   style,
   className,
   withBottomPadding = true,
   ...props
-}: ScreenLayoutProps) {
+}: ScreenLayoutProps) => {
   const isFocused = useIsFocused();
-  const bottomPadding = withBottomPadding ? 60 : 0;
 
   const translateY = useSharedValue(20);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
     if (isFocused) {
-      // Прыжок вверх и появление
+      // Jump up and fade in animation
       translateY.value = withSpring(0, { damping: 20, stiffness: 150, mass: 0.8 });
       opacity.value = withTiming(1, { duration: 300 });
     } else {
-      // Сброс в исходное состояние при уходе с экрана
+      // Reset to initial state when leaving screen
       translateY.value = 20;
       opacity.value = 0;
     }
@@ -59,7 +58,7 @@ export function ScreenLayout({
               {
                 flex: 1,
                 height: '100%',
-                maxWidth: 480,
+                maxWidth: Layout.maxContentWidth,
                 paddingHorizontal: Layout.screenPadding,
                 width: '100%',
               },

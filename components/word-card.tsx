@@ -31,7 +31,7 @@ interface WordCardProps {
     onShare?: () => void;
 }
 
-export function WordCard({
+export const WordCard = ({
     word,
     content,
     translationLanguage,
@@ -39,11 +39,11 @@ export function WordCard({
     onToggleFavorite,
     onAudioPress,
     onShare,
-}: WordCardProps) {
+}: WordCardProps) => {
     const article = word.article;
     const hasArticle = !!article && article !== 'none';
     const articleColors = hasArticle ? ARTICLE_COLORS[article] : null;
-    const partOfSpeechColor = (PART_OF_SPEECH_COLORS as any)[word.part_of_speech];
+    const partOfSpeechColor = PART_OF_SPEECH_COLORS[word.part_of_speech as keyof typeof PART_OF_SPEECH_COLORS];
 
     return (
         <BrutalCard>

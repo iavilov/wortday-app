@@ -12,7 +12,7 @@ interface HighlightedTextProps {
  * Renders text with **highlighted** parts in a neo-brutalist style.
  * Uses a View inside a Text to achieve the inline block look.
  */
-export function HighlightedText({ text, textClassName = '', highlightClassName = '' }: HighlightedTextProps) {
+export const HighlightedText = ({ text, textClassName = '', highlightClassName = '' }: HighlightedTextProps) => {
     const parts = text.split(/(\*\*.*?\*\*)/g);
 
     return (

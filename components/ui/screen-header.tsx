@@ -23,7 +23,7 @@ interface ScreenHeaderProps extends ViewProps {
  * Reusable Screen Header with Neo-brutalist badge and title.
  * Supports left/right elements, alignment, and back button for secondary screens.
  */
-export function ScreenHeader({
+export const ScreenHeader = ({
     title,
     badgeText,
     badgeColor = Colors.accentYellow,
@@ -36,7 +36,7 @@ export function ScreenHeader({
     className = '',
     style,
     ...props
-}: ScreenHeaderProps) {
+}: ScreenHeaderProps) => {
     const router = useRouter();
 
     // Determine the layout type based on props

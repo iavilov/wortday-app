@@ -50,7 +50,7 @@ export default function LoginScreen() {
 
         if (isAppleMockEnabled()) {
             // Mock mode - no need for real Apple credential
-            const result = await signInWithApple({} as any);
+            const result = await signInWithApple({ identityToken: null });
             if (!result.error) {
                 // Auth guard will redirect to /(tabs)
             } else {

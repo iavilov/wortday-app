@@ -15,11 +15,11 @@ interface EtymologyAccordionProps {
   defaultOpen?: boolean;
 }
 
-export function EtymologyAccordion({
+export const EtymologyAccordion = ({
   title,
   children,
   defaultOpen = false
-}: EtymologyAccordionProps) {
+}: EtymologyAccordionProps) => {
   const height = useSharedValue(0);
   const contentHeight = useSharedValue(0);
   const isOpen = useSharedValue(defaultOpen);

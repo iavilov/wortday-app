@@ -8,7 +8,7 @@ interface BrutalDividerProps {
     className?: string;
 }
 
-export function BrutalDivider({ dashed = true, className }: BrutalDividerProps) {
+export const BrutalDivider = ({ dashed = true, className }: BrutalDividerProps) => {
     if (dashed) {
         return (
             <View className={className} style={styles.svgContainer}>

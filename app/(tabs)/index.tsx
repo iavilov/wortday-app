@@ -51,7 +51,6 @@ export default function Index() {
   const content = getWordContent(todayWord, translationLanguage);
 
   const displayWord = todayWord.word_de;
-  console.log(displayWord);
   const dateString = formatDate(new Date(), translationLanguage);
 
   const onShare = async () => {
@@ -71,7 +70,10 @@ export default function Index() {
 
   const handleAudioPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert('Audio coming soon', 'Произношение подключим в следующих релизах.');
+    Alert.alert(
+      t('home.audioComingSoon', translationLanguage),
+      t('home.audioComingSoonMessage', translationLanguage)
+    );
   };
 
   return (

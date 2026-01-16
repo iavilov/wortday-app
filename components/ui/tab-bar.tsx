@@ -8,11 +8,11 @@ import React, { useEffect, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+export const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     const [containerWidth, setContainerWidth] = useState(Layout.maxContentWidth);
 
-    const BORDER_WIDTH = 4;
-    const HORIZONTAL_PADDING = 16;
+    const BORDER_WIDTH = Border.primary;
+    const HORIZONTAL_PADDING = Layout.screenPadding;
     const indicatorSize = 50;
     const indicatorTop = 10;
 
@@ -128,7 +128,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 }
 
 // Separate component for animated content
-function AnimatedTabContent({ Icon, label, isFocused }: { Icon: any, label: string, isFocused: boolean }) {
+const AnimatedTabContent = ({ Icon, label, isFocused }: { Icon: any, label: string, isFocused: boolean }) => {
     const scale = useSharedValue(isFocused ? 1.05 : 1);
     const opacity = useSharedValue(isFocused ? 1 : 0.6);
 

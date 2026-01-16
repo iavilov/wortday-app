@@ -14,11 +14,11 @@ interface BrutalSwitchProps {
     activeColor?: string;
 }
 
-export function BrutalSwitch({
+export const BrutalSwitch = ({
     value,
     onValueChange,
     activeColor = Colors.primary
-}: BrutalSwitchProps) {
+}: BrutalSwitchProps) => {
     const translateX = useSharedValue(value ? 24 : 0);
 
     useEffect(() => {
@@ -32,7 +32,7 @@ export function BrutalSwitch({
         const backgroundColor = interpolateColor(
             translateX.value,
             [0, 24],
-            ['#E5E7EB', activeColor]
+            [Colors.gray200, activeColor]
         );
 
         return {
@@ -66,11 +66,11 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 16,
         borderWidth: 2,
-        borderColor: '#121212',
+        borderColor: Colors.border,
         padding: 2,
         justifyContent: 'center',
         // Shadow
-        shadowColor: '#121212',
+        shadowColor: Colors.border,
         shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 1,
         shadowRadius: 0,
@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         borderRadius: 12,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.surface,
         borderWidth: 2,
-        borderColor: '#121212',
+        borderColor: Colors.border,
     },
 });

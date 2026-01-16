@@ -231,10 +231,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       if (error) throw error;
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('[Auth] Sign in error:', error);
       set({ isLoading: false });
-      return { success: false, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
     }
   },
 
@@ -249,10 +250,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       if (error) throw error;
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('[Auth] Sign up error:', error);
       set({ isLoading: false });
-      return { success: false, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
     }
   },
 }));
