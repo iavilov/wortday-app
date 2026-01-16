@@ -72,21 +72,39 @@ export default function RootLayout() {
   // Handle navigation after hydration (Auth Guard + Onboarding)
   useEffect(() => {
     if (!isReady || !fontsLoaded || !settingsHydrated || !wordHydrated || !authInitialized) {
+      console.log('[AuthGuard] Waiting for initialization...', {
+        isReady,
+        fontsLoaded,
+        settingsHydrated,
+        wordHydrated,
+        authInitialized,
+      });
       return;
     }
 
     const inAuthFlow = segments[0] === 'auth';
     const inOnboarding = segments[0] === 'onboarding';
 
+    console.log('[AuthGuard] Checking navigation:', {
+      isAuthenticated,
+      hasCompletedOnboarding,
+      segments: segments.join('/'),
+      inAuthFlow,
+      inOnboarding,
+    });
+
     // Priority 1: Auth Guard (redirect to login if not authenticated)
     if (!isAuthenticated && !inAuthFlow) {
+      console.log('[AuthGuard] Priority 1: Redirecting to login (not authenticated)');
       router.replace('/auth/login');
       SplashScreen.hideAsync();
       return;
     }
 
     // Priority 2: Redirect authenticated users away from auth flow
-    if (isAuthenticated && inAuthFlow) {
+    // BUT only if onboarding is completed (otherwise Priority 3 will handle it)
+    if (isAuthenticated && inAuthFlow && hasCompletedOnboarding) {
+      console.log('[AuthGuard] Priority 2: Redirecting to tabs (auth flow + onboarding completed)');
       router.replace('/(tabs)');
       SplashScreen.hideAsync();
       return;
@@ -94,17 +112,20 @@ export default function RootLayout() {
 
     // Priority 3: Onboarding flow (only for authenticated users)
     if (isAuthenticated && !hasCompletedOnboarding && !inOnboarding) {
+      console.log('[AuthGuard] Priority 3: Redirecting to onboarding (not completed)');
       router.replace('/onboarding');
       SplashScreen.hideAsync();
       return;
     }
 
     if (isAuthenticated && hasCompletedOnboarding && inOnboarding) {
+      console.log('[AuthGuard] Redirecting to tabs (onboarding completed but in onboarding screen)');
       router.replace('/(tabs)');
       SplashScreen.hideAsync();
       return;
     }
 
+    console.log('[AuthGuard] No redirect needed, hiding splash screen');
     SplashScreen.hideAsync();
   }, [isReady, fontsLoaded, settingsHydrated, wordHydrated, authInitialized, isAuthenticated, hasCompletedOnboarding, segments]);
 

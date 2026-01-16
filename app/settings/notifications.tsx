@@ -97,6 +97,46 @@ export default function NotificationsScreen() {
     setShowTimePicker(true);
   };
 
+  // Early return for web platform
+  if (Platform.OS === 'web') {
+    return (
+      <ScreenLayout>
+        <ScrollView
+          className="flex-1 w-full"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 160, alignItems: 'center' }}
+        >
+          <ScreenHeader
+            title={t('settings.notifications', translationLanguage)}
+            showBackButton
+            badgeText={t('settings.title', translationLanguage)}
+            badgeColor={Colors.primary}
+          />
+
+          <ContentContainer>
+            <View
+              className="w-full p-5"
+              style={{
+                backgroundColor: Colors.surface,
+                borderWidth: Border.primary,
+                borderColor: Colors.border,
+                borderRadius: borderRadius.LARGE,
+                ...createBrutalShadow(4, Colors.border),
+              }}
+            >
+              <Text className="text-border text-base font-w-bold mb-2">
+                {t('notifications.notAvailableWeb', translationLanguage)}
+              </Text>
+              <Text className="text-text-muted text-sm font-w-medium">
+                {t('notifications.notAvailableWebDescription', translationLanguage)}
+              </Text>
+            </View>
+          </ContentContainer>
+        </ScrollView>
+      </ScreenLayout>
+    );
+  }
+
   if (isLoading) {
     return (
       <ScreenLayout>

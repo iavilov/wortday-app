@@ -20,14 +20,14 @@ type TabType = 'all' | 'favorites';
 export default function HistoryScreen() {
   const router = useRouter();
   const { translationLanguage } = useSettingsStore();
-  const { loadAllWords, allWords, getFavoriteWords } = useWordStore();
+  const { loadHistoryWords, historyWords, getFavoriteWords } = useWordStore();
   const [activeTab, setActiveTab] = useState<TabType>('all');
 
   useEffect(() => {
-    loadAllWords();
+    loadHistoryWords();
   }, []);
 
-  const displayWords = activeTab === 'all' ? allWords : getFavoriteWords();
+  const displayWords = activeTab === 'all' ? historyWords : getFavoriteWords();
 
   return (
     <ScreenLayout>
@@ -92,7 +92,7 @@ export default function HistoryScreen() {
               className="absolute -top-[6px] -right-[-6px] bg-white border-2 border-border h-7 min-w-[28px] items-center justify-center rounded-full z-10 px-1"
               style={{ borderColor: Colors.border }}
             >
-              <Text className="text-[11px] font-w-bold">{allWords.length}</Text>
+              <Text className="text-[11px] font-w-bold">{historyWords.length}</Text>
             </View>
           </BrutalButton>
 

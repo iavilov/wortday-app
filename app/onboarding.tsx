@@ -2,6 +2,7 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
+import { useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { LanguageLevel, LEVEL_OPTIONS } from '@/types/settings';
 import { createBrutalShadow } from '@/utils/platform-styles';
@@ -16,12 +17,31 @@ import { ScrollView, Text, View } from 'react-native';
 export default function OnboardingScreen() {
   const router = useRouter();
   const { setLanguageLevel, setRegistrationDate, setHasCompletedOnboarding, translationLanguage } = useSettingsStore();
+  const { updateProfile } = useAuthStore();
   const [selectedLevel, setSelectedLevel] = useState<LanguageLevel>('beginner');
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
+    const today = new Date().toISOString().split('T')[0];
+
+    console.log('[Onboarding] Completing onboarding:', {
+      selectedLevel,
+      registrationDate: today,
+    });
+
+    // Update local settings first (optimistic update)
     setLanguageLevel(selectedLevel);
-    setRegistrationDate(new Date().toISOString().split('T')[0]);
+    setRegistrationDate(today);
     setHasCompletedOnboarding(true);
+
+    // CRITICAL: Update profile in database (single source of truth)
+    // This ensures users see the same state across all devices
+    await updateProfile({
+      language_level: selectedLevel,
+      registration_date: today,
+      has_completed_onboarding: true, // Save onboarding status to DB
+    });
+
+    console.log('[Onboarding] Profile updated in database (including onboarding status), redirecting to tabs');
     router.replace('/(tabs)');
   };
 

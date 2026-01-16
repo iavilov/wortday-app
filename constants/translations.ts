@@ -344,6 +344,18 @@ export const UI_TRANSLATIONS = {
             en: 'Based on your current timezone ({zone})',
             de: 'Basierend auf Ihrer aktuellen Zeitzone ({zone})',
         },
+        notAvailableWeb: {
+            ru: 'Уведомления недоступны',
+            uk: 'Сповіщення недоступні',
+            en: 'Notifications Unavailable',
+            de: 'Benachrichtigungen nicht verfügbar',
+        },
+        notAvailableWebDescription: {
+            ru: 'Push-уведомления доступны только в приложениях iOS и Android.',
+            uk: 'Push-сповіщення доступні тільки в додатках iOS та Android.',
+            en: 'Push notifications are only available in iOS and Android apps.',
+            de: 'Push-Benachrichtigungen sind nur in iOS- und Android-Apps verfügbar.',
+        },
     },
     account: {
         profile: {

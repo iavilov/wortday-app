@@ -18,6 +18,7 @@ export interface UserProfile {
   translation_language: 'ru' | 'uk' | 'en' | 'de';
   language_level: 'beginner' | 'intermediate' | 'advanced';
   registration_date: string;
+  has_completed_onboarding: boolean;
   notifications_enabled: boolean;
   notification_time: string;
   created_at: string;
@@ -131,6 +132,7 @@ export function mapDbProfile(dbProfile: any): UserProfile | null {
     translation_language: dbProfile.translation_language,
     language_level: dbProfile.language_level,
     registration_date: dbProfile.registration_date,
+    has_completed_onboarding: dbProfile.has_completed_onboarding || false,
     notifications_enabled: dbProfile.notifications_enabled,
     notification_time: dbProfile.notification_time,
     created_at: dbProfile.created_at,

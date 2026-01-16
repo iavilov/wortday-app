@@ -134,6 +134,34 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       const profile = mapDbProfile(data);
       set({ profile });
+
+      // Sync all user settings from DB to settings-store
+      // This ensures DB is the single source of truth and prevents stale AsyncStorage data
+      const settingsStore = (await import('@/store/settings-store')).useSettingsStore.getState();
+
+      if (data.registration_date) {
+        const dbDate = data.registration_date; // Already in YYYY-MM-DD format from DB
+        if (settingsStore.registrationDate !== dbDate) {
+          console.log(`[Auth] Syncing registration_date from DB: ${dbDate} (was: ${settingsStore.registrationDate})`);
+          settingsStore.setRegistrationDate(dbDate);
+        }
+      }
+
+      if (data.language_level) {
+        const dbLevel = data.language_level;
+        if (settingsStore.languageLevel !== dbLevel) {
+          console.log(`[Auth] Syncing language_level from DB: ${dbLevel} (was: ${settingsStore.languageLevel})`);
+          settingsStore.setLanguageLevel(dbLevel);
+        }
+      }
+
+      // CRITICAL: Sync onboarding completion status from DB
+      // This allows users to see the same state across all devices
+      const dbOnboardingStatus = data.has_completed_onboarding || false;
+      if (settingsStore.hasCompletedOnboarding !== dbOnboardingStatus) {
+        console.log(`[Auth] Syncing has_completed_onboarding from DB: ${dbOnboardingStatus} (was: ${settingsStore.hasCompletedOnboarding})`);
+        settingsStore.setHasCompletedOnboarding(dbOnboardingStatus);
+      }
     } catch (error) {
       console.error('[Auth] Fetch profile error:', error);
     }
@@ -243,12 +271,30 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   signUpWithEmail: async (email, password) => {
     try {
       set({ isLoading: true });
+
+      // IMPORTANT: Clear all local data before creating new account
+      // This ensures fresh state for new user (especially important on web/dev)
+      console.log('[Auth] Clearing local data for new user registration');
+      const { storage } = await import('@/lib/storage');
+      await storage.removeItem('vocade-settings');
+      await storage.removeItem('vocade-favorites');
+      await storage.removeItem('vocade-favorites-migrated');
+
+      // Reset settings store to defaults (DB will become source of truth after profile is created)
+      const { useSettingsStore } = await import('@/store/settings-store');
+      const settingsStore = useSettingsStore.getState();
+      settingsStore.setHasCompletedOnboarding(false);
+      settingsStore.setRegistrationDate('');
+      settingsStore.setLanguageLevel('beginner');
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) throw error;
+
+      // Note: Auth listener will trigger fetchProfile which will sync DB data to settings-store
       return { success: true };
     } catch (error: unknown) {
       console.error('[Auth] Sign up error:', error);

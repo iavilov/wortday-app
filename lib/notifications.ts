@@ -106,7 +106,7 @@ export async function getNotificationSettings(): Promise<{
   time: string;
 }> {
   const enabled = (await storage.getItem(NOTIFICATION_ENABLED_KEY)) === 'true';
-  const time = (await storage.getItem(NOTIFICATION_TIME_KEY)) || '09:00';
+  const time = (await storage.getItem(NOTIFICATION_TIME_KEY)) || '15:00';
 
   return { enabled, time };
 }

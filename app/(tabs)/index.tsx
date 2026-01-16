@@ -16,12 +16,20 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Share, Text, View } from 'react-native';
 
 export default function Index() {
-  const { todayWord, isLoading, loadTodayWord, toggleFavorite, isFavorite } = useWordStore();
+  const { todayWord, isLoading, loadTodayWord, toggleFavorite, isFavorite, markWordAsViewed } = useWordStore();
   const { translationLanguage } = useSettingsStore();
 
   useEffect(() => {
     loadTodayWord();
   }, []);
+
+  // Auto-mark word as viewed when loaded
+  useEffect(() => {
+    if (todayWord && !isLoading) {
+      console.log(`[Home] Auto-marking word as viewed: ${todayWord.id}`);
+      markWordAsViewed(todayWord.id);
+    }
+  }, [todayWord?.id, isLoading]);
 
   if (isLoading) {
     return (

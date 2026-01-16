@@ -1,7 +1,7 @@
 # Supabase Database Schema
 
-**Version:** 0.9.0 (Auth Screens + Protected Routes)  
-**Last Updated:** 14.01.2026
+**Version:** 1.0.0 (Word History System Integration)
+**Last Updated:** 16.01.2026
 
 ---
 
@@ -54,6 +54,7 @@ Database structure for Vocade with support for:
 | `translation_language`| `TEXT` | Native language (ru, uk, en, de) |
 | `language_level` | `TEXT` | Selected learning level |
 | `registration_date` | `DATE` | Registration date |
+| `has_completed_onboarding` | `BOOLEAN` | Onboarding completion status |
 | `notifications_enabled`| `BOOLEAN` | Notifications enabled flag |
 | `notification_time` | `TIME` | Daily notification time |
 
@@ -73,6 +74,53 @@ Database structure for Vocade with support for:
 | `times_reviewed` | `INTEGER` | Number of reviews |
 | `next_review_date` | `DATE` | Next review date (for SRS) |
 | `ease_factor` | `DECIMAL` | Ease factor for algorithm |
+
+#### Word History System Usage
+
+The `user_words_history` table is now actively used for:
+
+1. **View Tracking**: Automatically marks words as viewed when user opens Word of the Day
+2. **Favorites System**: Syncs favorites between local storage and database
+3. **Review Counting**: Increments `times_reviewed` on each view
+4. **Future SRS**: `next_review_date` and `ease_factor` prepared for spaced repetition
+
+**Implementation:**
+- Service: `lib/word-history-service.ts`
+- Store integration: `store/word-store.ts`
+- Auto-tracking: `app/(tabs)/index.tsx`
+
+**Key Functions:**
+- `markWordAsViewed(wordId)` - Called on index.tsx mount, upserts record with incremented review count
+- `toggleFavorite(wordId)` - Upserts `is_favorite` field with optimistic local updates
+- `getFavoriteIds()` - Fetches user favorites for sync with AsyncStorage
+- `migrateFavoritesToDatabase(ids)` - One-time migration from AsyncStorage to database
+
+**Data Flow:**
+```
+User opens home screen
+  → useEffect triggers markWordAsViewed(todayWord.id)
+    → Service checks auth.getUser()
+      → Upsert to user_words_history
+        → Increment times_reviewed OR create new record
+```
+
+**Favorites Sync:**
+```
+App launch
+  → Load favorites from AsyncStorage
+    → Check migration flag (vocade-favorites-migrated)
+      → If not migrated: migrateFavoritesToDatabase()
+        → Sync from DB to local state
+          → Set migration flag
+
+User toggles favorite
+  → Optimistic local update
+    → Save to AsyncStorage (offline support)
+      → Sync to DB via toggleFavorite()
+        → On error: rollback optimistic update
+```
+
+For detailed documentation, see: `docs/word-history-flow.md`
 
 ---
 
@@ -205,6 +253,7 @@ CREATE TABLE users (
   translation_language TEXT DEFAULT 'ru',
   language_level TEXT DEFAULT 'beginner',
   registration_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  has_completed_onboarding BOOLEAN DEFAULT FALSE,
   notifications_enabled BOOLEAN DEFAULT TRUE,
   notification_time TIME DEFAULT '09:00:00',
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -376,5 +425,5 @@ npm install expo-apple-authentication expo-web-browser  # for auth screens
 
 ---
 
-**Status:** ✅ Ready for production  
-**Last Updated:** 14.01.2026
+**Status:** ✅ Ready for production
+**Last Updated:** 16.01.2026
