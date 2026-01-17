@@ -17,11 +17,14 @@ import { ActivityIndicator, Alert, ScrollView, Share, Text, View } from 'react-n
 
 export default function Index() {
   const { todayWord, isLoading, loadTodayWord, toggleFavorite, isFavorite, markWordAsViewed } = useWordStore();
-  const { translationLanguage } = useSettingsStore();
+  const { translationLanguage, languageLevel, registrationDate } = useSettingsStore();
 
+  // Load today's word when component mounts OR when level/registration date changes
+  // This ensures correct word is shown when switching between accounts
   useEffect(() => {
+    console.log(`[Home] Loading today's word for level=${languageLevel}, registrationDate=${registrationDate}`);
     loadTodayWord();
-  }, []);
+  }, [languageLevel, registrationDate, loadTodayWord]);
 
   // Auto-mark word as viewed when loaded
   useEffect(() => {
@@ -29,7 +32,7 @@ export default function Index() {
       console.log(`[Home] Auto-marking word as viewed: ${todayWord.id}`);
       markWordAsViewed(todayWord.id);
     }
-  }, [todayWord?.id, isLoading]);
+  }, [todayWord?.id, isLoading, markWordAsViewed]);
 
   if (isLoading) {
     return (

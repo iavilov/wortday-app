@@ -199,6 +199,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       set({ isLoading: true });
       await supabase.auth.signOut();
+
+      // Clear auth state
       set({
         user: null,
         session: null,
@@ -206,6 +208,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isAuthenticated: false,
         isLoading: false,
       });
+
+      // IMPORTANT: Clear word-store to prevent showing wrong user's data
+      const { useWordStore } = await import('@/store/word-store');
+      const wordStore = useWordStore.getState();
+      wordStore.todayWord = null;
+      wordStore.historyWords = [];
+      wordStore.allWords = [];
+      wordStore.favoriteIds = new Set();
+      console.log('[Auth] Cleared word-store on logout');
     } catch (error) {
       console.error('[Auth] Sign out error:', error);
       set({ isLoading: false });

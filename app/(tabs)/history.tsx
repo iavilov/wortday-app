@@ -19,13 +19,16 @@ type TabType = 'all' | 'favorites';
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const { translationLanguage } = useSettingsStore();
+  const { translationLanguage, languageLevel, registrationDate } = useSettingsStore();
   const { loadHistoryWords, historyWords, getFavoriteWords } = useWordStore();
   const [activeTab, setActiveTab] = useState<TabType>('all');
 
+  // Load history when component mounts OR when level/registration date changes
+  // This ensures correct history is shown when switching between accounts
   useEffect(() => {
+    console.log(`[History] Loading history for level=${languageLevel}, registrationDate=${registrationDate}`);
     loadHistoryWords();
-  }, []);
+  }, [languageLevel, registrationDate, loadHistoryWords]);
 
   const displayWords = activeTab === 'all' ? historyWords : getFavoriteWords();
 
