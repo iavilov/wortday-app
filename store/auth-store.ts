@@ -209,16 +209,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isLoading: false,
       });
 
-      // IMPORTANT: Clear word-store to prevent showing wrong user's data
-      const { useWordStore } = await import('@/store/word-store');
-      const wordStore = useWordStore.getState();
-      wordStore.todayWord = null;
-      wordStore.historyWords = [];
-      wordStore.allWords = [];
-      wordStore.favoriteIds = new Set();
-      console.log('[Auth] Cleared word-store on logout');
     } catch (error) {
       console.error('[Auth] Sign out error:', error);
+      set({ isLoading: false });
+    } finally {
+      // Always clear local stores to prevent data leakage/flickering
+      const { useWordStore } = await import('@/store/word-store');
+      const { useSettingsStore } = await import('@/store/settings-store');
+
+      useWordStore.getState().reset();
+      useSettingsStore.getState().reset();
+
+      console.log('[Auth] Cleared word-store and settings-store on logout');
       set({ isLoading: false });
     }
   },
@@ -318,7 +320,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
 // Auth state listener hook (call in root layout)
 export function setupAuthListener() {
-  const { setSession, setProfile, fetchProfile } = useAuthStore.getState();
+  const { setSession, setProfile, fetchProfile, setLoading } = useAuthStore.getState();
 
   const {
     data: { subscription },
@@ -327,14 +329,16 @@ export function setupAuthListener() {
 
     switch (event) {
       case 'SIGNED_IN':
+        setLoading(true); // Show loader while fetching profile
         setSession(session);
-        // Small delay to ensure profile is created by trigger
-        setTimeout(() => fetchProfile(), 500);
+        await fetchProfile(); // Wait for profile fetch
+        setLoading(false); // Hide loader when everything is ready
         break;
 
       case 'SIGNED_OUT':
         setSession(null);
         setProfile(null);
+        setLoading(false);
         break;
 
       case 'TOKEN_REFRESHED':
@@ -348,8 +352,10 @@ export function setupAuthListener() {
 
       case 'INITIAL_SESSION':
         if (session) {
+          setLoading(true);
           setSession(session);
           await fetchProfile();
+          setLoading(false);
         }
         break;
     }

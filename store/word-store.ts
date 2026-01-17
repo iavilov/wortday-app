@@ -1,6 +1,6 @@
 import { storage } from '@/lib/storage';
-import * as wordService from '@/lib/word-service';
 import * as wordHistoryService from '@/lib/word-history-service';
+import * as wordService from '@/lib/word-service';
 import { Word } from '@/types/word';
 import { create } from 'zustand';
 
@@ -29,6 +29,7 @@ interface WordStore {
   playbackSpeed: number;
   setIsPlaying: (playing: boolean) => void;
   setPlaybackSpeed: (speed: number) => void;
+  reset: () => void;
 }
 
 const FAVORITES_KEY = 'vocade-favorites';
@@ -54,26 +55,33 @@ export const useWordStore = create<WordStore>((set, get) => ({
       const stored = await storage.getItem(FAVORITES_KEY);
       const localFavorites = stored ? JSON.parse(stored) : [];
 
-      // Check if migration already happened
-      const migrated = await storage.getItem(FAVORITES_MIGRATED_KEY);
+      // Check if user is authenticated before syncing with DB
+      const { data: { user } } = await (await import('@/lib/supabase-client')).supabase.auth.getUser();
 
-      if (!migrated && localFavorites.length > 0) {
-        console.log('[WordStore] Migrating favorites to database...');
-        const { success, error } = await wordHistoryService.migrateFavoritesToDatabase(localFavorites);
+      if (user) {
+        // Check if migration already happened
+        const migrated = await storage.getItem(FAVORITES_MIGRATED_KEY);
 
-        if (success) {
-          await storage.setItem(FAVORITES_MIGRATED_KEY, 'true');
-          set({ _hasMigratedFavorites: true });
-          console.log('[WordStore] Favorites migration completed');
+        if (!migrated && localFavorites.length > 0) {
+          console.log('[WordStore] Migrating favorites to database...');
+          const { success, error } = await wordHistoryService.migrateFavoritesToDatabase(localFavorites);
+
+          if (success) {
+            await storage.setItem(FAVORITES_MIGRATED_KEY, 'true');
+            set({ _hasMigratedFavorites: true });
+            console.log('[WordStore] Favorites migration completed');
+          } else {
+            console.error('[WordStore] Favorites migration failed:', error);
+          }
         } else {
-          console.error('[WordStore] Favorites migration failed:', error);
+          set({ _hasMigratedFavorites: true });
         }
-      } else {
-        set({ _hasMigratedFavorites: true });
-      }
 
-      // Sync favorites from database
-      await get().syncFavoritesFromDB();
+        // Sync favorites from database
+        await get().syncFavoritesFromDB();
+      } else {
+        console.log('[WordStore] Hydrated local only (not authenticated)');
+      }
 
       set({ _hasHydrated: true });
     } catch (e) {
@@ -244,5 +252,20 @@ export const useWordStore = create<WordStore>((set, get) => ({
 
   setPlaybackSpeed: (speed: number) => {
     set({ playbackSpeed: speed });
+  },
+
+  reset: () => {
+    set({
+      todayWord: null,
+      allWords: [],
+      historyWords: [],
+      favoriteIds: new Set<string>(),
+      lastVisitDate: null,
+      isLoading: false,
+      error: null,
+      _hasHydrated: false,
+      _hasMigratedFavorites: false,
+      isPlaying: false,
+    });
   }
 }));

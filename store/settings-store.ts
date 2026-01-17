@@ -24,6 +24,7 @@ interface SettingsStore {
   setHasCompletedOnboarding: (completed: boolean) => void;
   hydrate: () => Promise<void>;
   _setHasHydrated: (state: boolean) => void;
+  reset: () => void;
 }
 
 const STORAGE_KEY = 'vocade-settings';
@@ -87,6 +88,17 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   _setHasHydrated: (state: boolean) => {
     set({ _hasHydrated: state });
   },
+
+  reset: () => {
+    set({
+      translationLanguage: 'en',
+      languageLevel: 'beginner',
+      userEmail: 'user@example.com',
+      registrationDate: null,
+      hasCompletedOnboarding: false,
+      _hasHydrated: false,
+    });
+  }
 }));
 
 // Helper to save to storage

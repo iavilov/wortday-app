@@ -35,7 +35,7 @@ export default function RootLayout() {
 
   const { hasCompletedOnboarding, _hasHydrated: settingsHydrated, hydrate: hydrateSettings } = useSettingsStore();
   const { _hasHydrated: wordHydrated, hydrate: hydrateWords } = useWordStore();
-  const { initialize: initializeAuth, isInitialized: authInitialized, isAuthenticated } = useAuthStore();
+  const { initialize: initializeAuth, isInitialized: authInitialized, isAuthenticated, isLoading: authLoading } = useAuthStore();
 
   const [fontsLoaded] = useFonts({
     IBMPlexSans_400Regular,
@@ -71,13 +71,14 @@ export default function RootLayout() {
 
   // Handle navigation after hydration (Auth Guard + Onboarding)
   useEffect(() => {
-    if (!isReady || !fontsLoaded || !settingsHydrated || !wordHydrated || !authInitialized) {
+    if (!isReady || !fontsLoaded || !settingsHydrated || !wordHydrated || !authInitialized || authLoading) {
       console.log('[AuthGuard] Waiting for initialization...', {
         isReady,
         fontsLoaded,
         settingsHydrated,
         wordHydrated,
         authInitialized,
+        authLoading,
       });
       return;
     }
@@ -127,9 +128,9 @@ export default function RootLayout() {
 
     console.log('[AuthGuard] No redirect needed, hiding splash screen');
     SplashScreen.hideAsync();
-  }, [isReady, fontsLoaded, settingsHydrated, wordHydrated, authInitialized, isAuthenticated, hasCompletedOnboarding, segments]);
+  }, [isReady, fontsLoaded, settingsHydrated, wordHydrated, authInitialized, isAuthenticated, hasCompletedOnboarding, segments, authLoading]);
 
-  if (!fontsLoaded || !isReady || !settingsHydrated || !wordHydrated) {
+  if (!fontsLoaded || !isReady || !settingsHydrated || !wordHydrated || authLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
         <ActivityIndicator size="large" color={Colors.primary} />
