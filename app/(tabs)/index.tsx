@@ -16,7 +16,7 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Share, Text, View } from 'react-native';
 
 export default function Index() {
-  const { todayWord, isLoading, loadTodayWord, toggleFavorite, isFavorite, markWordAsViewed } = useWordStore();
+  const { todayWord, isLoading, loadTodayWord, toggleFavorite, favoriteIds, markWordAsViewed } = useWordStore();
   const { translationLanguage, languageLevel, registrationDate } = useSettingsStore();
 
   // Load today's word when component mounts OR when level/registration date changes
@@ -134,7 +134,7 @@ export default function Index() {
             word={todayWord}
             content={content}
             translationLanguage={translationLanguage}
-            isFavorite={isFavorite(todayWord.id)}
+            isFavorite={favoriteIds.has(todayWord.id)}
             onToggleFavorite={() => toggleFavorite(todayWord.id)}
             onAudioPress={handleAudioPress}
           // onShare is in header, so not passed here

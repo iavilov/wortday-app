@@ -6,8 +6,8 @@
 
 ---
 
-## 🚀 Current Status: v1.0.0 (Supabase Words Integration)
-**Last Updated:** 16.01.2026
+## 🚀 Current Status: v1.0.1 (Stability & Fixes)
+**Last Updated:** 17.01.2026
 
 ### Key Achievements v1.0.0:
 
@@ -29,6 +29,23 @@
 - TypeScript typing for all requests
 
 **📄 Detailed Documentation:** See `docs/supabase-words-integration.md`
+
+---
+
+### Key Achievements v1.0.1:
+
+#### Stability & UI Improvements
+✅ **No Data Flickering:**
+- Implemented `reset()` methods for all stores
+- Proper cleanup on logout prevents showing previous user's data
+
+✅ **Smoother Auth Flow:**
+- Improved `AuthGuard` in `_layout.tsx` to wait for profile loading
+- Added proper loading indicators during auth initialization
+
+✅ **Optimistic UI:**
+- Instant feedback when toggling favorites
+- Validated with direct store subscription in components
 
 ---
 
@@ -261,6 +278,14 @@ vocade/
 
 ---
 
+### v1.0.1 — Stability & Fixes ✅ COMPLETED
+- [x] Fixed "Auth session missing" error on login screen
+- [x] Fixed user data flickering on logout/login (store reset)
+- [x] Implemented proper loading state during auth initialization
+- [x] Added Optimistic UI updates for Favorites (instant heart toggle)
+
+---
+
 ### v1.1.0 — Production Auth Setup (Priority 1)
 - [ ] Apple Developer account + setup
 - [ ] Google Cloud Console OAuth credentials
@@ -345,9 +370,9 @@ npm run android # Android
 
 ---
 
-**Last Updated:** 16.01.2026
-**Version:** 1.0.0 (Supabase Words Integration)
-**Status:** ✅ Production ready - database integration complete
+**Last Updated:** 17.01.2026
+**Version:** 1.0.1 (Stability & Fixes)
+**Status:** ✅ Production ready - highly stable
 **Next Milestone:** v1.1.0 — Apple/Google OAuth production credentials + Content population
 
 ---
