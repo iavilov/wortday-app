@@ -320,13 +320,18 @@ CREATE POLICY "Users can delete own profile" ON users FOR DELETE USING ((select 
 -- USER_WORDS_HISTORY: Own data only
 CREATE POLICY "Users can view own history" ON user_words_history FOR SELECT USING ((select auth.uid()) = user_id);
 CREATE POLICY "Users can insert own history" ON user_words_history FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
-CREATE POLICY "Users can update own history" ON user_words_history FOR UPDATE USING ((select auth.uid()) = user_id);
+CREATE POLICY "Users can update own history" ON user_words_history FOR UPDATE
+  USING ((select auth.uid()) = user_id)
+  WITH CHECK ((select auth.uid()) = user_id);
 CREATE POLICY "Users can delete own history" ON user_words_history FOR DELETE USING ((select auth.uid()) = user_id);
 
 -- USER_STREAKS: Own data only
 CREATE POLICY "Users can view own streaks" ON user_streaks FOR SELECT USING ((select auth.uid()) = user_id);
 CREATE POLICY "Users can insert own streaks" ON user_streaks FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
-CREATE POLICY "Users can update own streaks" ON user_streaks FOR UPDATE USING ((select auth.uid()) = user_id);
+CREATE POLICY "Users can update own streaks" ON user_streaks FOR UPDATE
+  USING ((select auth.uid()) = user_id)
+  WITH CHECK ((select auth.uid()) = user_id);
+CREATE POLICY "Users can delete own streaks" ON user_streaks FOR DELETE USING ((select auth.uid()) = user_id);
 ```
 
 ### Step 4: Functions & Triggers

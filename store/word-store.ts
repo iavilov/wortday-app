@@ -22,7 +22,6 @@ interface WordStore {
   syncFavoritesFromDB: () => Promise<void>;
   toggleFavorite: (wordId: string) => Promise<void>;
   isFavorite: (wordId: string) => boolean;
-  getFavoriteWords: () => Word[];
   hydrate: () => Promise<void>;
 
   isPlaying: boolean;
@@ -177,28 +176,44 @@ export const useWordStore = create<WordStore>((set, get) => ({
   // Sync favorites from database
   syncFavoritesFromDB: async () => {
     try {
+      console.log('[WordStore] Syncing favorites from DB...');
       const { favoriteIds, error } = await wordHistoryService.getFavoriteIds();
 
       if (error) {
-        console.error('[WordStore] Failed to sync favorites from DB:', error);
+        console.error('[WordStore] ❌ Failed to sync favorites from DB:', error);
+        // Don't throw - fail gracefully
         return;
       }
 
       const favoriteSet = new Set(favoriteIds);
       set({ favoriteIds: favoriteSet });
 
-      // Update AsyncStorage for offline mode
+      // Persist to AsyncStorage for offline mode
       await storage.setItem(FAVORITES_KEY, JSON.stringify(favoriteIds));
 
-      console.log(`[WordStore] Synced ${favoriteIds.length} favorites from database`);
+      console.log(`[WordStore] ✅ Synced ${favoriteIds.length} favorites from database`);
     } catch (error) {
-      console.error('[WordStore] Failed to sync favorites from DB:', error);
+      console.error('[WordStore] ❌ Exception in syncFavoritesFromDB:', error);
+      // Fail gracefully - don't crash the app
     }
   },
 
   toggleFavorite: async (wordId: string) => {
+    console.log('[WordStore] toggleFavorite CALLED with wordId:', wordId);
+
+    // Check if a toggle is already in progress for this word
+    const state = get();
+    if ((state as any)._toggleInProgress?.[wordId]) {
+      console.warn('[WordStore] Toggle already in progress for', wordId, '- ignoring duplicate call');
+      return;
+    }
+
+    // Mark toggle as in progress
+    (state as any)._toggleInProgress = { ...((state as any)._toggleInProgress || {}), [wordId]: true };
+
     const currentFavorites = get().favoriteIds;
     const wasFavorite = currentFavorites.has(wordId);
+    console.log('[WordStore] Current state - wasFavorite:', wasFavorite, 'total favorites:', currentFavorites.size);
 
     // Optimistic update
     const newFavorites = new Set(currentFavorites);
@@ -209,41 +224,66 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
 
     set({ favoriteIds: newFavorites });
+    console.log('[WordStore] Optimistic update complete, newFavorites.size:', newFavorites.size);
 
     // Persist to AsyncStorage for offline mode
     try {
       await storage.setItem(FAVORITES_KEY, JSON.stringify([...newFavorites]));
+      console.log('[WordStore] Saved to AsyncStorage successfully');
     } catch (e) {
       console.error('[WordStore] Failed to save favorites to storage:', e);
+      return; // Early exit if AsyncStorage fails
     }
 
     // Sync with database
+    console.log('[WordStore] Calling wordHistoryService.toggleFavorite...');
     try {
       const { success, is_favorite, error } = await wordHistoryService.toggleFavorite(wordId);
+      console.log('[WordStore] Service returned:', { success, is_favorite, error });
 
       if (!success) {
-        console.error('[WordStore] Failed to sync favorite to DB:', error);
+        console.error('[WordStore] ❌ Failed to sync favorite to DB:', error);
         // Rollback optimistic update
         set({ favoriteIds: currentFavorites });
         await storage.setItem(FAVORITES_KEY, JSON.stringify([...currentFavorites]));
+        console.log('[WordStore] Rolled back to previous state');
       } else {
-        console.log(`[WordStore] Synced favorite to DB: ${wordId} = ${is_favorite}`);
+        // SUCCESS - verify is_favorite matches expectation
+        const expectedFavorite = !wasFavorite;
+        if (is_favorite !== expectedFavorite) {
+          console.warn('[WordStore] ⚠️ DB state mismatch! Expected:', expectedFavorite, 'Got:', is_favorite);
+        }
+
+        // Sync local state with DB truth (just in case)
+        const correctFavorites = new Set(currentFavorites);
+        if (is_favorite) {
+          correctFavorites.add(wordId);
+        } else {
+          correctFavorites.delete(wordId);
+        }
+        set({ favoriteIds: correctFavorites });
+        await storage.setItem(FAVORITES_KEY, JSON.stringify([...correctFavorites]));
+
+        console.log(`[WordStore] ✅ Synced favorite to DB: ${wordId} = ${is_favorite}`);
       }
     } catch (error) {
-      console.error('[WordStore] Failed to sync favorite to DB:', error);
+      console.error('[WordStore] ❌ Exception in toggleFavorite:', error);
       // Rollback optimistic update
       set({ favoriteIds: currentFavorites });
       await storage.setItem(FAVORITES_KEY, JSON.stringify([...currentFavorites]));
+      console.log('[WordStore] Rolled back due to exception');
+    } finally {
+      // Always clear the in-progress flag
+      const state = get();
+      const inProgress = { ...((state as any)._toggleInProgress || {}) };
+      delete inProgress[wordId];
+      (state as any)._toggleInProgress = inProgress;
+      console.log('[WordStore] Toggle completed for', wordId);
     }
   },
 
   isFavorite: (wordId: string) => {
     return get().favoriteIds.has(wordId);
-  },
-
-  getFavoriteWords: () => {
-    const { historyWords, favoriteIds } = get();
-    return historyWords.filter(word => favoriteIds.has(word.id));
   },
 
   setIsPlaying: (playing: boolean) => {

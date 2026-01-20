@@ -329,10 +329,28 @@ export function setupAuthListener() {
 
     switch (event) {
       case 'SIGNED_IN':
-        setLoading(true); // Show loader while fetching profile
+        // Only show loader if not already authenticated (prevent loader on token refresh)
+        const currentState = useAuthStore.getState();
+        const isReauth = currentState.isAuthenticated && currentState.session !== null;
+
+        if (!isReauth) {
+          setLoading(true); // Show loader only for initial sign-in
+        }
+
         setSession(session);
-        await fetchProfile(); // Wait for profile fetch
-        setLoading(false); // Hide loader when everything is ready
+
+        try {
+          await fetchProfile(); // Wait for profile fetch
+
+          // Sync user-specific data after auth
+          const wordStore = (await import('@/store/word-store')).useWordStore.getState();
+          await wordStore.syncFavoritesFromDB();
+          console.log('[Auth] Synced user data after sign-in');
+        } catch (error) {
+          console.error('[Auth] Failed to fetch profile on SIGNED_IN:', error);
+        } finally {
+          setLoading(false); // Always hide loader in finally block
+        }
         break;
 
       case 'SIGNED_OUT':
@@ -342,20 +360,35 @@ export function setupAuthListener() {
         break;
 
       case 'TOKEN_REFRESHED':
+        // Silent token refresh - don't show loader
         setSession(session);
         break;
 
       case 'USER_UPDATED':
         setSession(session);
-        await fetchProfile();
+        try {
+          await fetchProfile();
+        } catch (error) {
+          console.error('[Auth] Failed to fetch profile on USER_UPDATED:', error);
+        }
         break;
 
       case 'INITIAL_SESSION':
         if (session) {
           setLoading(true);
           setSession(session);
-          await fetchProfile();
-          setLoading(false);
+          try {
+            await fetchProfile();
+
+            // Sync user-specific data after initial session
+            const wordStore = (await import('@/store/word-store')).useWordStore.getState();
+            await wordStore.syncFavoritesFromDB();
+            console.log('[Auth] Synced user data after initial session');
+          } catch (error) {
+            console.error('[Auth] Failed to fetch profile on INITIAL_SESSION:', error);
+          } finally {
+            setLoading(false); // Always hide loader in finally block
+          }
         }
         break;
     }

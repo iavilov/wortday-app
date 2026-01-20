@@ -9,9 +9,9 @@ import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import { ARTICLE_COLORS, Article, PART_OF_SPEECH_COLORS } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { ArrowRight, Search } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -20,17 +20,37 @@ type TabType = 'all' | 'favorites';
 export default function HistoryScreen() {
   const router = useRouter();
   const { translationLanguage, languageLevel, registrationDate } = useSettingsStore();
-  const { loadHistoryWords, historyWords, getFavoriteWords } = useWordStore();
   const [activeTab, setActiveTab] = useState<TabType>('all');
 
-  // Load history when component mounts OR when level/registration date changes
-  // This ensures correct history is shown when switching between accounts
-  useEffect(() => {
-    console.log(`[History] Loading history for level=${languageLevel}, registrationDate=${registrationDate}`);
-    loadHistoryWords();
-  }, [languageLevel, registrationDate, loadHistoryWords]);
+  // Zustand reactive selectors - automatically re-render when dependencies change
+  const historyWords = useWordStore(state => state.historyWords);
+  const favoriteIds = useWordStore(state => state.favoriteIds);
+  const loadHistoryWords = useWordStore(state => state.loadHistoryWords);
 
-  const displayWords = activeTab === 'all' ? historyWords : getFavoriteWords();
+  // Computed value using useMemo to prevent infinite loop
+  // useMemo memoizes the result and only recalculates when dependencies change
+  const favoriteWords = useMemo(() =>
+    historyWords.filter(word => favoriteIds.has(word.id)),
+    [historyWords, favoriteIds]
+  );
+
+  // Reset to "All" tab when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      console.log('[History] Screen focused - resetting to "All" tab');
+      setActiveTab('all');
+    }, [])
+  );
+
+  // Load history when screen comes into focus OR when level/registration date changes
+  useFocusEffect(
+    useCallback(() => {
+      console.log(`[History] Loading history for level=${languageLevel}, registrationDate=${registrationDate}`);
+      loadHistoryWords();
+    }, [languageLevel, registrationDate, loadHistoryWords])
+  );
+
+  const displayWords = activeTab === 'all' ? historyWords : favoriteWords;
 
   return (
     <ScreenLayout>
