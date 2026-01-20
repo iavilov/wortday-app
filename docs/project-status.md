@@ -6,8 +6,8 @@
 
 ---
 
-## 🚀 Current Status: v1.0.1 (Stability & Fixes)
-**Last Updated:** 17.01.2026
+## 🚀 Current Status: v1.0.2 (Unit Testing Setup)
+**Last Updated:** 20.01.2026
 
 ### Key Achievements v1.0.0:
 
@@ -46,6 +46,53 @@
 ✅ **Optimistic UI:**
 - Instant feedback when toggling favorites
 - Validated with direct store subscription in components
+
+---
+
+### Key Achievements v1.0.2:
+
+#### Unit Testing Infrastructure (NEW)
+✅ **Jest Configuration:**
+- Configured Jest with `jest-expo` preset for React Native
+- Created test infrastructure with mocks and helpers
+- 36 unit tests passing (12 service layer + 24 store tests)
+
+✅ **Service Layer Tests:**
+- `toggleFavorite` - RLS-First pattern validation
+- Verified NO race conditions (`getSession()` not called)
+- Authentication error handling
+- Performance tests (< 50ms with mocks)
+
+✅ **Store Tests:**
+- State management (`isFavorite`, `favoriteIds`)
+- Reset functionality (all fields)
+- Edge cases (special characters, empty sets)
+- Playback state management
+
+✅ **Documentation:**
+- Created `docs/testing-guide.md` with best practices
+- Added test scripts to `package.json`
+- Documented limitations and integration test recommendations
+
+**📄 Detailed Documentation:** See `docs/testing-guide.md`
+
+**New Files:**
+```
+jest.config.js                           # Jest configuration
+__tests__/setup.ts                       # Global test setup
+__tests__/mocks/supabase.ts             # Supabase mock helpers
+__tests__/mocks/auth-store.ts           # Auth store mock helpers
+__tests__/lib/word-history-service.test.ts  # 12 service tests
+__tests__/store/word-store.test.ts          # 24 store tests
+docs/testing-guide.md                   # Testing documentation
+```
+
+**Test Commands:**
+```bash
+npm test                 # Run all tests
+npm run test:watch       # Watch mode for TDD
+npm run test:coverage    # Coverage report
+```
 
 ---
 
@@ -215,14 +262,16 @@ vocade/
 ✅ **Haptic Feedback** — tactile feedback on iOS  
 
 ### Technical:
-✅ **Word Service** — service layer for DB interactions (NEW v1.0.0)  
-✅ **Async Data Loading** — loading states for all screens (NEW v1.0.0)  
-✅ **Supabase Client** — with AsyncStorage for sessions  
-✅ **Auth Store** — Zustand with onAuthStateChange  
-✅ **Word Store** — Zustand with real-time database sync (UPDATED v1.0.0)  
-✅ **TypeScript** — full typing  
-✅ **Expo Router** — file-based navigation  
-✅ **NativeWind v4** — Tailwind CSS for RN  
+✅ **Word Service** — service layer for DB interactions (NEW v1.0.0)
+✅ **Async Data Loading** — loading states for all screens (NEW v1.0.0)
+✅ **Supabase Client** — with AsyncStorage for sessions
+✅ **Auth Store** — Zustand with onAuthStateChange
+✅ **Word Store** — Zustand with real-time database sync (UPDATED v1.0.0)
+✅ **Unit Tests** — 36 tests with Jest (NEW v1.0.2)
+✅ **RLS-First Pattern** — validated with tests (NEW v1.0.2)
+✅ **TypeScript** — full typing
+✅ **Expo Router** — file-based navigation
+✅ **NativeWind v4** — Tailwind CSS for RN
 
 ---
 
@@ -283,6 +332,17 @@ vocade/
 - [x] Fixed user data flickering on logout/login (store reset)
 - [x] Implemented proper loading state during auth initialization
 - [x] Added Optimistic UI updates for Favorites (instant heart toggle)
+
+---
+
+### v1.0.2 — Unit Testing Setup ✅ COMPLETED
+- [x] Configured Jest with `jest-expo` preset
+- [x] Created test infrastructure (mocks, helpers, setup)
+- [x] Implemented 36 unit tests (12 service + 24 store)
+- [x] RLS-First pattern validation tests
+- [x] State management tests (isFavorite, reset)
+- [x] Documentation (`docs/testing-guide.md`)
+- [x] Added test scripts to package.json (test, test:watch, test:coverage)
 
 ---
 
@@ -368,11 +428,15 @@ npm run android # Android
 **Navigation:**
 - Expo Router 6.0.19
 
+**Testing:**
+- Jest 29.7.0
+- jest-expo 54.0.16
+
 ---
 
-**Last Updated:** 17.01.2026
-**Version:** 1.0.1 (Stability & Fixes)
-**Status:** ✅ Production ready - highly stable
+**Last Updated:** 20.01.2026
+**Version:** 1.0.2 (Unit Testing Setup)
+**Status:** ✅ Production ready - highly stable with test coverage
 **Next Milestone:** v1.1.0 — Apple/Google OAuth production credentials + Content population
 
 ---
@@ -388,4 +452,6 @@ The project documentation is organized in the following files:
 - **docs/tech-stack.md** - Technology stack and architecture decisions
 - **docs/coding-conventions.md** - React Native coding standards and patterns
 - **docs/supabase-words-integration.md** - Words service integration guide
+- **docs/supabase-race-conditions.md** - RLS-First pattern and race condition solutions
+- **docs/testing-guide.md** - Unit testing setup and best practices (NEW v1.0.2)
 - **docs/ai-workflow-guide.md** - Best practices for AI collaboration
