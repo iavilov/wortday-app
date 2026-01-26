@@ -1,368 +1,171 @@
 # CLAUDE.md
 
 ## 🚨 SESSION STARTUP PROTOCOL
-**CRITICAL RULE:** At the very beginning of any conversation, you MUST implicitly read `docs/memory.md` to understand the current context and pending tasks. 
-- You do not need to announce that you read it unless asked.
-- Use the content of `docs/memory.md` to inform your first response.
+**CRITICAL:** On every session start:
+1. Check if `docs/memory.md` was provided in system prompt
+2. If NOT → **IMMEDIATELY READ** `docs/memory.md` to understand project status
+3. Use this context to inform your first response
 
 ## 🧠 Memory Persistence Protocol
-**WHEN** the user types `/exit` or indicates the task is done:
-1. **SUMMARIZE** progress into `docs/memory.md` (overwrite logic).
-2. **CONFIRM** saving.
-3. Only then allow exit.
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Overview
-
-**Wortday** is an aesthetic German language learning companion built on the "Word of the Day" concept. It's a cross-platform React Native application (iOS, Android, Web) focused on micro-learning and visual appeal.
-
-**Key Characteristics:**
-- Neobrutalism design system with bold colors and sharp shadows
-- Supabase backend for authentication and content
-- Multilingual UI (English, German, Russian, Ukrainian)
-- Level-based content (Beginner, Intermediate, Advanced)
-
-## Documentation Structure
-
-**This file serves as the main router. For detailed information, see:**
-
-- `docs/project-status.md` - Project status, version history, and roadmap
-- `docs/auth-flow.md` - Complete authentication system documentation
-- `docs/database-schema.md` - Supabase database schema and RLS policies
-- `docs/tech-stack.md` - Technology stack and dependencies
-- `docs/coding-conventions.md` - React Native coding standards and patterns
-- `docs/ai-workflow-guide.md` - Best practices for working with AI assistants
-- `docs/testing-guide.md` - Unit testing setup and best practices
-- `docs/supabase-race-conditions.md` - RLS-First pattern documentation
-- `docs/pwa-setup.md` - Complete PWA setup and configuration guide
-- `docs/pwa-quick-start.md` - Quick reference for PWA development
-
-## 🗣️ Communication Rules
-- **Chat Language:** Russian (Русский) — always explain your reasoning in Russian.
-- **Code/Comments:** English — code, variables, and comments must be in English.
-- **Tone:** Professional, concise, focused on solution.
-
-## Development Commands
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-
-# Platform-specific builds
-npm run web       # Web development
-npm run ios       # iOS simulator
-npm run android   # Android emulator
-
-# PWA builds
-npm run build:pwa     # Build Progressive Web App
-npm run serve         # Test PWA locally (HTTP)
-npm run serve:https   # Test PWA locally (HTTPS)
-
-# Code quality
-npm run lint      # Run ESLint
-
-# Testing
-npm test          # Run all unit tests
-npm run test:watch    # Run tests in watch mode
-npm run test:coverage # Generate coverage report
-```
-
-**Format for docs/memory.md:**
-Keep it concise (bullet points). Remove outdated info.
-
-## Architecture
-
-### File-Based Routing (Expo Router)
-
-The app uses Expo Router for navigation with a file-based routing structure:
-
-```
-app/
-├── _layout.tsx              # Root layout with Auth Guard
-├── (tabs)/                  # Main tab navigation
-│   ├── index.tsx           # Home (Word of the Day)
-│   ├── history.tsx         # Learning history
-│   └── settings.tsx        # Settings hub
-├── auth/                    # Authentication flow
-│   ├── login.tsx
-│   ├── register.tsx
-│   └── reset-password.tsx
-├── settings/               # Settings screens
-│   ├── account.tsx
-│   ├── language.tsx
-│   ├── level.tsx
-│   └── notifications.tsx
-└── onboarding.tsx          # First-time setup
-```
-
-### State Management (Zustand)
-
-Three global stores manage application state:
-
-1. **auth-store.ts** - Authentication state with Supabase session sync
-   - `onAuthStateChange` listener for real-time updates
-   - User profile from `public.users` table
-   - Auth guard logic
-
-2. **word-store.ts** - Word content and favorites
-   - Integrates with `lib/word-service.ts` for Supabase queries
-   - Calculates "today's word" based on registration date and level
-   - Manages favorites (persisted to database)
-
-3. **settings-store.ts** - User preferences
-   - Language, level, notifications
-   - Persisted to AsyncStorage
-   - Synced with user profile in database
-
-### Service Layer Pattern
-
-All external data access goes through service layers:
-
-- `lib/auth-service.ts` - Authentication operations (signIn, signUp, signOut, etc.)
-- `lib/word-service.ts` - Word fetching from Supabase
-- `lib/supabase-client.ts` - Singleton Supabase client with AsyncStorage adapter
-
-**Never access Supabase directly from components** - always use service functions.
-
-### Design System
-
-The app follows a strict Neobrutalism design system defined in `constants/design-tokens.ts`:
-
-- **Colors**: Defined in `palette` object, never use hardcoded hex values
-- **Border Radius**: Use `borderRadius.LARGE` (20px) for cards, `borderRadius.MEDIUM` (12px) for buttons
-- **Shadows**: Always use `shadows.brutal` variants (4px solid black shadows)
-- **Typography**: IBM Plex Sans font family via `FontNames` constants
-- **Layout**: `Layout.maxContentWidth = 432px` for all screens
-
-**Key Design Tokens:**
-```typescript
-Colors.primary          // #FFE347 (yellow)
-Colors.accentPink       // #FF6B9D
-Colors.accentBlue       // #00D4FF
-Colors.background       // #FFFCF4 (cream)
-Colors.textMain         // #121212 (ink)
-```
-
-### Authentication Flow
-
-**Auth Guard** in `app/_layout.tsx` enforces navigation rules:
-
-1. Unauthenticated users → `/auth/login`
-2. Authenticated users → Onboarding (if not completed)
-3. After onboarding → Main app `/(tabs)`
-
-**Supported Auth Methods:**
-- Email/Password
-- Sign in with Apple (currently in mock mode for development)
-- Google OAuth
-
-**Important:** Apple Sign In only provides `fullName` on first authentication. The app handles this with delayed profile updates (see `docs/auth-flow.md`).
-
-## Key Technical Patterns
-
-### Async Data Loading
-
-All data fetching follows this pattern:
-
-```typescript
-const [data, setData] = useState<DataType | null>(null);
-const [isLoading, setIsLoading] = useState(true);
-const [error, setError] = useState<string | null>(null);
-
-useEffect(() => {
-  const loadData = async () => {
-    setIsLoading(true);
-    const { data, error } = await service.fetchData();
-    if (error) {
-      setError(error);
-    } else {
-      setData(data);
-    }
-    setIsLoading(false);
-  };
-  loadData();
-}, [dependency]);
-```
-
-Always show loading states with `ActivityIndicator` and handle errors gracefully.
-
-### Platform-Specific Code
-
-Use `Platform.OS` for platform-specific logic:
-
-```typescript
-import { Platform } from 'react-native';
-
-if (Platform.OS === 'web') {
-  // Web-specific code (e.g., localStorage, window.confirm)
-} else {
-  // Mobile-specific code (e.g., AsyncStorage, Alert.alert)
-}
-```
-
-### Translations
-
-All user-facing text must be translated. Use the `t()` helper from `lib/i18n-helpers.ts`:
-
-```typescript
-import { t } from '@/lib/i18n-helpers';
-
-const text = t('settings.account.title', userLanguage);
-```
-
-Translation keys are defined in `constants/translations.ts`.
-
-## Database Schema
-
-The app uses Supabase with the following key tables:
-
-- `words` - German words with translations (JSONB), examples, etymology
-- `users` - User profiles (linked to `auth.users`)
-- `user_words_history` - Learning history and favorites
-- `user_streaks` - Gamification data (future)
-
-**Row Level Security (RLS)** is enabled on all tables. Users can only access their own data.
-
-**Critical:** The `public.users` table is separate from `auth.users`. A trigger automatically creates user profiles on signup.
-
-## Common Tasks
-
-### Adding a New Screen
-
-1. Create file in `app/` directory (e.g., `app/new-screen.tsx`)
-2. Use `ScreenLayout` component for consistent styling
-3. Add navigation in `app/_layout.tsx` if needed
-4. Follow established patterns for loading states and error handling
-
-### Adding a New Translation
-
-1. Add key to all language objects in `constants/translations.ts`
-2. Use `t()` helper function to access translations
-3. Test in all supported languages
-
-### Working with Supabase
-
-1. Add types to appropriate file in `types/`
-2. Create service function in `lib/word-service.ts` or `lib/auth-service.ts`
-3. Update store if needed
-4. Handle loading and error states in components
-
-### Modifying the Database Schema
-
-1. Update schema in Supabase Dashboard SQL Editor
-2. Document changes in `docs/database-schema.md`
-3. Update TypeScript types
-4. Update service functions
-
-## Critical Gotchas
-
-1. **Apple Sign In fullName**: Only available on first auth. Must be saved immediately with delayed update pattern.
-
-2. **Auth State Sync**: The `setupAuthListener()` must be initialized in `app/_layout.tsx`. Don't create multiple listeners.
-
-3. **Word Sequencing**: Words are fetched by `level` + `sequence_number`, calculated from user's registration date. Not by calendar date.
-
-4. **Platform Storage**: Web uses `localStorage`, mobile uses `AsyncStorage`. The Supabase client adapter handles this automatically.
-
-5. **Design Tokens**: Never use raw hex colors or pixel values. Always use tokens from `constants/design-tokens.ts`.
-
-6. **RLS Policies**: All database queries are subject to RLS. Test thoroughly with different users.
-
-7. **Mock Mode**: Apple Sign In is currently in mock mode (`EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=true`). Requires Apple Developer account for production.
-
-## Progressive Web App (PWA)
-
-Wortday is configured as a full-featured PWA:
-
-- **Standalone Mode**: Runs without browser UI (address bar, navigation)
-- **Offline Support**: Service Worker caches assets and API responses
-- **Installable**: Add to home screen on mobile/desktop
-- **Auto-updates**: Background updates with user notification
-
-**PWA Files:**
-- `public/manifest.json` - App manifest (theme, icons, display mode)
-- `public/service-worker.js` - Offline caching and updates
-- `public/index.html` - Custom HTML with PWA meta tags
-- `public/icon-*.png` - App icons (144px, 192px, 384px, 512px)
-
-**Usage:**
-```typescript
-import { usePWA } from '@/hooks/usePWA';
-import { PWAInstallBanner } from '@/components/PWAInstallBanner';
-
-const { isPWA, isInstallable, install } = usePWA();
-```
-
-**Build & Deploy:**
-```bash
-npm run build:pwa   # Build PWA
-npm run serve       # Test locally
-vercel --prod       # Deploy to production
-```
-
-See `docs/pwa-setup.md` for complete documentation.
-
-## Environment Variables
-
-Required environment variables (see `.env`):
-
-```bash
-EXPO_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
-EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=true  # Set to false in production
-```
-
-## Testing
-
-### Unit Tests (Jest)
-
-The project uses Jest with `jest-expo` preset for unit testing. Test coverage focuses on critical business logic:
-
-**Test Files:**
-- `__tests__/lib/word-history-service.test.ts` - Service layer tests (12 tests)
-- `__tests__/store/word-store.test.ts` - Zustand store tests (24 tests)
-
-**Key Test Coverage:**
-- ✅ `toggleFavorite` - RLS-First pattern validation
-- ✅ Auth checks without race conditions
-- ✅ State management (isFavorite, reset)
-- ✅ Error handling and edge cases
-
-**Running Tests:**
-```bash
-npm test                 # Run all tests once
-npm run test:watch       # Watch mode for TDD
-npm run test:coverage    # Generate coverage report
-```
-
-**Limitations:**
-- Some `toggleFavorite` tests limited by Jest's handling of dynamic imports
-- Integration tests recommended for full E2E coverage with real Supabase
-
-### Manual Testing Checklist
-
-- Test authentication flows on all platforms (Web, iOS, Android)
-- Verify Auth Guard redirects work correctly
-- Test with different language levels and UI languages
-- Check RLS policies by testing as different users
-- Verify offline behavior (app should show errors gracefully)
-- Test rapid favorite toggling (no race conditions)
-
-## Current Status
-
-**Version:** 1.0.0 (Supabase Words Integration)
-**Status:** Production-ready with mock auth providers
-
-**Next Priorities:**
-1. Production Apple Sign In setup (requires Apple Developer account)
-2. Google OAuth credentials configuration
-3. Content population (1095+ words across 3 levels)
-4. Audio pronunciation features
+**WHEN** user says "Финиш", "Done", "Save", or `/memory-save`:
+1. **READ** current `docs/memory.md`
+2. **SUMMARIZE** current session progress
+3. **OVERWRITE** `docs/memory.md` with updated status
+4. **CONFIRM** with: "✅ Memory updated. You can exit."
+
+**Format:** Bullet points. Structure: "Latest Session", "Pending Tasks". Keep 2-3 recent sessions.
 
 ---
 
-For detailed technical documentation, see files in `docs/` directory.
+## 📁 Project Overview
+
+**Wortday** - Aesthetic German learning app with "Word of the Day" micro-learning.
+
+**Stack:**
+- React Native (Expo SDK 52) + Web PWA
+- Supabase (Auth, DB, Storage)
+- Zustand (State), NativeWind (Styling)
+- Neobrutalism design (IBM Plex Sans, brutal shadows)
+
+**Platforms:** iOS, Android, Web (PWA at app.wortday.com)
+
+---
+
+## 🗣️ Communication Rules
+
+- **Reasoning & Explanations:** Russian (Русский)
+- **Code, Comments, Docs:** English
+- **Tone:** Senior Engineer. Concise. No fluff.
+
+---
+
+## 📚 Documentation Map (Read for Details)
+
+**Router docs (this file)** → Specialized docs:
+
+| Doc | Purpose |
+|-----|---------|
+| `docs/memory.md` | Session history & pending tasks |
+| `docs/project-status.md` | Roadmap & versioning |
+| `docs/coding-conventions.md` | Code standards & patterns |
+| `docs/auth-flow.md` | Auth system (Apple/Google/Email) |
+| `docs/database-schema.md` | SQL schema & RLS policies |
+| `docs/tech-stack.md` | Dependencies & versions |
+| `docs/design-system.md` | UI patterns (Neobrutalism) |
+| `docs/pwa-setup.md` | Service Worker & Web config |
+| `docs/ai-workflow-guide.md` | Effective prompting patterns |
+
+---
+
+## 🏗️ Architecture Rules
+
+### Service Layer (CRITICAL)
+- **ALL** Supabase calls → `lib/*-service.ts` ONLY
+- **NEVER** call Supabase directly from `app/` or `components/`
+- **NEVER** expose `service_role` keys in client code
+- Return pattern: `{ data: T | null, error: string | null }`
+
+### Design System (CRITICAL)
+- **Source of Truth:** `constants/design-tokens.ts`
+- **NEVER** use hardcoded values: `#FFE347`, `borderRadius: 20`, `fontSize: 16`
+- **ALWAYS** use: `Colors.primary`, `borderRadius.LARGE`, `FontNames.bold`
+
+### State Management
+- **Zustand stores:** `store/auth-store.ts`, `store/word-store.ts`, `store/settings-store.ts`
+- **Selective subscriptions:** `const user = useAuthStore(s => s.user)` ✅
+- **Avoid:** `const store = useAuthStore()` ❌ (causes unnecessary re-renders)
+
+### Translations
+- **ALL user-facing text** → `t('key', language)` from `constants/translations.ts`
+- **NO hardcoded strings** in JSX/components
+
+---
+
+## ⚙️ Custom Skills (Slash Commands)
+
+Use these for common workflows:
+
+- `/memory-save` - Update docs/memory.md with current session
+- `/project-status` - Show project overview & recent progress
+- `/code-audit [file]` - Verify code follows conventions
+
+Built-in Claude Code skills:
+- `/plan` - Enter planning mode for complex features
+- `/code-review` - Review recent changes
+- `/tdd` - Test-driven development workflow
+
+---
+
+## 🛠️ Development Workflows
+
+### Feature Development
+```bash
+npm start          # Metro bundler
+npm run web        # Web/PWA dev
+npm run ios        # iOS Simulator
+npm run android    # Android Emulator
+```
+
+### Before Committing
+```bash
+npm run lint       # ESLint check
+npm run typecheck  # TypeScript validation (if configured)
+```
+
+### Git Commits
+- Prefix: `feat:`, `fix:`, `chore:`, `docs:`
+- Example: `feat: add favorites to word history screen`
+
+---
+
+## 🚨 Critical Constraints
+
+**DO NOT:**
+- ❌ Hardcode colors, sizes, fonts (use design tokens)
+- ❌ Call Supabase directly from components (use services)
+- ❌ Use `any` type (use proper types or `unknown`)
+- ❌ Add hardcoded English text (use translations)
+- ❌ Use `Alert.alert` on Web (check `Platform.OS`)
+- ❌ Create inline interfaces (define in `types/`)
+- ❌ Skip loading/error states
+
+**ALWAYS:**
+- ✅ Read `docs/coding-conventions.md` before writing code
+- ✅ Use `@/` import alias (`import { X } from '@/lib/Y'`)
+- ✅ Add console logs with prefixes: `console.log('[Service Name] Message')`
+- ✅ Handle loading states: `isLoading`, `error`, `data`
+- ✅ Check platform differences: iOS vs Android vs Web
+- ✅ Update `docs/memory.md` at end of session
+
+---
+
+## 📋 Quick Reference Links
+
+**Before making changes, check:**
+- `constants/design-tokens.ts` - Before styling
+- `constants/translations.ts` - Before adding text
+- `types/*.ts` - Before creating interfaces
+- `docs/coding-conventions.md` - Before writing code
+
+**After completing work:**
+- Run `npm run lint`
+- Update `docs/memory.md` (use `/memory-save`)
+- Test on iOS, Android, Web
+
+---
+
+## 🎯 Success Metrics
+
+You're following best practices when:
+- ✅ AI-generated code passes lint without changes
+- ✅ No hardcoded values (all use design tokens)
+- ✅ All text uses translations
+- ✅ Service layer consistently used
+- ✅ TypeScript strict mode satisfied
+- ✅ Documentation stays up-to-date
+
+---
+
+**Version:** 2.0
+**Last Updated:** 2026-01-26
+**Status:** ✅ Optimized for Claude Code workflow

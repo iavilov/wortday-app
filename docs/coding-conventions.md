@@ -1,20 +1,13 @@
 # Coding Conventions
 
-**Last Updated:** 16.01.2026
-**Version:** 1.0.0
+**Last Updated:** 26.01.2026
+**Version:** 1.0.1
 
 This document defines coding standards and best practices for the Wortday React Native project.
 
 ---
 
 ## General Principles
-
-### Language
-
-- **Code & Comments:** English only
-- **Documentation:** English only
-- **Team Communication:** Russian (our internal discussions)
-- **User-Facing Text:** Must be translated via `constants/translations.ts`
 
 ### Code Style
 
