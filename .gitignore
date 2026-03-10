@@ -37,7 +37,9 @@ yarn-error.*
 .vscode/
 
 
+# Claude Code - local only (shared configs tracked in git)
 .claude/settings.local.json
+CLAUDE.local.md
 
 
 # typescript

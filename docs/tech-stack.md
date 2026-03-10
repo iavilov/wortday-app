@@ -1,262 +1,262 @@
-# Technology Stack
+# Технологический стек
 
-**Last Updated:** 16.01.2026
-**Version:** 1.0.0
+**Последнее обновление:** 16.01.2026
+**Версия:** 1.0.0
 
 ---
 
-## Core Framework
+## Основной фреймворк
 
-### React Native & Expo
+### React Native и Expo
 
 **React Native:** 0.81.5
 **Expo SDK:** ~54.0.29
 **TypeScript:** ~5.9.2
 
-Wortday is built as a Universal App using Expo, supporting iOS, Android, and Web (PWA) from a single codebase.
+Wortday построен как универсальное приложение на Expo с поддержкой iOS, Android и Web (PWA) из единой кодовой базы.
 
-**Why Expo:**
-- Simplified development workflow
-- Over-the-air updates
-- Managed native modules
-- Excellent TypeScript support
-- Built-in tools for notifications, fonts, and more
+**Почему Expo:**
+- Упрощённый процесс разработки
+- Обновления по воздуху (OTA)
+- Управляемые нативные модули
+- Отличная поддержка TypeScript
+- Встроенные инструменты для уведомлений, шрифтов и многого другого
 
 ---
 
-## Navigation
+## Навигация
 
 ### Expo Router
 
-**Version:** ~6.0.19
+**Версия:** ~6.0.19
 
-File-based routing system inspired by Next.js. Routes are automatically generated from the `app/` directory structure.
+Файловая система маршрутизации, вдохновлённая Next.js. Маршруты автоматически генерируются из структуры директории `app/`.
 
-**Key Features:**
-- Type-safe navigation
-- Deep linking support
-- Layout nesting with `_layout.tsx` files
-- Stack, Tabs, and Modal navigation patterns
+**Ключевые возможности:**
+- Типобезопасная навигация
+- Поддержка deep linking
+- Вложенные лейауты через файлы `_layout.tsx`
+- Паттерны навигации: Stack, Tabs и Modal
 
-**Related Dependencies:**
+**Связанные зависимости:**
 - `@react-navigation/native`: ~7.1.8
 - `@react-navigation/bottom-tabs`: ~7.4.0
 - `@react-navigation/elements`: ~2.6.3
 
 ---
 
-## Backend & Database
+## Бэкенд и база данных
 
 ### Supabase
 
-**Package:** `@supabase/supabase-js` ^2.90.1
+**Пакет:** `@supabase/supabase-js` ^2.90.1
 
-Open-source Firebase alternative providing:
-- **Authentication** - Email/Password, Apple, Google OAuth
-- **PostgreSQL Database** - With Row Level Security (RLS)
-- **Real-time Subscriptions** - Live data updates (planned for v1.2.0)
-- **Storage** - File storage for audio (planned for v1.1.0)
+Альтернатива Firebase с открытым исходным кодом, предоставляющая:
+- **Аутентификация** — Email/Password, Apple, Google OAuth
+- **База данных PostgreSQL** — с Row Level Security (RLS)
+- **Подписки в реальном времени** — обновления данных в реальном времени (планируется в v1.2.0)
+- **Хранилище** — файловое хранилище для аудио (планируется в v1.1.0)
 
-**Architecture:**
-- Singleton client in `lib/supabase-client.ts`
-- Service layer pattern (`lib/auth-service.ts`, `lib/word-service.ts`)
-- AsyncStorage adapter for session persistence across platforms
+**Архитектура:**
+- Singleton-клиент в `lib/supabase-client.ts`
+- Паттерн сервисного слоя (`lib/auth-service.ts`, `lib/word-service.ts`)
+- Адаптер AsyncStorage для сохранения сессий на всех платформах
 
 ---
 
-## State Management
+## Управление состоянием
 
 ### Zustand
 
-**Version:** ^5.0.9
+**Версия:** ^5.0.9
 
-Minimal, fast state management library. Chosen for:
-- Simple API with hooks
-- No boilerplate compared to Redux
-- Built-in TypeScript support
-- Async action support
-- DevTools integration
+Минимальная и быстрая библиотека управления состоянием. Выбрана за:
+- Простой API на хуках
+- Отсутствие бойлерплейта по сравнению с Redux
+- Встроенная поддержка TypeScript
+- Поддержка асинхронных действий
+- Интеграция с DevTools
 
-**Stores:**
-- `auth-store.ts` - Authentication state + Supabase sync
-- `word-store.ts` - Word content + favorites
-- `settings-store.ts` - User preferences with AsyncStorage persistence
+**Сторы:**
+- `auth-store.ts` — состояние аутентификации + синхронизация с Supabase
+- `word-store.ts` — контент слов + избранное
+- `settings-store.ts` — пользовательские настройки с персистентностью через AsyncStorage
 
-**Storage Adapter:** `@react-native-async-storage/async-storage` ^2.2.0
+**Адаптер хранилища:** `@react-native-async-storage/async-storage` ^2.2.0
 
 ---
 
-## Styling
+## Стилизация
 
 ### NativeWind
 
-**Version:** ^4.2.1
+**Версия:** ^4.2.1
 **Tailwind CSS:** ^3.4.19
 
-Tailwind CSS for React Native, enabling utility-first styling with:
-- Platform-specific styles
-- Responsive design
-- Dark mode support (future)
-- Type-safe class names
+Tailwind CSS для React Native, обеспечивающий utility-first стилизацию с:
+- Платформо-специфичные стили
+- Адаптивный дизайн
+- Поддержка тёмной темы (в будущем)
+- Типобезопасные имена классов
 
-**Design Tokens:**
-All design values are centralized in `constants/design-tokens.ts`:
-- Colors (Neobrutalism palette)
-- Border radius, shadows, spacing
-- Typography (IBM Plex Sans)
+**Дизайн-токены:**
+Все значения дизайна централизованы в `constants/design-tokens.ts`:
+- Цвета (палитра Neobrutalism)
+- Скругления, тени, отступы
+- Типографика (IBM Plex Sans)
 
 ---
 
-## Animation
+## Анимации
 
 ### React Native Reanimated
 
-**Version:** ~4.1.1
+**Версия:** ~4.1.1
 
-High-performance animations running on native thread:
-- Layout transitions
-- Shared element transitions (planned)
-- Gesture-based interactions
+Высокопроизводительные анимации, выполняемые в нативном потоке:
+- Переходы лейаутов
+- Переходы общих элементов (планируется)
+- Взаимодействия на основе жестов
 
-**Related:**
-- `react-native-gesture-handler` ~2.28.0 - Touch gesture support
+**Связанные пакеты:**
+- `react-native-gesture-handler` ~2.28.0 — поддержка жестов касания
 
 ---
 
-## UI Components & Icons
+## UI-компоненты и иконки
 
 ### Lucide React Native
 
-**Version:** ^0.561.0
+**Версия:** ^0.561.0
 
-Beautifully crafted open-source icons:
-- 1000+ icons
-- Consistent design
+Красиво оформленные иконки с открытым исходным кодом:
+- 1000+ иконок
+- Единообразный дизайн
 - Tree-shakable
-- TypeScript support
+- Поддержка TypeScript
 
-**SVG Support:**
+**Поддержка SVG:**
 - `react-native-svg` ^15.15.1
 
 ---
 
-## Typography
+## Типографика
 
 ### IBM Plex Sans
 
-**Package:** `@expo-google-fonts/ibm-plex-sans` ^0.4.1
+**Пакет:** `@expo-google-fonts/ibm-plex-sans` ^0.4.1
 
-Geometric sans-serif font family designed for clarity:
-- **Weights Used:** Regular (400), Medium (500), SemiBold (600), Bold (700)
-- Excellent readability in small sizes
-- Supports Latin, Cyrillic, Greek characters
-- Perfect for multilingual app (DE, EN, RU, UK)
+Геометрический шрифт без засечек, разработанный для ясности:
+- **Используемые начертания:** Regular (400), Medium (500), SemiBold (600), Bold (700)
+- Отличная читаемость при малых размерах
+- Поддержка латиницы, кириллицы, греческого алфавита
+- Идеален для мультиязычного приложения (DE, EN, RU, UK)
 
-**Font Loading:**
+**Загрузка шрифтов:**
 - `expo-font` ~14.0.10
 
 ---
 
-## Platform-Specific Features
+## Платформо-специфичные возможности
 
 ### iOS
 
-**Apple Authentication:**
+**Аутентификация Apple:**
 - `expo-apple-authentication` ^8.0.8
-- Currently in mock mode for development
-- Requires Apple Developer account for production
+- В данный момент в режиме мока для разработки
+- Для продакшена требуется аккаунт Apple Developer
 
-### Android & iOS Notifications
+### Уведомления Android и iOS
 
-**Push Notifications:**
+**Push-уведомления:**
 - `expo-notifications` ^0.32.15
-- Local daily repeating notifications
-- Customizable time settings
-- Badge management
+- Локальные ежедневные повторяющиеся уведомления
+- Настраиваемое время отправки
+- Управление бейджами
 
-### Haptic Feedback
+### Тактильная обратная связь
 
-**Package:** `expo-haptics` ~15.0.8
-- Touch feedback on buttons
-- iOS only (gracefully degrades on Android)
+**Пакет:** `expo-haptics` ~15.0.8
+- Тактильный отклик при нажатии кнопок
+- Только iOS (корректная деградация на Android)
 
 ---
 
-## Media & Assets
+## Медиа и ресурсы
 
-### Audio (Planned)
+### Аудио (планируется)
 
-**Audio Playback:**
+**Воспроизведение аудио:**
 - `expo-av` ^16.0.8
-- For word pronunciation (future feature)
+- Для произношения слов (будущая функция)
 
-### Linear Gradients
+### Линейные градиенты
 
-**Package:** `expo-linear-gradient` ~15.0.8
-- Background gradients
-- Card effects
+**Пакет:** `expo-linear-gradient` ~15.0.8
+- Фоновые градиенты
+- Эффекты карточек
 
 ---
 
-## Authentication & OAuth
+## Аутентификация и OAuth
 
-### OAuth & Web Browser
+### OAuth и веб-браузер
 
-**Web Browser:**
+**Веб-браузер:**
 - `expo-web-browser` ~15.0.10
-- For Google OAuth flow on mobile
+- Для потока Google OAuth на мобильных устройствах
 
-**Linking:**
+**Связывание:**
 - `expo-linking` ~8.0.10
-- Deep linking support for OAuth callbacks
+- Поддержка deep linking для обратных вызовов OAuth
 
 ---
 
-## System Integration
+## Системная интеграция
 
-### System UI
+### Системный UI
 
-**Expo Packages:**
-- `expo-status-bar` ~3.0.9 - Status bar styling
-- `expo-system-ui` ~6.0.9 - System UI configuration
-- `expo-constants` ~18.0.12 - App constants and config
-- `expo-symbols` ~1.0.8 - SF Symbols for iOS
+**Пакеты Expo:**
+- `expo-status-bar` ~3.0.9 — стилизация статус-бара
+- `expo-system-ui` ~6.0.9 — конфигурация системного UI
+- `expo-constants` ~18.0.12 — константы и конфигурация приложения
+- `expo-symbols` ~1.0.8 — SF Symbols для iOS
 
-**Safe Areas:**
+**Безопасные области:**
 - `react-native-safe-area-context` ~5.6.0
-- Handles notches, home indicators, etc.
+- Обработка вырезов, домашних индикаторов и т.д.
 
-**Screens:**
+**Экраны:**
 - `react-native-screens` ~4.16.0
-- Native navigation performance
+- Нативная производительность навигации
 
 ---
 
-## Development Tools
+## Инструменты разработки
 
 ### ESLint
 
-**Package:** `eslint` ^9.25.0
-**Config:** `eslint-config-expo` ~10.0.0
+**Пакет:** `eslint` ^9.25.0
+**Конфигурация:** `eslint-config-expo` ~10.0.0
 
-Expo's recommended ESLint configuration for React Native projects.
+Рекомендуемая конфигурация ESLint от Expo для проектов на React Native.
 
-**Run Linter:**
+**Запуск линтера:**
 ```bash
 npm run lint
 ```
 
 ### Babel
 
-**Plugin:** `babel-plugin-transform-import-meta` ^2.3.3
+**Плагин:** `babel-plugin-transform-import-meta` ^2.3.3
 
-Required for certain transformations in Expo projects.
+Необходим для определённых трансформаций в проектах Expo.
 
 ---
 
-## Dependencies Summary
+## Сводка зависимостей
 
-### Production Dependencies (Key Packages)
+### Продакшен-зависимости (ключевые пакеты)
 
 ```json
 {
@@ -274,38 +274,38 @@ Required for certain transformations in Expo projects.
 
 ---
 
-## Architecture Decisions
+## Архитектурные решения
 
-### Why Zustand over Redux?
+### Почему Zustand, а не Redux?
 
-- **Simpler API:** No actions, reducers, or dispatch boilerplate
-- **Better TypeScript:** Automatic type inference
-- **Smaller Bundle:** ~1KB vs 10KB+ for Redux
-- **Async Support:** Built-in async actions without middleware
+- **Простой API:** Нет бойлерплейта с actions, reducers и dispatch
+- **Лучшая поддержка TypeScript:** Автоматический вывод типов
+- **Меньший бандл:** ~1KB против 10KB+ у Redux
+- **Поддержка асинхронности:** Встроенные async actions без middleware
 
-### Why Expo over bare React Native?
+### Почему Expo, а не голый React Native?
 
-- **Faster Development:** Managed workflow with OTA updates
-- **Cross-Platform:** Single codebase for iOS, Android, Web
-- **Maintenance:** Expo team handles native dependencies
-- **Future-Proof:** Easy ejection to bare workflow if needed
+- **Быстрая разработка:** Управляемый воркфлоу с OTA-обновлениями
+- **Кроссплатформенность:** Единая кодовая база для iOS, Android, Web
+- **Поддержка:** Команда Expo управляет нативными зависимостями
+- **Перспективность:** Лёгкий переход на bare workflow при необходимости
 
-### Why Supabase over Firebase?
+### Почему Supabase, а не Firebase?
 
-- **Open Source:** Self-hostable PostgreSQL
-- **SQL Database:** Powerful queries vs NoSQL
-- **RLS Policies:** Row-level security built-in
-- **Better Privacy:** GDPR-compliant, EU hosting options
-- **Cost:** More predictable pricing
+- **Открытый исходный код:** PostgreSQL с возможностью self-hosting
+- **SQL-база данных:** Мощные запросы вместо NoSQL
+- **RLS-политики:** Встроенная безопасность на уровне строк
+- **Конфиденциальность:** Соответствие GDPR, возможность хостинга в ЕС
+- **Стоимость:** Более предсказуемое ценообразование
 
-### Why NativeWind over StyleSheet?
+### Почему NativeWind, а не StyleSheet?
 
-- **Consistency:** Same classes work on Web and Native
-- **Productivity:** Utility-first approach speeds up development
-- **Design System:** Easy to enforce design tokens
-- **Responsive:** Built-in responsive utilities
+- **Единообразие:** Одни и те же классы работают на Web и Native
+- **Продуктивность:** Utility-first подход ускоряет разработку
+- **Дизайн-система:** Простое применение дизайн-токенов
+- **Адаптивность:** Встроенные утилиты для адаптивного дизайна
 
 ---
 
-**Last Updated:** 16.01.2026
-**Status:** ✅ Production-ready stack
+**Последнее обновление:** 16.01.2026
+**Статус:** Стек готов к продакшену

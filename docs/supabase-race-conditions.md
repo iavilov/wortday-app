@@ -1,37 +1,37 @@
-# Supabase Race Conditions & RLS-First Pattern
+# Состояния гонки в Supabase и паттерн RLS-First
 
-**Created:** 2026-01-19
-**Status:** ✅ Resolved
-**Priority:** 🔴 CRITICAL
-
----
-
-## 📋 Table of Contents
-
-1. [Problem Summary](#problem-summary)
-2. [Symptoms](#symptoms)
-3. [Root Cause Analysis](#root-cause-analysis)
-4. [Diagnostic Process](#diagnostic-process)
-5. [Solution: RLS-First Pattern](#solution-rls-first-pattern)
-6. [Unit Testing](#unit-testing)
-7. [Code Examples](#code-examples)
-8. [Best Practices](#best-practices)
+**Создано:** 2026-01-19
+**Статус:** ✅ Решено
+**Приоритет:** 🔴 КРИТИЧЕСКИЙ
 
 ---
 
-## Problem Summary
+## 📋 Оглавление
 
-**Problem:** `toggleFavorite()` worked "every other time" - first click successfully updated DB, second click hung for 3+ seconds and rolled back.
-
-**Root Cause:** Race condition in Supabase Auth Module - parallel calls to `getUser()` or `getSession()` get blocked by internal locks, especially during token refresh.
-
-**Solution:** RLS-First Pattern - remove all explicit auth checks from application code, rely on Row Level Security policies at the database level.
+1. [Краткое описание проблемы](#краткое-описание-проблемы)
+2. [Симптомы](#симптомы)
+3. [Анализ коренной причины](#анализ-коренной-причины)
+4. [Процесс диагностики](#процесс-диагностики)
+5. [Решение: паттерн RLS-First](#решение-паттерн-rls-first)
+6. [Модульное тестирование](#модульное-тестирование)
+7. [Примеры кода](#примеры-кода)
+8. [Лучшие практики](#лучшие-практики)
 
 ---
 
-## Symptoms
+## Краткое описание проблемы
 
-### Symptom 1: Async Hanging
+**Проблема:** `toggleFavorite()` работал «через раз» — первый клик успешно обновлял БД, второй зависал на 3+ секунды и откатывался.
+
+**Коренная причина:** Состояние гонки в модуле Supabase Auth — параллельные вызовы `getUser()` или `getSession()` блокируются внутренними блокировками, особенно во время обновления токена.
+
+**Решение:** Паттерн RLS-First — удалить все явные проверки авторизации из кода приложения, полагаться на политики Row Level Security на уровне базы данных.
+
+---
+
+## Симптомы
+
+### Симптом 1: Зависание асинхронных операций
 ```
 Click 1: ✅ Works (200-300ms)
   [WordStore] toggleFavorite CALLED
@@ -46,41 +46,41 @@ Click 2 (1-2 seconds later): ❌ Hangs (3000ms+ timeout)
   [WordStore] Rolled back to previous state
 ```
 
-### Symptom 2: History Screen Becomes Empty
-- After a hung toggle click, navigating to History screen shows an empty list
-- After page reload, the list is restored
-- Indicates a problem with async data loading during auth module blocking
+### Симптом 2: Экран истории становится пустым
+- После зависшего клика на переключение, переход на экран History показывает пустой список
+- После перезагрузки страницы список восстанавливается
+- Указывает на проблему с асинхронной загрузкой данных во время блокировки модуля авторизации
 
-### Symptom 3: Non-Deterministic Reproduction
-- Hanging occurs **intermittently**
-- Depends on timing and Supabase auth module state
-- More frequent with rapid repeated clicks (1-2 seconds between clicks)
-- Less frequent with slow clicks (5+ seconds between clicks)
+### Симптом 3: Недетерминированное воспроизведение
+- Зависание происходит **периодически**
+- Зависит от тайминга и состояния модуля Supabase Auth
+- Чаще при быстрых повторных кликах (1-2 секунды между кликами)
+- Реже при медленных кликах (5+ секунд между кликами)
 
 ---
 
-## Root Cause Analysis
+## Анализ коренной причины
 
-### Technical Explanation
+### Техническое объяснение
 
-Supabase Auth Module uses **internal locks** to synchronize auth operations:
+Модуль Supabase Auth использует **внутренние блокировки** для синхронизации операций авторизации:
 
-1. **Token Refresh Lock**
-   - When access token expires (default: 1 hour), Supabase automatically triggers a refresh
-   - During refresh, all auth operations (`getUser()`, `getSession()`, etc.) are blocked
-   - Lock can last from 1 to 5+ seconds depending on network latency
+1. **Блокировка обновления токена**
+   - Когда access token истекает (по умолчанию: 1 час), Supabase автоматически запускает обновление
+   - Во время обновления все операции авторизации (`getUser()`, `getSession()` и т.д.) блокируются
+   - Блокировка может длиться от 1 до 5+ секунд в зависимости от сетевой задержки
 
-2. **Parallel Operations Lock**
-   - If two requests call `getUser()` or `getSession()` in parallel
-   - The second request **waits** for the first to complete (blocking, not queued)
-   - This is protection against race conditions inside the auth module
+2. **Блокировка параллельных операций**
+   - Если два запроса вызывают `getUser()` или `getSession()` параллельно
+   - Второй запрос **ожидает** завершения первого (блокирующее ожидание, не очередь)
+   - Это защита от состояний гонки внутри модуля авторизации
 
-3. **Storage Access Lock**
-   - `getSession()` reads from AsyncStorage/localStorage
-   - On Web this is synchronous, but on React Native it's async
-   - Parallel reads can be blocked by OS-level file locks
+3. **Блокировка доступа к хранилищу**
+   - `getSession()` читает из AsyncStorage/localStorage
+   - На Web это синхронная операция, но на React Native — асинхронная
+   - Параллельные чтения могут блокироваться блокировками файлов на уровне ОС
 
-### Why This Is Critical for toggleFavorite()
+### Почему это критично для toggleFavorite()
 
 ```typescript
 // PROBLEMATIC CODE (old version):
@@ -96,34 +96,34 @@ export async function toggleFavorite(wordId: string) {
 }
 ```
 
-**Hanging Scenario:**
+**Сценарий зависания:**
 
-1. User clicks heart icon → `toggleFavorite()` is called
-2. Function calls `getUser()` → Auth module starts token refresh (background)
-3. User clicks **second time** (1 second later)
-4. Second `getUser()` call is **blocked** by the first refresh
-5. Timeout triggers after 3 seconds → Rollback
-6. User sees that favorite was not updated
+1. Пользователь нажимает иконку сердца → вызывается `toggleFavorite()`
+2. Функция вызывает `getUser()` → модуль Auth запускает обновление токена (фоново)
+3. Пользователь нажимает **второй раз** (через 1 секунду)
+4. Второй вызов `getUser()` **блокируется** первым обновлением
+5. Таймаут срабатывает через 3 секунды → Откат
+6. Пользователь видит, что избранное не обновилось
 
-### Why getSession() Didn't Help
+### Почему getSession() не помог
 
 ```typescript
 // ❌ ALSO DOESN'T WORK:
 const { data: { session }, error } = await supabase.auth.getSession();
 ```
 
-**Reasons:**
-- `getSession()` also uses internal locks
-- On React Native reads from AsyncStorage → async operation
-- Can be blocked during token refresh
-- Faster than `getUser()` (no network call), but still blocking
+**Причины:**
+- `getSession()` тоже использует внутренние блокировки
+- На React Native читает из AsyncStorage → асинхронная операция
+- Может блокироваться во время обновления токена
+- Быстрее, чем `getUser()` (нет сетевого вызова), но всё равно блокирует
 
 ---
 
-## Diagnostic Process
+## Процесс диагностики
 
-### Step 1: Adding Logging
-Added extensive logging to each step:
+### Шаг 1: Добавление логирования
+Добавлено подробное логирование на каждом шаге:
 
 ```typescript
 export async function toggleFavorite(wordId: string) {
@@ -135,17 +135,17 @@ export async function toggleFavorite(wordId: string) {
 }
 ```
 
-**Result:** Discovered that execution stops at `"Checking auth..."` → indicates problem in auth call.
+**Результат:** Обнаружено, что выполнение останавливается на `"Checking auth..."` → проблема в вызове авторизации.
 
-### Step 2: Replacing getUser() with getSession()
+### Шаг 2: Замена getUser() на getSession()
 ```typescript
 // Attempt #1: Use getSession() instead of getUser()
 const { data: { session } } = await supabase.auth.getSession();
 ```
 
-**Result:** Hanging reduced from ~5s to ~3s, but problem persisted.
+**Результат:** Зависание уменьшилось с ~5с до ~3с, но проблема осталась.
 
-### Step 3: Adding Timeout Wrapper
+### Шаг 3: Добавление обёртки с таймаутом
 ```typescript
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return Promise.race([
@@ -162,10 +162,10 @@ const session = await withTimeout(
 );
 ```
 
-**Result:** Confirmed that `getSession()` hangs for 3+ seconds → need to remove auth calls entirely.
+**Результат:** Подтверждено, что `getSession()` зависает на 3+ секунды → необходимо полностью убрать вызовы авторизации.
 
-### Step 4: RLS-First Pattern (Final Solution)
-Removed all auth checks, rely on Row Level Security:
+### Шаг 4: Паттерн RLS-First (финальное решение)
+Удалены все проверки авторизации, полагаемся на Row Level Security:
 
 ```typescript
 // ✅ SOLUTION: No auth calls!
@@ -181,17 +181,17 @@ export async function toggleFavorite(wordId: string) {
 }
 ```
 
-**Result:** ✅ Hanging completely eliminated, all clicks work instantly.
+**Результат:** ✅ Зависание полностью устранено, все клики работают мгновенно.
 
 ---
 
-## Solution: RLS-First Pattern
+## Решение: паттерн RLS-First
 
-### Principle
+### Принцип
 
-**Move security enforcement from application layer to database layer.**
+**Перенести контроль безопасности с уровня приложения на уровень базы данных.**
 
-Instead of checking auth in application code:
+Вместо проверки авторизации в коде приложения:
 ```typescript
 // ❌ BAD: Application-level auth check
 const { data: { user } } = await supabase.auth.getUser();
@@ -204,7 +204,7 @@ await supabase
   .eq('word_id', wordId);
 ```
 
-Use RLS policies for automatic filtering:
+Используем политики RLS для автоматической фильтрации:
 ```typescript
 // ✅ GOOD: Database-level auth enforcement
 await supabase
@@ -213,11 +213,11 @@ await supabase
   .eq('word_id', wordId);  // RLS automatically adds: WHERE user_id = auth.uid()
 ```
 
-### Implementation
+### Реализация
 
-#### 1. SELECT/UPDATE operations - Zero auth checks
+#### 1. Операции SELECT/UPDATE — без проверок авторизации
 
-**File:** `lib/word-history-service.ts`
+**Файл:** `lib/word-history-service.ts`
 
 ```typescript
 export async function toggleFavorite(wordId: string): Promise<ToggleFavoriteResult> {
@@ -314,9 +314,9 @@ export async function toggleFavorite(wordId: string): Promise<ToggleFavoriteResu
 }
 ```
 
-#### 2. Required RLS Policies
+#### 2. Необходимые политики RLS
 
-**File:** `docs/database-schema.md` (Step 3: RLS Policies)
+**Файл:** `docs/database-schema.md` (Шаг 3: Политики RLS)
 
 ```sql
 -- ✅ CRITICAL: UPDATE policy must include both USING + WITH CHECK
@@ -335,14 +335,14 @@ CREATE POLICY "Users can delete own history" ON user_words_history FOR DELETE
   USING ((select auth.uid()) = user_id);
 ```
 
-**Why `WITH CHECK` is Important:**
-- `USING` checks the row **before** modification (OLD row)
-- `WITH CHECK` checks the row **after** modification (NEW row)
-- Without `WITH CHECK`, Supabase **silently blocks** UPDATE (count = 0, no error)
+**Почему `WITH CHECK` важен:**
+- `USING` проверяет строку **до** модификации (OLD row)
+- `WITH CHECK` проверяет строку **после** модификации (NEW row)
+- Без `WITH CHECK` Supabase **молча блокирует** UPDATE (count = 0, без ошибки)
 
-#### 3. Lock mechanism against parallel calls
+#### 3. Механизм блокировки параллельных вызовов
 
-**File:** `store/word-store.ts`
+**Файл:** `store/word-store.ts`
 
 ```typescript
 toggleFavorite: async (wordId: string) => {
@@ -432,12 +432,12 @@ toggleFavorite: async (wordId: string) => {
 
 ---
 
-## Unit Testing
+## Модульное тестирование
 
-### Critical Test Cases
+### Критические тест-кейсы
 
-#### Test Case 1: Rapid Sequential Clicks
-**Goal:** Verify that parallel toggleFavorite calls don't cause race conditions
+#### Тест-кейс 1: Быстрые последовательные клики
+**Цель:** Убедиться, что параллельные вызовы toggleFavorite не вызывают состояний гонки
 
 ```typescript
 describe('toggleFavorite - Rapid Sequential Clicks', () => {
@@ -484,8 +484,8 @@ describe('toggleFavorite - Rapid Sequential Clicks', () => {
 });
 ```
 
-#### Test Case 2: RLS Policy Enforcement
-**Goal:** Verify that RLS blocks access to other users' records
+#### Тест-кейс 2: Проверка политик RLS
+**Цель:** Убедиться, что RLS блокирует доступ к записям других пользователей
 
 ```typescript
 describe('toggleFavorite - RLS Policy Enforcement', () => {
@@ -537,8 +537,8 @@ describe('toggleFavorite - RLS Policy Enforcement', () => {
 });
 ```
 
-#### Test Case 3: INSERT with auth-store
-**Goal:** Verify that INSERT gets userId from auth-store, not from async call
+#### Тест-кейс 3: INSERT с auth-store
+**Цель:** Убедиться, что INSERT получает userId из auth-store, а не из асинхронного вызова
 
 ```typescript
 describe('toggleFavorite - INSERT Operation', () => {
@@ -596,8 +596,8 @@ describe('toggleFavorite - INSERT Operation', () => {
 });
 ```
 
-#### Test Case 4: Optimistic Update & Rollback
-**Goal:** Verify that UI updates optimistically and rolls back on error
+#### Тест-кейс 4: Оптимистичное обновление и откат
+**Цель:** Убедиться, что UI обновляется оптимистично и откатывается при ошибке
 
 ```typescript
 describe('toggleFavorite - Optimistic Update', () => {
@@ -650,8 +650,8 @@ describe('toggleFavorite - Optimistic Update', () => {
 });
 ```
 
-#### Test Case 5: Lock Mechanism
-**Goal:** Verify that parallel calls for the same word_id are ignored
+#### Тест-кейс 5: Механизм блокировки
+**Цель:** Убедиться, что параллельные вызовы для одного word_id игнорируются
 
 ```typescript
 describe('toggleFavorite - Lock Mechanism', () => {
@@ -700,9 +700,9 @@ describe('toggleFavorite - Lock Mechanism', () => {
 });
 ```
 
-### Integration Test Scenario
+### Сценарий интеграционного тестирования
 
-**Goal:** End-to-end test of real user flow
+**Цель:** Сквозной тест реального пользовательского сценария
 
 ```typescript
 describe('Favorites System - E2E', () => {
@@ -761,9 +761,9 @@ describe('Favorites System - E2E', () => {
 
 ---
 
-## Code Examples
+## Примеры кода
 
-### ❌ ANTI-PATTERN: Explicit auth check in service layer
+### ❌ АНТИПАТТЕРН: Явная проверка авторизации в сервисном слое
 
 ```typescript
 // DON'T DO THIS - causes race conditions!
@@ -784,7 +784,7 @@ export async function toggleFavorite(wordId: string) {
 }
 ```
 
-### ✅ BEST PRACTICE: RLS-First pattern
+### ✅ ЛУЧШАЯ ПРАКТИКА: Паттерн RLS-First
 
 ```typescript
 // DO THIS - fast and safe!
@@ -830,29 +830,29 @@ export async function toggleFavorite(wordId: string) {
 
 ---
 
-## Best Practices
+## Лучшие практики
 
-### ✅ DO
+### ✅ РЕКОМЕНДУЕТСЯ
 
-1. **Trust RLS policies** - Let database handle security, not application code
-2. **Use in-memory auth state** - Get `user.id` from Zustand store, not async calls
-3. **Check row count** - Verify `count > 0` after UPDATE to detect RLS blocks
-4. **Implement locks** - Prevent parallel operations on same resource
-5. **Add timeouts** - Detect hanging operations early (for debugging)
-6. **Log extensively** - Make debugging race conditions easier
+1. **Доверять политикам RLS** — пусть база данных обеспечивает безопасность, а не код приложения
+2. **Использовать состояние авторизации из памяти** — получать `user.id` из Zustand store, а не из асинхронных вызовов
+3. **Проверять количество строк** — убеждаться, что `count > 0` после UPDATE для обнаружения блокировок RLS
+4. **Реализовать блокировки** — предотвращать параллельные операции над одним ресурсом
+5. **Добавлять таймауты** — обнаруживать зависания на ранней стадии (для отладки)
+6. **Логировать подробно** — упрощать отладку состояний гонки
 
-### ❌ DON'T
+### ❌ НЕ РЕКОМЕНДУЕТСЯ
 
-1. **Call `getUser()` in hot paths** - Causes race conditions during token refresh
-2. **Call `getSession()` repeatedly** - Even this can hang on React Native
-3. **Duplicate security logic** - RLS + app-level checks = maintenance burden
-4. **Ignore row count** - Silent RLS failures are hard to debug
-5. **Skip error boundaries** - Race conditions can cause unexpected UI states
-6. **Remove logging too early** - Keep diagnostic logs in production
+1. **Вызывать `getUser()` в горячих путях** — вызывает состояния гонки при обновлении токена
+2. **Вызывать `getSession()` многократно** — даже это может зависнуть на React Native
+3. **Дублировать логику безопасности** — RLS + проверки на уровне приложения = бремя поддержки
+4. **Игнорировать количество строк** — молчаливые сбои RLS сложно отлаживать
+5. **Пропускать обработку ошибок** — состояния гонки могут вызвать неожиданные состояния UI
+6. **Удалять логирование слишком рано** — оставляйте диагностические логи в продакшене
 
-### Database RLS Requirements
+### Требования к политикам RLS для базы данных
 
-**Minimum policies for RLS-First pattern:**
+**Минимальные политики для паттерна RLS-First:**
 
 ```sql
 -- SELECT: User sees only their own records
@@ -873,47 +873,47 @@ CREATE POLICY "delete_own_records" ON table_name FOR DELETE
   USING ((select auth.uid()) = user_id);
 ```
 
-**Why `WITH CHECK` is Critical:**
-- Without it, UPDATE can **silently fail** (no error, count = 0)
-- This is hard to debug because there's no exception
-- Always use `WITH CHECK` for UPDATE policies!
+**Почему `WITH CHECK` критически важен:**
+- Без него UPDATE может **молча завершиться неудачей** (без ошибки, count = 0)
+- Это сложно отлаживать, потому что нет исключения
+- Всегда используйте `WITH CHECK` для политик UPDATE!
 
 ---
 
-## Related Files
+## Связанные файлы
 
-### Modified Files (in order of importance):
+### Изменённые файлы (в порядке важности):
 
-1. **lib/word-history-service.ts** - RLS-first implementation for all CRUD operations
-2. **store/word-store.ts** - Lock mechanism for toggleFavorite
-3. **docs/database-schema.md** - Updated RLS policies with `WITH CHECK`
-4. **app/(tabs)/history.tsx** - useFocusEffect for reload on navigation
+1. **lib/word-history-service.ts** — реализация RLS-first для всех CRUD-операций
+2. **store/word-store.ts** — механизм блокировки для toggleFavorite
+3. **docs/database-schema.md** — обновлённые политики RLS с `WITH CHECK`
+4. **app/(tabs)/history.tsx** — useFocusEffect для перезагрузки при навигации
 
-### Affected Systems:
+### Затронутые системы:
 
-- Authentication (auth-store.ts, supabase auth)
-- Favorites management (word-store.ts, word-history-service.ts)
-- Database security (RLS policies)
-- UI state management (React hooks, Zustand)
-
----
-
-## Conclusion
-
-**Problem:** Race condition in Supabase auth module blocked parallel `getUser()`/`getSession()` calls.
-
-**Solution:** RLS-First Pattern - removed all auth checks from application code, rely on database RLS policies.
-
-**Result:**
-- ✅ Hanging completely eliminated
-- ✅ toggleFavorite works instantly with any number of clicks
-- ✅ Simplified code (less async logic)
-- ✅ More secure architecture (security at DB level)
-
-**Key Lesson:** Always prefer database-level security (RLS) over application-level checks. This eliminates an entire class of race conditions and simplifies code.
+- Авторизация (auth-store.ts, Supabase Auth)
+- Управление избранным (word-store.ts, word-history-service.ts)
+- Безопасность базы данных (политики RLS)
+- Управление состоянием UI (React hooks, Zustand)
 
 ---
 
-**Author:** Claude Code (AI Assistant)
-**Date:** 2026-01-19
-**Version:** 1.0.0
+## Заключение
+
+**Проблема:** Состояние гонки в модуле Supabase Auth блокировало параллельные вызовы `getUser()`/`getSession()`.
+
+**Решение:** Паттерн RLS-First — удалены все проверки авторизации из кода приложения, полагаемся на политики RLS базы данных.
+
+**Результат:**
+- ✅ Зависание полностью устранено
+- ✅ toggleFavorite работает мгновенно при любом количестве кликов
+- ✅ Упрощённый код (меньше асинхронной логики)
+- ✅ Более безопасная архитектура (безопасность на уровне БД)
+
+**Ключевой урок:** Всегда предпочитайте безопасность на уровне базы данных (RLS) проверкам на уровне приложения. Это устраняет целый класс состояний гонки и упрощает код.
+
+---
+
+**Автор:** Claude Code (AI Assistant)
+**Дата:** 2026-01-19
+**Версия:** 1.0.0

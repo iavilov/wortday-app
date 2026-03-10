@@ -1,101 +1,101 @@
-# Supabase Database Schema
+# Схема базы данных Supabase
 
-**Version:** 1.0.0 (Word History System Integration)
-**Last Updated:** 16.01.2026
-
----
-
-## 📋 Overview
-
-Database structure for Wortday with support for:
-- **Authentication** (Email/Password, Sign in with Apple, Google)
-- Multilingual content (JSONB)
-- Difficulty level system (Beginner/Intermediate/Advanced)
-- Persistent favorites
-- Learned words history
-- Account deletion (Apple App Store requirement)
+**Версия:** 1.0.0 (Интеграция системы истории слов)
+**Последнее обновление:** 16.01.2026
 
 ---
 
-## 🗂️ Tables
+## Обзор
+
+Структура базы данных Wortday с поддержкой:
+- **Аутентификация** (Email/Password, Sign in with Apple, Google)
+- Мультиязычный контент (JSONB)
+- Система уровней сложности (Beginner/Intermediate/Advanced)
+- Постоянное хранение избранного
+- История изученных слов
+- Удаление аккаунта (требование Apple App Store)
+
+---
+
+## Таблицы
 
 ### 1. `words`
-**Description:** Main words table (infinitely scalable)
+**Описание:** Основная таблица слов (бесконечно масштабируемая)
 
-| Field | Type | Description |
+| Поле | Тип | Описание |
 | :--- | :--- | :--- |
-| `id` | `TEXT` | PK, e.g., 'beg-seq-1', 'int-seq-100' |
-| `level` | `TEXT` | Difficulty level (beginner/intermediate/advanced) |
-| `sequence_number` | `INTEGER` | Sequence number within the level |
-| `word_de` | `TEXT` | German word |
-| `article` | `TEXT` | Article (der/die/das) |
-| `transcription_de` | `TEXT` | Transcription (IPA) |
-| `part_of_speech` | `TEXT` | Part of speech |
-| `translations` | `JSONB` | Translations into different languages |
-| `content` | `JSONB` | Examples, etymology, synonyms |
-| `media` | `JSONB` | Links to audio files |
+| `id` | `TEXT` | PK, например: 'beg-seq-1', 'int-seq-100' |
+| `level` | `TEXT` | Уровень сложности (beginner/intermediate/advanced) |
+| `sequence_number` | `INTEGER` | Порядковый номер внутри уровня |
+| `word_de` | `TEXT` | Немецкое слово |
+| `article` | `TEXT` | Артикль (der/die/das) |
+| `transcription_de` | `TEXT` | Транскрипция (IPA) |
+| `part_of_speech` | `TEXT` | Часть речи |
+| `translations` | `JSONB` | Переводы на разные языки |
+| `content` | `JSONB` | Примеры, этимология, синонимы |
+| `media` | `JSONB` | Ссылки на аудиофайлы |
 
-*Full SQL query with indexes and RLS is available in the [SQL for Copying](#sql-for-copying-to-supabase-sql-editor) section.*
+*Полный SQL-запрос с индексами и RLS доступен в разделе [SQL для копирования](#sql-для-копирования-в-supabase-sql-editor).*
 
 ---
 
-### 2. `users` (Profiles)
-**Description:** User profiles linked to Supabase Auth
+### 2. `users` (Профили)
+**Описание:** Профили пользователей, связанные с Supabase Auth
 
-⚠️ **IMPORTANT:** The table is named `users`, but it is NOT `auth.users`. It is a public profiles table.
+**ВАЖНО:** Таблица называется `users`, но это НЕ `auth.users`. Это публичная таблица профилей.
 
-| Field | Type | Description |
+| Поле | Тип | Описание |
 | :--- | :--- | :--- |
-| `id` | `UUID` | PK, link to `auth.users.id` |
-| `email` | `TEXT` | User email |
-| `display_name` | `TEXT` | Display name |
-| `auth_provider` | `TEXT` | email, apple or google |
-| `is_private_email` | `BOOLEAN` | Apple Private Relay flag |
-| `translation_language`| `TEXT` | Native language (ru, uk, en, de) |
-| `language_level` | `TEXT` | Selected learning level |
-| `registration_date` | `DATE` | Registration date |
-| `has_completed_onboarding` | `BOOLEAN` | Onboarding completion status |
-| `notifications_enabled`| `BOOLEAN` | Notifications enabled flag |
-| `notification_time` | `TIME` | Daily notification time |
+| `id` | `UUID` | PK, ссылка на `auth.users.id` |
+| `email` | `TEXT` | Email пользователя |
+| `display_name` | `TEXT` | Отображаемое имя |
+| `auth_provider` | `TEXT` | email, apple или google |
+| `is_private_email` | `BOOLEAN` | Флаг Apple Private Relay |
+| `translation_language`| `TEXT` | Родной язык (ru, uk, en, de) |
+| `language_level` | `TEXT` | Выбранный уровень обучения |
+| `registration_date` | `DATE` | Дата регистрации |
+| `has_completed_onboarding` | `BOOLEAN` | Статус прохождения онбординга |
+| `notifications_enabled`| `BOOLEAN` | Флаг включения уведомлений |
+| `notification_time` | `TIME` | Время ежедневного уведомления |
 
-*All RLS policies (View/Insert/Update/Delete) are configured for owner-only access.*
+*Все RLS-политики (View/Insert/Update/Delete) настроены на доступ только для владельца.*
 
 ---
 
 ### 3. `user_words_history`
-**Description:** History of learned words + favorites
+**Описание:** История изученных слов + избранное
 
-| Field | Type | Description |
+| Поле | Тип | Описание |
 | :--- | :--- | :--- |
-| `user_id` | `UUID` | FK to `users.id` |
-| `word_id` | `TEXT` | FK to `words.id` |
-| `learned_at` | `TIMESTAMPTZ` | Date learned |
-| `is_favorite` | `BOOLEAN` | In "Favorites" list |
-| `times_reviewed` | `INTEGER` | Number of reviews |
-| `next_review_date` | `DATE` | Next review date (for SRS) |
-| `ease_factor` | `DECIMAL` | Ease factor for algorithm |
+| `user_id` | `UUID` | FK на `users.id` |
+| `word_id` | `TEXT` | FK на `words.id` |
+| `learned_at` | `TIMESTAMPTZ` | Дата изучения |
+| `is_favorite` | `BOOLEAN` | В списке «Избранное» |
+| `times_reviewed` | `INTEGER` | Количество повторений |
+| `next_review_date` | `DATE` | Дата следующего повторения (для SRS) |
+| `ease_factor` | `DECIMAL` | Коэффициент лёгкости для алгоритма |
 
-#### Word History System Usage
+#### Использование системы истории слов
 
-The `user_words_history` table is now actively used for:
+Таблица `user_words_history` активно используется для:
 
-1. **View Tracking**: Automatically marks words as viewed when user opens Word of the Day
-2. **Favorites System**: Syncs favorites between local storage and database
-3. **Review Counting**: Increments `times_reviewed` on each view
-4. **Future SRS**: `next_review_date` and `ease_factor` prepared for spaced repetition
+1. **Отслеживание просмотров**: Автоматически отмечает слова как просмотренные при открытии «Слова дня»
+2. **Система избранного**: Синхронизирует избранное между локальным хранилищем и базой данных
+3. **Подсчёт повторений**: Увеличивает `times_reviewed` при каждом просмотре
+4. **Будущая SRS**: `next_review_date` и `ease_factor` подготовлены для интервального повторения
 
-**Implementation:**
-- Service: `lib/word-history-service.ts`
-- Store integration: `store/word-store.ts`
-- Auto-tracking: `app/(tabs)/index.tsx`
+**Реализация:**
+- Сервис: `lib/word-history-service.ts`
+- Интеграция со стором: `store/word-store.ts`
+- Автоматическое отслеживание: `app/(tabs)/index.tsx`
 
-**Key Functions:**
-- `markWordAsViewed(wordId)` - Called on index.tsx mount, upserts record with incremented review count
-- `toggleFavorite(wordId)` - Upserts `is_favorite` field with optimistic local updates
-- `getFavoriteIds()` - Fetches user favorites for sync with AsyncStorage
-- `migrateFavoritesToDatabase(ids)` - One-time migration from AsyncStorage to database
+**Ключевые функции:**
+- `markWordAsViewed(wordId)` — вызывается при монтировании index.tsx, выполняет upsert записи с увеличенным счётчиком повторений
+- `toggleFavorite(wordId)` — выполняет upsert поля `is_favorite` с оптимистичным локальным обновлением
+- `getFavoriteIds()` — получает избранное пользователя для синхронизации с AsyncStorage
+- `migrateFavoritesToDatabase(ids)` — одноразовая миграция из AsyncStorage в базу данных
 
-**Data Flow:**
+**Поток данных:**
 ```
 User opens home screen
   → useEffect triggers markWordAsViewed(todayWord.id)
@@ -104,7 +104,7 @@ User opens home screen
         → Increment times_reviewed OR create new record
 ```
 
-**Favorites Sync:**
+**Синхронизация избранного:**
 ```
 App launch
   → Load favorites from AsyncStorage
@@ -120,39 +120,39 @@ User toggles favorite
         → On error: rollback optimistic update
 ```
 
-For detailed documentation, see: `docs/word-history-flow.md`
+Подробная документация: `docs/word-history-flow.md`
 
 ---
 
-### 4. `user_streaks` (Future v0.9.0)
-**Description:** Streak system (consecutive days)
+### 4. `user_streaks` (Планируется в v0.9.0)
+**Описание:** Система серий (последовательные дни)
 
-| Field | Type | Description |
+| Поле | Тип | Описание |
 | :--- | :--- | :--- |
-| `user_id` | `UUID` | PK, link to `users.id` |
-| `current_streak` | `INTEGER` | Current streak |
-| `longest_streak` | `INTEGER` | Longest streak |
-| `total_words_learned`| `INTEGER` | Total words learned |
+| `user_id` | `UUID` | PK, ссылка на `users.id` |
+| `current_streak` | `INTEGER` | Текущая серия |
+| `longest_streak` | `INTEGER` | Самая длинная серия |
+| `total_words_learned`| `INTEGER` | Всего изученных слов |
 
 ---
 
-## 🔧 Functions & Triggers
+## Функции и триггеры
 
-### Auto-create profile on signup
+### Автоматическое создание профиля при регистрации
 
-Automatically creates a record in the `public.users` table when a user registers via Supabase Auth. Extracts email, provider, and name from metadata.
+Автоматически создаёт запись в таблице `public.users` при регистрации пользователя через Supabase Auth. Извлекает email, провайдер и имя из метаданных.
 
-### Delete Account (Apple Requirement)
+### Удаление аккаунта (требование Apple)
 
-RPC function to delete all user data and their record in `auth.users`. Used to comply with Apple App Store account deletion requirements.
+RPC-функция для удаления всех данных пользователя и его записи в `auth.users`. Используется для соответствия требованиям Apple App Store по удалению аккаунтов.
 
-### Update timestamp trigger
+### Триггер обновления временной метки
 
-Universal trigger to automatically update the `updated_at` column when records in `users` and `words` tables are modified.
+Универсальный триггер для автоматического обновления столбца `updated_at` при изменении записей в таблицах `users` и `words`.
 
 ---
 
-## 📊 JSONB Structures
+## Структуры JSONB
 
 ### translations
 ```json
@@ -188,40 +188,40 @@ Universal trigger to automatically update the `updated_at` column when records i
 
 ---
 
-## 🔐 Auth Configuration (Supabase Dashboard)
+## Конфигурация аутентификации (Supabase Dashboard)
 
-### 1. Enable Providers
-In Supabase Dashboard → Authentication → Providers:
+### 1. Включение провайдеров
+В Supabase Dashboard → Authentication → Providers:
 
 **Email:**
-- ✅ Enable Email provider
-- ✅ Confirm email: OFF (for quick testing, enable in production)
+- Включить Email-провайдер
+- Подтверждение email: ВЫКЛ (для быстрого тестирования, включить в продакшене)
 
 **Apple:**
-- ✅ Enable Apple provider
+- Включить Apple-провайдер
 - Services ID: `com.wortday.app`
 - Callback URL: `https://ghrbimousviadvdwvuhx.supabase.co/auth/v1/callback`
 
 **Google:**
-- ✅ Enable Google provider
-- Client ID: (from Google Cloud Console)
-- Client Secret: (from Google Cloud Console)
+- Включить Google-провайдер
+- Client ID: (из Google Cloud Console)
+- Client Secret: (из Google Cloud Console)
 
-### 2. URL Configuration
+### 2. Конфигурация URL
 Authentication → URL Configuration:
-- Site URL: `wortday://` (for deep linking)
+- Site URL: `wortday://` (для deep linking)
 - Redirect URLs:
   - `wortday://auth/callback`
-  - `http://localhost:8081` (dev)
-  - `https://wortday.com` (production web)
+  - `http://localhost:8081` (разработка)
+  - `https://wortday.com` (продакшен веб)
 
 ---
 
-## 📋 SQL for copying to Supabase SQL Editor
+## SQL для копирования в Supabase SQL Editor
 
-**⚠️ Execute in order!**
+**Выполняйте по порядку!**
 
-### Step 1: Tables
+### Шаг 1: Таблицы
 ```sql
 -- 1. WORDS TABLE
 CREATE TABLE words (
@@ -287,7 +287,7 @@ CREATE TABLE user_streaks (
 );
 ```
 
-### Step 2: Indexes
+### Шаг 2: Индексы
 ```sql
 -- Words indexes
 CREATE INDEX idx_words_level ON words(level);
@@ -300,7 +300,7 @@ CREATE INDEX idx_user_words_favorite ON user_words_history(user_id, is_favorite)
 CREATE INDEX idx_user_words_learned ON user_words_history(user_id, learned_at DESC);
 ```
 
-### Step 3: RLS Policies
+### Шаг 3: RLS-политики
 ```sql
 -- Enable RLS
 ALTER TABLE words ENABLE ROW LEVEL SECURITY;
@@ -334,7 +334,7 @@ CREATE POLICY "Users can update own streaks" ON user_streaks FOR UPDATE
 CREATE POLICY "Users can delete own streaks" ON user_streaks FOR DELETE USING ((select auth.uid()) = user_id);
 ```
 
-### Step 4: Functions & Triggers
+### Шаг 4: Функции и триггеры
 ```sql
 -- Auto-create profile trigger
 CREATE OR REPLACE FUNCTION handle_new_user()
@@ -393,7 +393,7 @@ CREATE TRIGGER update_words_updated_at
 
 ---
 
-## 🧪 Test Data
+## Тестовые данные
 
 ```sql
 -- Test word for verification
@@ -414,15 +414,15 @@ VALUES (
 
 ---
 
-## 📱 Client Integration
+## Клиентская интеграция
 
-### Environment Variables
+### Переменные окружения
 ```env
 EXPO_PUBLIC_SUPABASE_URL=https://ghrbimousviadvdwvuhx.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-### Dependencies
+### Зависимости
 ```bash
 npm install @supabase/supabase-js @react-native-async-storage/async-storage
 npm install expo-apple-authentication expo-web-browser  # for auth screens
@@ -430,5 +430,5 @@ npm install expo-apple-authentication expo-web-browser  # for auth screens
 
 ---
 
-**Status:** ✅ Ready for production
-**Last Updated:** 16.01.2026
+**Статус:** Готово к продакшену
+**Последнее обновление:** 16.01.2026

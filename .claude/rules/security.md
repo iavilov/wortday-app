@@ -1,21 +1,19 @@
-# Security Rules
+# Безопасность
 
 ## Supabase
-- NEVER expose `service_role` key in client code
-- ALL database access through RLS-protected queries
-- Validate user ownership in queries: `.eq('user_id', userId)`
+- Никогда не выставлять `service_role` ключ в клиентский код
+- Весь доступ к БД через RLS-защищённые запросы
+- Проверять владельца: `.eq('user_id', userId)`
 
-## Environment Variables
-- Secrets in `.env` only (never hardcoded)
-- Only `EXPO_PUBLIC_*` vars accessible in client code
-- Never log sensitive data (tokens, passwords, keys)
+## Переменные окружения
+- Секреты только в `.env` (никогда хардкод)
+- В клиенте доступны только `EXPO_PUBLIC_*`
+- Не логировать токены, пароли, ключи
 
-## Authentication
-- Always verify auth state before protected operations
-- Handle token refresh gracefully
-- Clear sensitive data on sign out
+## Аутентификация
+- Проверять auth состояние перед защищёнными операциями
+- Обрабатывать обновление токенов
+- Очищать данные при выходе
 
-## Input
-- Sanitize user input before database operations
-- Use parameterized queries (Supabase handles this)
-- Validate data shapes at service boundaries
+## Ввод данных
+- Валидировать формы данных на границах сервисов

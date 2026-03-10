@@ -1,30 +1,30 @@
-# Coding Conventions
+# Соглашения по написанию кода
 
-**Last Updated:** 26.01.2026
-**Version:** 1.0.1
+**Последнее обновление:** 26.01.2026
+**Версия:** 1.0.1
 
-This document defines coding standards and best practices for the Wortday React Native project.
-
----
-
-## General Principles
-
-### Code Style
-
-- Use **TypeScript** for all new files
-- Use **functional components** with hooks (no class components)
-- Use **arrow functions** for component definitions
-- Use **explicit return types** for functions when the type isn't obvious
-- Follow **ESLint** rules (`npm run lint`)
+Этот документ определяет стандарты кодирования и лучшие практики для проекта Wortday на React Native.
 
 ---
 
-## File Naming Conventions
+## Общие принципы
 
-### Components
+### Стиль кода
+
+- Используйте **TypeScript** для всех новых файлов
+- Используйте **функциональные компоненты** с хуками (без классовых компонентов)
+- Используйте **стрелочные функции** для определения компонентов
+- Используйте **явные возвращаемые типы** для функций, когда тип неочевиден
+- Следуйте правилам **ESLint** (`npm run lint`)
+
+---
+
+## Соглашения по именованию файлов
+
+### Компоненты
 
 ```
-PascalCase for React components:
+PascalCase для React-компонентов:
   ✅ BrutalButton.tsx
   ✅ ScreenHeader.tsx
   ✅ WordCard.tsx
@@ -32,10 +32,10 @@ PascalCase for React components:
   ❌ screen_header.tsx
 ```
 
-### Utilities & Services
+### Утилиты и сервисы
 
 ```
-kebab-case for utility files:
+kebab-case для файлов утилит:
   ✅ auth-service.ts
   ✅ word-service.ts
   ✅ date-helpers.ts
@@ -43,19 +43,19 @@ kebab-case for utility files:
   ❌ DateHelpers.ts
 ```
 
-### Stores
+### Хранилища (Stores)
 
 ```
-kebab-case with -store suffix:
+kebab-case с суффиксом -store:
   ✅ auth-store.ts
   ✅ settings-store.ts
   ✅ word-store.ts
 ```
 
-### Screens (Expo Router)
+### Экраны (Expo Router)
 
 ```
-kebab-case for route files:
+kebab-case для файлов маршрутов:
   ✅ app/auth/login.tsx
   ✅ app/settings/account.tsx
   ✅ app/(tabs)/index.tsx
@@ -63,11 +63,11 @@ kebab-case for route files:
 
 ---
 
-## TypeScript Standards
+## Стандарты TypeScript
 
-### Type Definitions
+### Определение типов
 
-Always define types/interfaces in the appropriate `types/` file:
+Всегда определяйте типы и интерфейсы в соответствующем файле `types/`:
 
 ```typescript
 // ✅ Good
@@ -83,7 +83,7 @@ export interface Word {
 const word: { id: string; word_de: string } = ...
 ```
 
-### Type Imports
+### Импорт типов
 
 ```typescript
 // ✅ Good
@@ -94,7 +94,7 @@ import type { UserProfile } from '@/types/auth';
 import { Word, getAllWords } from '@/lib/word-service';
 ```
 
-### Avoid `any`
+### Избегайте `any`
 
 ```typescript
 // ❌ Bad
@@ -112,9 +112,9 @@ if (isWord(data)) {
 
 ---
 
-## React Component Patterns
+## Паттерны React-компонентов
 
-### Functional Components
+### Функциональные компоненты
 
 ```typescript
 // ✅ Good - arrow function with explicit return type
@@ -132,7 +132,7 @@ export function WordCard({ word }: { word: Word }) {
 }
 ```
 
-### Props Interface
+### Интерфейс пропсов
 
 ```typescript
 // ✅ Good - separate interface
@@ -152,7 +152,7 @@ export const WordCard = ({ word, onPress }: { word: Word; onPress?: () => void }
 };
 ```
 
-### State Management
+### Управление состоянием
 
 ```typescript
 // ✅ Good - explicit typing
@@ -166,11 +166,11 @@ const [word, setWord] = useState(null);
 
 ---
 
-## Async Patterns
+## Асинхронные паттерны
 
-### Data Fetching
+### Загрузка данных
 
-Always follow this pattern for async data loading:
+Всегда следуйте этому паттерну для асинхронной загрузки данных:
 
 ```typescript
 const [data, setData] = useState<DataType | null>(null);
@@ -211,9 +211,9 @@ if (error) {
 return <View>{/* render data */}</View>;
 ```
 
-### Service Functions
+### Сервисные функции
 
-Service functions should return `{ data, error }` pattern:
+Сервисные функции должны возвращать результат в формате `{ data, error }`:
 
 ```typescript
 // ✅ Good
@@ -250,11 +250,11 @@ export const getTodayWord = async (...): Promise<Word> => {
 
 ---
 
-## Styling Standards
+## Стандарты стилизации
 
-### Use Design Tokens
+### Используйте дизайн-токены
 
-**Never use hardcoded values.** Always use tokens from `constants/design-tokens.ts`:
+**Никогда не используйте захардкоженные значения.** Всегда используйте токены из `constants/design-tokens.ts`:
 
 ```typescript
 // ✅ Good
@@ -274,9 +274,9 @@ import { Colors, borderRadius, shadows } from '@/constants/design-tokens';
 }} />
 ```
 
-### NativeWind Classes
+### Классы NativeWind
 
-Use utility classes where possible:
+Используйте утилитарные классы, где это возможно:
 
 ```typescript
 // ✅ Good
@@ -290,7 +290,7 @@ Use utility classes where possible:
 </View>
 ```
 
-### Platform-Specific Styles
+### Платформозависимые стили
 
 ```typescript
 import { Platform } from 'react-native';
@@ -314,9 +314,9 @@ if (Platform.OS === 'web') {
 
 ---
 
-## Component Structure
+## Структура компонентов
 
-### File Organization
+### Организация файла
 
 ```typescript
 // 1. Imports
@@ -368,9 +368,9 @@ export const WordDetail = ({ word }: WordDetailProps): JSX.Element => {
 
 ---
 
-## Store Patterns (Zustand)
+## Паттерны хранилищ (Zustand)
 
-### Store Structure
+### Структура хранилища
 
 ```typescript
 import { create } from 'zustand';
@@ -412,7 +412,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 }));
 ```
 
-### Using Stores
+### Использование хранилищ
 
 ```typescript
 // ✅ Good - selective subscription
@@ -426,11 +426,11 @@ const authStore = useAuthStore();
 
 ---
 
-## Translation Pattern
+## Паттерн локализации
 
-### Adding Translations
+### Добавление переводов
 
-1. Add keys to all languages in `constants/translations.ts`:
+1. Добавьте ключи для всех языков в `constants/translations.ts`:
 
 ```typescript
 export const translations = {
@@ -469,7 +469,7 @@ export const translations = {
 };
 ```
 
-2. Use with the `t()` helper:
+2. Используйте с помощью хелпера `t()`:
 
 ```typescript
 import { t } from '@/lib/i18n-helpers';
@@ -482,9 +482,9 @@ const translationLanguage = useSettingsStore((state) => state.translationLanguag
 
 ---
 
-## Error Handling
+## Обработка ошибок
 
-### User-Facing Errors
+### Ошибки для пользователя
 
 ```typescript
 // ✅ Good - user-friendly messages
@@ -501,9 +501,9 @@ if (error) {
 }
 ```
 
-### Console Logging
+### Логирование в консоль
 
-Use prefixes for easy filtering:
+Используйте префиксы для удобной фильтрации:
 
 ```typescript
 // ✅ Good
@@ -515,7 +515,7 @@ console.log('User signed in');
 console.log(error);
 ```
 
-### Try-Catch Patterns
+### Паттерны try-catch
 
 ```typescript
 // ✅ Good - specific error handling
@@ -537,9 +537,9 @@ try {
 
 ---
 
-## Navigation
+## Навигация
 
-### Using Router
+### Использование роутера
 
 ```typescript
 import { useRouter } from 'expo-router';
@@ -555,7 +555,7 @@ router.back();
 router.push('/non-existent'); // TypeScript error
 ```
 
-### Route Parameters
+### Параметры маршрута
 
 ```typescript
 // In app/history/[id].tsx
@@ -566,25 +566,25 @@ const { id } = useLocalSearchParams<{ id: string }>();
 
 ---
 
-## Testing Checklist
+## Чеклист тестирования
 
-When adding new features:
+При добавлении новых функций:
 
-- [ ] Test on iOS simulator
-- [ ] Test on Android emulator
-- [ ] Test on Web browser
-- [ ] Test with all UI languages (EN, DE, RU, UK)
-- [ ] Test with all levels (beginner, intermediate, advanced)
-- [ ] Test loading states
-- [ ] Test error states (disconnect network)
-- [ ] Test authentication flows
-- [ ] Run `npm run lint`
+- [ ] Протестировать на iOS-симуляторе
+- [ ] Протестировать на Android-эмуляторе
+- [ ] Протестировать в веб-браузере
+- [ ] Протестировать со всеми языками интерфейса (EN, DE, RU, UK)
+- [ ] Протестировать со всеми уровнями (beginner, intermediate, advanced)
+- [ ] Протестировать состояния загрузки
+- [ ] Протестировать состояния ошибок (отключить сеть)
+- [ ] Протестировать потоки аутентификации
+- [ ] Запустить `npm run lint`
 
 ---
 
-## Common Pitfalls
+## Типичные ошибки
 
-### 1. Platform-Specific APIs
+### 1. Платформозависимые API
 
 ```typescript
 // ❌ Bad - Alert.alert doesn't work on Web
@@ -598,7 +598,7 @@ if (Platform.OS === 'web') {
 }
 ```
 
-### 2. AsyncStorage on Web
+### 2. AsyncStorage в вебе
 
 ```typescript
 // ✅ Good - use the storage adapter
@@ -606,7 +606,7 @@ import { supabase } from '@/lib/supabase-client';
 // Handles web/mobile automatically
 ```
 
-### 3. Apple Sign In Mock Mode
+### 3. Мок-режим Apple Sign In
 
 ```typescript
 // Remember to disable mock mode in production
@@ -614,7 +614,7 @@ import { supabase } from '@/lib/supabase-client';
 EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=false
 ```
 
-### 4. RLS Policies
+### 4. Политики RLS
 
 ```typescript
 // Always test with authenticated users
@@ -627,21 +627,21 @@ const { data } = await supabase
 
 ---
 
-## Code Review Checklist
+## Чеклист код-ревью
 
-Before submitting code:
+Перед отправкой кода:
 
-- [ ] No hardcoded colors/sizes (use design tokens)
-- [ ] All text is translated (no hardcoded strings)
-- [ ] Types are defined (no `any`)
-- [ ] Loading and error states are handled
-- [ ] Console logs use prefixes
-- [ ] Platform differences are handled
-- [ ] ESLint passes
-- [ ] File naming follows conventions
-- [ ] Comments are in English
+- [ ] Нет захардкоженных цветов/размеров (используйте дизайн-токены)
+- [ ] Весь текст переведён (нет захардкоженных строк)
+- [ ] Типы определены (нет `any`)
+- [ ] Состояния загрузки и ошибок обработаны
+- [ ] Логи в консоли используют префиксы
+- [ ] Платформенные различия учтены
+- [ ] ESLint проходит без ошибок
+- [ ] Именование файлов соответствует соглашениям
+- [ ] Комментарии написаны на английском
 
 ---
 
-**Last Updated:** 16.01.2026
-**Status:** ✅ Active conventions
+**Последнее обновление:** 16.01.2026
+**Статус:** ✅ Действующие соглашения

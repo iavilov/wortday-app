@@ -1,19 +1,19 @@
-# PWA Setup Documentation
+# Документация по настройке PWA
 
-## Overview
+## Обзор
 
-Wortday is configured as a Progressive Web App (PWA) with full offline support and installability on mobile and desktop devices.
+Wortday настроен как Progressive Web App (PWA) с полной поддержкой офлайн-режима и возможностью установки на мобильные и настольные устройства.
 
-## Features
+## Возможности
 
-- **Standalone Display Mode**: Runs without browser UI (address bar, navigation buttons)
-- **Offline Support**: Service Worker caches assets and API responses
-- **Installable**: Can be installed to home screen/desktop
-- **App-like Experience**: Full-screen mode with native app feel
-- **Fast Loading**: Aggressive caching for instant load times
-- **Auto-updates**: Automatic service worker updates with user notification
+- **Режим Standalone**: Запуск без элементов интерфейса браузера (адресная строка, кнопки навигации)
+- **Поддержка офлайн-режима**: Service Worker кеширует ресурсы и ответы API
+- **Установка**: Можно установить на домашний экран или рабочий стол
+- **Опыт, как в нативном приложении**: Полноэкранный режим с ощущением нативного приложения
+- **Быстрая загрузка**: Агрессивное кеширование для мгновенной загрузки
+- **Автообновления**: Автоматическое обновление Service Worker с уведомлением пользователя
 
-## File Structure
+## Структура файлов
 
 ```
 wortday/
@@ -34,40 +34,40 @@ wortday/
     └── PWAInstallBanner.tsx # Install prompt UI component
 ```
 
-## Configuration
+## Конфигурация
 
-### Manifest Settings
+### Настройки Manifest
 
-The `manifest.json` configures how the app behaves when installed:
+Файл `manifest.json` определяет поведение приложения после установки:
 
-- **Display Mode**: `standalone` (hides browser UI)
-- **Orientation**: `portrait` (mobile-first)
-- **Theme Color**: `#6BCF7F` (Wortday green)
-- **Background Color**: `#FFFAF0` (cream background)
-- **Icons**: Multiple sizes for different platforms
-- **Shortcuts**: Quick access to Today's Word and History
+- **Display Mode**: `standalone` (скрывает интерфейс браузера)
+- **Orientation**: `portrait` (приоритет мобильных устройств)
+- **Theme Color**: `#6BCF7F` (зелёный цвет Wortday)
+- **Background Color**: `#FFFAF0` (кремовый фон)
+- **Иконки**: Несколько размеров для разных платформ
+- **Shortcuts**: Быстрый доступ к «Слову дня» и Истории
 
-### Service Worker Strategy
+### Стратегия Service Worker
 
-The service worker uses different caching strategies:
+Service Worker использует различные стратегии кеширования:
 
-1. **Static Assets** (Cache First):
+1. **Статические ресурсы** (Cache First):
    - HTML, CSS, JavaScript
-   - Images, fonts, icons
-   - Served from cache, updated in background
+   - Изображения, шрифты, иконки
+   - Отдаются из кеша, обновляются в фоне
 
-2. **API Calls** (Network First):
+2. **Вызовы API** (Network First):
    - Supabase REST API (`/rest/v1/`)
    - Supabase Auth API (`/auth/v1/`)
-   - Fresh data preferred, cache as fallback
+   - Предпочтение свежим данным, кеш как запасной вариант
 
 3. **Runtime Cache**:
-   - Dynamic content cached as accessed
-   - Cleaned up on service worker update
+   - Динамический контент кешируется по мере обращения
+   - Очищается при обновлении Service Worker
 
-### Meta Tags
+### Meta-теги
 
-The custom `index.html` includes PWA-specific meta tags:
+Пользовательский `index.html` включает специфичные для PWA meta-теги:
 
 ```html
 <!-- Standalone mode -->
@@ -86,33 +86,33 @@ The custom `index.html` includes PWA-specific meta tags:
 </style>
 ```
 
-## Usage
+## Использование
 
-### Installing the PWA
+### Установка PWA
 
 **iOS (Safari):**
-1. Open app.wortday.com in Safari
-2. Tap Share button (box with arrow)
-3. Scroll down and tap "Add to Home Screen"
-4. Tap "Add"
+1. Откройте app.wortday.com в Safari
+2. Нажмите кнопку «Поделиться» (квадрат со стрелкой)
+3. Прокрутите вниз и нажмите «На экран «Домой»»
+4. Нажмите «Добавить»
 
 **Android (Chrome):**
-1. Open app.wortday.com in Chrome
-2. Tap the menu (⋮)
-3. Tap "Install app" or "Add to Home screen"
-4. Tap "Install"
+1. Откройте app.wortday.com в Chrome
+2. Нажмите меню (⋮)
+3. Нажмите «Установить приложение» или «Добавить на главный экран»
+4. Нажмите «Установить»
 
-**Desktop (Chrome/Edge):**
-1. Open app.wortday.com
-2. Click the install icon in address bar
-3. Or use menu > "Install Wortday"
-4. Click "Install"
+**Десктоп (Chrome/Edge):**
+1. Откройте app.wortday.com
+2. Нажмите иконку установки в адресной строке
+3. Или через меню > «Установить Wortday»
+4. Нажмите «Установить»
 
-### Using PWA Components
+### Использование PWA-компонентов
 
-#### PWA Install Banner
+#### Баннер установки PWA
 
-Add to any screen to prompt installation:
+Добавьте на любой экран для предложения установки:
 
 ```tsx
 import { PWAInstallBanner } from '@/components/PWAInstallBanner';
@@ -127,9 +127,9 @@ export default function HomeScreen() {
 }
 ```
 
-#### usePWA Hook
+#### Хук usePWA
 
-Access PWA state and functions:
+Доступ к состоянию и функциям PWA:
 
 ```tsx
 import { usePWA } from '@/hooks/usePWA';
@@ -152,9 +152,9 @@ export default function SettingsScreen() {
 }
 ```
 
-#### PWA Utilities
+#### Утилиты PWA
 
-Direct utility functions:
+Прямые вспомогательные функции:
 
 ```tsx
 import { isPWA, promptInstall, shareContent, getDisplayMode } from '@/lib/pwa-utils';
@@ -175,138 +175,138 @@ await shareContent({
 const mode = getDisplayMode(); // 'standalone', 'browser', etc.
 ```
 
-## Testing
+## Тестирование
 
-### Local Testing
+### Локальное тестирование
 
-1. Build web version:
+1. Соберите веб-версию:
    ```bash
    npm run build:web
    ```
 
-2. Serve with HTTPS (required for service workers):
+2. Запустите с HTTPS (обязательно для Service Worker):
    ```bash
    npx serve dist -s -l 8080 --ssl-cert cert.pem --ssl-key key.pem
    ```
 
-3. Open in browser and check:
-   - Service worker registration in DevTools > Application
-   - Manifest in DevTools > Application > Manifest
-   - Install prompt appears
-   - Offline mode works (DevTools > Network > Offline)
+3. Откройте в браузере и проверьте:
+   - Регистрацию Service Worker в DevTools > Application
+   - Manifest в DevTools > Application > Manifest
+   - Появление предложения установки
+   - Работу офлайн-режима (DevTools > Network > Offline)
 
-### Production Testing
+### Тестирование на продакшене
 
-1. Deploy to app.wortday.com (Vercel handles HTTPS)
-2. Open in various browsers/devices
-3. Test installation on each platform
-4. Verify offline functionality
-5. Check service worker updates
+1. Разверните на app.wortday.com (Vercel обеспечивает HTTPS)
+2. Откройте в различных браузерах и на устройствах
+3. Протестируйте установку на каждой платформе
+4. Проверьте работу в офлайн-режиме
+5. Проверьте обновления Service Worker
 
 ### DevTools
 
 **Chrome DevTools > Application:**
-- Service Workers: View active worker, force update
-- Manifest: Validate manifest.json
-- Storage: View cached assets
-- Clear Site Data: Reset PWA state
+- Service Workers: просмотр активного воркера, принудительное обновление
+- Manifest: валидация manifest.json
+- Storage: просмотр кешированных ресурсов
+- Clear Site Data: сброс состояния PWA
 
 **Lighthouse:**
-- Run PWA audit
-- Check installability criteria
-- Verify offline support
-- Validate manifest
+- Запуск PWA-аудита
+- Проверка критериев устанавливаемости
+- Верификация поддержки офлайн-режима
+- Валидация manifest
 
-## Troubleshooting
+## Устранение неполадок
 
-### Install Prompt Not Showing
+### Предложение установки не появляется
 
-**Causes:**
-- Already installed
-- Not served over HTTPS
-- Manifest invalid
-- Service worker failed to register
-- User dismissed prompt recently
+**Причины:**
+- Приложение уже установлено
+- Сайт не обслуживается по HTTPS
+- Невалидный manifest
+- Service Worker не зарегистрирован
+- Пользователь недавно отклонил предложение
 
-**Solutions:**
-- Check DevTools > Console for errors
-- Validate manifest.json
-- Clear browser data and reload
-- Test in incognito mode
+**Решения:**
+- Проверьте DevTools > Console на наличие ошибок
+- Провалидируйте manifest.json
+- Очистите данные браузера и перезагрузите страницу
+- Протестируйте в режиме инкогнито
 
-### Service Worker Not Updating
+### Service Worker не обновляется
 
-**Causes:**
-- Browser caching old worker
-- skipWaiting() not called
-- User hasn't reloaded page
+**Причины:**
+- Браузер кеширует старый воркер
+- Не вызван skipWaiting()
+- Пользователь не перезагрузил страницу
 
-**Solutions:**
-- Force reload (Ctrl+Shift+R)
-- Unregister worker in DevTools
-- Update CACHE_NAME in service-worker.js
-- Use "Update on reload" in DevTools
+**Решения:**
+- Принудительная перезагрузка (Ctrl+Shift+R)
+- Снятие регистрации воркера в DevTools
+- Обновление CACHE_NAME в service-worker.js
+- Использование «Update on reload» в DevTools
 
-### Offline Mode Not Working
+### Офлайн-режим не работает
 
-**Causes:**
-- Service worker not registered
-- Assets not precached
-- Cache strategy incorrect
+**Причины:**
+- Service Worker не зарегистрирован
+- Ресурсы не добавлены в precache
+- Неправильная стратегия кеширования
 
-**Solutions:**
-- Check service worker status in DevTools
-- Verify PRECACHE_ASSETS list
-- Test with DevTools > Network > Offline
-- Check cache storage in Application tab
+**Решения:**
+- Проверьте статус Service Worker в DevTools
+- Убедитесь в корректности списка PRECACHE_ASSETS
+- Протестируйте через DevTools > Network > Offline
+- Проверьте кеш в разделе Application
 
-### Icons Not Appearing
+### Иконки не отображаются
 
-**Causes:**
-- Incorrect paths in manifest
-- Icons not in public/ folder
-- Wrong icon sizes
+**Причины:**
+- Некорректные пути в manifest
+- Иконки отсутствуют в папке public/
+- Неправильные размеры иконок
 
-**Solutions:**
-- Verify icon paths are relative to root (/)
-- Check icons exist in public/
-- Use correct sizes (192x192, 512x512)
-- Validate with DevTools > Manifest
+**Решения:**
+- Убедитесь, что пути к иконкам указаны относительно корня (/)
+- Проверьте наличие иконок в public/
+- Используйте корректные размеры (192x192, 512x512)
+- Провалидируйте через DevTools > Manifest
 
-## Performance
+## Производительность
 
-### Caching Strategy Impact
+### Влияние стратегии кеширования
 
-- **First Load**: ~2-3s (network)
-- **Subsequent Loads**: <500ms (cache)
-- **Offline**: <100ms (cache only)
+- **Первая загрузка**: ~2-3 сек (сеть)
+- **Последующие загрузки**: <500 мс (кеш)
+- **Офлайн**: <100 мс (только кеш)
 
-### Cache Size
+### Размер кеша
 
-- **Precache**: ~5-10 MB (app bundle + assets)
-- **Runtime Cache**: ~50 MB max
-- **Cleaned on Update**: Old caches auto-deleted
+- **Precache**: ~5-10 МБ (бандл приложения + ресурсы)
+- **Runtime Cache**: максимум ~50 МБ
+- **Очистка при обновлении**: старые кеши удаляются автоматически
 
-### Best Practices
+### Лучшие практики
 
-1. **Minimize Precache**: Only cache critical assets
-2. **Use Runtime Cache**: Cache on demand
-3. **Set Cache Limits**: Prevent unlimited growth
-4. **Regular Updates**: Keep service worker fresh
+1. **Минимизируйте Precache**: кешируйте только критические ресурсы
+2. **Используйте Runtime Cache**: кеширование по запросу
+3. **Установите лимиты кеша**: предотвращение неконтролируемого роста
+4. **Регулярные обновления**: поддерживайте Service Worker актуальным
 
-## Security
+## Безопасность
 
-### HTTPS Required
+### Требование HTTPS
 
-PWA features require HTTPS (except localhost):
+Функции PWA требуют HTTPS (кроме localhost):
 - Service Workers
 - Push Notifications
 - Geolocation API
-- Camera/Microphone access
+- Доступ к камере/микрофону
 
 ### Content Security Policy
 
-Add to index.html if needed:
+При необходимости добавьте в index.html:
 
 ```html
 <meta http-equiv="Content-Security-Policy"
@@ -315,37 +315,37 @@ Add to index.html if needed:
                connect-src 'self' https://gsobjkutscaubnbiffsn.supabase.co">
 ```
 
-### Service Worker Scope
+### Область действия Service Worker
 
-Service worker is scoped to root (`/`):
-- Controls all pages
-- Cannot control parent directories
-- Can be restricted with `scope` in registration
+Service Worker привязан к корню (`/`):
+- Контролирует все страницы
+- Не может контролировать родительские директории
+- Может быть ограничен параметром `scope` при регистрации
 
-## Future Enhancements
+## Планы на будущее
 
 ### Push Notifications
 
-1. Add Push API permission request
-2. Store push subscription in database
-3. Send notifications from backend
-4. Handle notification clicks in service worker
+1. Добавить запрос разрешения Push API
+2. Сохранить подписку на push-уведомления в базе данных
+3. Отправлять уведомления с бэкенда
+4. Обработать клики по уведомлениям в Service Worker
 
 ### Background Sync
 
-1. Queue failed API requests
-2. Retry when online
-3. Show success/failure notifications
+1. Ставить в очередь неудавшиеся API-запросы
+2. Повторять при восстановлении соединения
+3. Показывать уведомления об успехе/неудаче
 
 ### Periodic Background Sync
 
-1. Update word cache in background
-2. Pre-fetch tomorrow's word
-3. Sync learning progress
+1. Обновлять кеш слов в фоне
+2. Предзагружать слово на завтра
+3. Синхронизировать прогресс обучения
 
 ### Share Target
 
-Allow sharing to Wortday app:
+Возможность делиться контентом с приложением Wortday:
 
 ```json
 {
@@ -362,10 +362,10 @@ Allow sharing to Wortday app:
 }
 ```
 
-## Resources
+## Ресурсы
 
-- [PWA Documentation](https://web.dev/progressive-web-apps/)
+- [Документация PWA](https://web.dev/progressive-web-apps/)
 - [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 - [Web App Manifest](https://developer.mozilla.org/en-US/docs/Web/Manifest)
-- [Workbox](https://developers.google.com/web/tools/workbox) - Advanced SW library
-- [PWA Builder](https://www.pwabuilder.com/) - PWA testing and validation
+- [Workbox](https://developers.google.com/web/tools/workbox) — продвинутая библиотека для Service Worker
+- [PWA Builder](https://www.pwabuilder.com/) — тестирование и валидация PWA

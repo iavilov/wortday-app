@@ -1,26 +1,26 @@
-# Testing Guide
+# Руководство по тестированию
 
-**Last Updated:** 2026-01-20
-**Status:** ✅ Active
-
----
-
-## Overview
-
-This guide covers the unit testing setup for Wortday, focusing on critical business logic and database interactions. The test suite ensures that the RLS-First pattern (documented in `supabase-race-conditions.md`) works correctly without race conditions.
+**Последнее обновление:** 2026-01-20
+**Статус:** ✅ Актуально
 
 ---
 
-## Test Infrastructure
+## Обзор
 
-### Technology Stack
+Это руководство описывает настройку модульного тестирования для Wortday с фокусом на критическую бизнес-логику и взаимодействие с базой данных. Набор тестов гарантирует, что паттерн RLS-First (задокументированный в `supabase-race-conditions.md`) работает корректно без состояний гонки.
 
-- **Test Framework:** Jest 29.7.0
-- **Preset:** `jest-expo` (Expo SDK 54)
-- **Environment:** Node.js (no React Native runtime)
-- **Mocking:** Jest manual mocks
+---
 
-### Configuration Files
+## Инфраструктура тестирования
+
+### Технологический стек
+
+- **Фреймворк тестирования:** Jest 29.7.0
+- **Пресет:** `jest-expo` (Expo SDK 54)
+- **Среда выполнения:** Node.js (без среды React Native)
+- **Мокирование:** Ручные моки Jest
+
+### Конфигурационные файлы
 
 ```
 wortday/
@@ -38,9 +38,9 @@ wortday/
 
 ---
 
-## Running Tests
+## Запуск тестов
 
-### Basic Commands
+### Базовые команды
 
 ```bash
 # Run all tests once
@@ -59,7 +59,7 @@ npm test -- word-history-service
 npm test -- --testNamePattern="toggleFavorite"
 ```
 
-### Expected Output
+### Ожидаемый вывод
 
 ```
 Test Suites: 2 passed, 2 total
@@ -70,107 +70,107 @@ Time:        2.702 s
 
 ---
 
-## Test Coverage
+## Покрытие тестами
 
-### word-history-service.ts (12 tests)
+### word-history-service.ts (12 тестов)
 
-**File:** `__tests__/lib/word-history-service.test.ts`
+**Файл:** `__tests__/lib/word-history-service.test.ts`
 
-#### Critical Tests
+#### Критические тесты
 
-1. **toggleFavorite - RLS-First Pattern**
-   - ✅ Toggle favorite from false to true
-   - ✅ Toggle favorite from true to false
-   - ✅ Verify `getSession()` is NOT called (RLS-First)
-   - ✅ Performance test (< 50ms with mocks)
+1. **toggleFavorite — паттерн RLS-First**
+   - ✅ Переключение избранного с false на true
+   - ✅ Переключение избранного с true на false
+   - ✅ Проверка, что `getSession()` НЕ вызывается (RLS-First)
+   - ✅ Тест производительности (< 50мс с моками)
 
 2. **markWordAsViewed**
-   - ✅ Update existing record (increment times_reviewed)
-   - ✅ Fail when not authenticated
-   - ✅ Fail on auth error
+   - ✅ Обновление существующей записи (инкремент times_reviewed)
+   - ✅ Сбой при отсутствии авторизации
+   - ✅ Сбой при ошибке авторизации
 
 3. **getFavoriteIds**
-   - ✅ Return empty array when not authenticated
+   - ✅ Возврат пустого массива при отсутствии авторизации
 
 4. **getUserHistory**
-   - ✅ Return empty array when not authenticated
+   - ✅ Возврат пустого массива при отсутствии авторизации
 
 5. **migrateFavoritesToDatabase**
-   - ✅ Skip migration when favoriteIds is empty
-   - ✅ Fail when not authenticated
+   - ✅ Пропуск миграции при пустом favoriteIds
+   - ✅ Сбой при отсутствии авторизации
 
-#### What's NOT Tested (Limitations)
+#### Что НЕ тестируется (ограничения)
 
-- INSERT path in `toggleFavorite` (requires `--experimental-vm-modules` for dynamic imports)
-- RLS block detection (count = 0)
-- Database error scenarios
-- Complex migration logic
+- Путь INSERT в `toggleFavorite` (требует `--experimental-vm-modules` для динамических импортов)
+- Обнаружение блокировки RLS (count = 0)
+- Сценарии ошибок базы данных
+- Сложная логика миграции
 
-**Reason:** The service uses `await import('@/store/auth-store')` which Jest doesn't handle well without experimental flags.
+**Причина:** Сервис использует `await import('@/store/auth-store')`, что Jest плохо обрабатывает без экспериментальных флагов.
 
-**Recommendation:** Use integration tests with real Supabase for full coverage.
-
----
-
-### word-store.ts (24 tests)
-
-**File:** `__tests__/store/word-store.test.ts`
-
-#### Test Categories
-
-1. **Initial State (5 tests)**
-   - Empty favoriteIds
-   - No todayWord
-   - Not loading
-   - No error
-   - Empty historyWords
-
-2. **isFavorite (4 tests)**
-   - Return false for unknown word
-   - Return true for favorited word
-   - Return false after removal
-   - Handle multiple favorites
-
-3. **setState (4 tests)**
-   - Update favoriteIds
-   - Update todayWord
-   - Update isLoading
-   - Update error
-
-4. **reset (7 tests)**
-   - Clear favoriteIds
-   - Clear todayWord
-   - Clear isLoading
-   - Clear error
-   - Clear historyWords
-   - Reset hydration flags
-   - Reset playback state
-
-5. **Playback State (2 tests)**
-   - Set isPlaying
-   - Set playbackSpeed
-
-6. **Edge Cases (3 tests)**
-   - Handle empty Set operations
-   - Handle multiple resets
-   - Handle special characters in word IDs
-
-#### What's NOT Tested (Limitations)
-
-- `toggleFavorite()` method (uses dynamic imports and real service)
-- `syncFavoritesFromDB()` (complex async flow)
-- `hydrate()` (complex migration logic)
-- `loadTodayWord()` (integration with word-service)
-
-**Reason:** These methods involve complex async flows and external dependencies.
-
-**Recommendation:** Use integration tests or E2E tests for these scenarios.
+**Рекомендация:** Использовать интеграционные тесты с реальным Supabase для полного покрытия.
 
 ---
 
-## Writing New Tests
+### word-store.ts (24 теста)
 
-### Basic Test Structure
+**Файл:** `__tests__/store/word-store.test.ts`
+
+#### Категории тестов
+
+1. **Начальное состояние (5 тестов)**
+   - Пустой favoriteIds
+   - Нет todayWord
+   - Не загружается
+   - Нет ошибки
+   - Пустой historyWords
+
+2. **isFavorite (4 теста)**
+   - Возврат false для неизвестного слова
+   - Возврат true для слова в избранном
+   - Возврат false после удаления
+   - Обработка нескольких избранных
+
+3. **setState (4 теста)**
+   - Обновление favoriteIds
+   - Обновление todayWord
+   - Обновление isLoading
+   - Обновление error
+
+4. **reset (7 тестов)**
+   - Очистка favoriteIds
+   - Очистка todayWord
+   - Очистка isLoading
+   - Очистка error
+   - Очистка historyWords
+   - Сброс флагов гидратации
+   - Сброс состояния воспроизведения
+
+5. **Состояние воспроизведения (2 теста)**
+   - Установка isPlaying
+   - Установка playbackSpeed
+
+6. **Граничные случаи (3 теста)**
+   - Обработка пустых операций с Set
+   - Обработка множественных сбросов
+   - Обработка специальных символов в ID слов
+
+#### Что НЕ тестируется (ограничения)
+
+- Метод `toggleFavorite()` (использует динамические импорты и реальный сервис)
+- `syncFavoritesFromDB()` (сложный асинхронный поток)
+- `hydrate()` (сложная логика миграции)
+- `loadTodayWord()` (интеграция с word-service)
+
+**Причина:** Эти методы включают сложные асинхронные потоки и внешние зависимости.
+
+**Рекомендация:** Использовать интеграционные или E2E-тесты для этих сценариев.
+
+---
+
+## Написание новых тестов
+
+### Базовая структура теста
 
 ```typescript
 // 1. Define mocks BEFORE jest.mock()
@@ -210,7 +210,7 @@ describe('feature', () => {
 });
 ```
 
-### Helper: Chainable Query Builder
+### Хелпер: Цепочечный построитель запросов
 
 ```typescript
 function createQueryBuilder(result: { data?: any; error?: any; count?: number }) {
@@ -234,50 +234,50 @@ mockFrom.mockReturnValueOnce(fetchBuilder);
 
 ---
 
-## Testing Best Practices
+## Лучшие практики тестирования
 
-### ✅ DO
+### ✅ РЕКОМЕНДУЕТСЯ
 
-1. **Test Business Logic, Not Implementation**
-   - Focus on public API behavior
-   - Don't test internal methods
+1. **Тестировать бизнес-логику, а не реализацию**
+   - Фокусируйтесь на поведении публичного API
+   - Не тестируйте внутренние методы
 
-2. **Use Descriptive Test Names**
+2. **Использовать описательные имена тестов**
    ```typescript
    it('should toggle favorite from false to true')
    it('should fail when not authenticated')
    ```
 
-3. **Follow AAA Pattern**
-   - **Arrange**: Setup mocks and data
-   - **Act**: Call the function
-   - **Assert**: Check results
+3. **Следовать паттерну AAA**
+   - **Arrange**: Настройка моков и данных
+   - **Act**: Вызов функции
+   - **Assert**: Проверка результатов
 
-4. **Mock at Module Boundaries**
-   - Mock external services (Supabase, AsyncStorage)
-   - Don't mock internal functions
+4. **Мокировать на границах модулей**
+   - Мокировать внешние сервисы (Supabase, AsyncStorage)
+   - Не мокировать внутренние функции
 
-5. **Test Error Scenarios**
-   - Network failures
-   - Authentication errors
-   - Invalid input
+5. **Тестировать сценарии ошибок**
+   - Сетевые сбои
+   - Ошибки авторизации
+   - Невалидные входные данные
 
-6. **Verify RLS-First Pattern**
+6. **Проверять паттерн RLS-First**
    ```typescript
    expect(mockGetSession).not.toHaveBeenCalled();
    ```
 
-### ❌ DON'T
+### ❌ НЕ РЕКОМЕНДУЕТСЯ
 
-1. **Don't Test Implementation Details**
-   - Don't test private methods
-   - Don't test internal state
+1. **Не тестировать детали реализации**
+   - Не тестируйте приватные методы
+   - Не тестируйте внутреннее состояние
 
-2. **Don't Duplicate Production Code**
-   - Keep tests simple
-   - Use helper functions for complex setups
+2. **Не дублировать продакшен-код**
+   - Держите тесты простыми
+   - Используйте хелпер-функции для сложных настроек
 
-3. **Don't Ignore Async/Await**
+3. **Не игнорировать async/await**
    ```typescript
    // ❌ BAD
    it('should work', () => {
@@ -290,23 +290,23 @@ mockFrom.mockReturnValueOnce(fetchBuilder);
    });
    ```
 
-4. **Don't Mock Everything**
-   - Only mock external dependencies
-   - Let pure functions run
+4. **Не мокировать всё подряд**
+   - Мокируйте только внешние зависимости
+   - Пусть чистые функции выполняются реально
 
-5. **Don't Write Flaky Tests**
-   - Avoid timing dependencies
-   - Use deterministic mocks
+5. **Не писать нестабильные тесты**
+   - Избегайте зависимости от тайминга
+   - Используйте детерминированные моки
 
 ---
 
-## Troubleshooting
+## Устранение неполадок
 
-### Common Issues
+### Частые проблемы
 
-#### 1. "Cannot find module '@/lib/...'"
+#### 1. «Cannot find module '@/lib/...'»
 
-**Solution:** Check `jest.config.js` has correct `moduleNameMapper`:
+**Решение:** Проверьте, что `jest.config.js` содержит корректный `moduleNameMapper`:
 
 ```javascript
 moduleNameMapper: {
@@ -314,9 +314,9 @@ moduleNameMapper: {
 },
 ```
 
-#### 2. "TypeError: supabase.from is not a function"
+#### 2. «TypeError: supabase.from is not a function»
 
-**Solution:** Use getter pattern in mock:
+**Решение:** Используйте паттерн с геттером в моке:
 
 ```typescript
 jest.mock('@/lib/supabase-client', () => ({
@@ -329,49 +329,49 @@ jest.mock('@/lib/supabase-client', () => ({
 }));
 ```
 
-#### 3. "Dynamic import callback error"
+#### 3. «Dynamic import callback error»
 
-**Solution:** This is expected for code using `await import()`. Either:
-- Skip the test
-- Refactor code to inject dependencies
-- Use `--experimental-vm-modules` (Node 16+)
+**Решение:** Это ожидаемо для кода, использующего `await import()`. Варианты:
+- Пропустить тест
+- Рефакторить код для внедрения зависимостей
+- Использовать `--experimental-vm-modules` (Node 16+)
 
-#### 4. "Tests hang/timeout"
+#### 4. «Тесты зависают/таймаут»
 
-**Solution:**
-- Ensure all mocks return Promises
-- Check for missing `async/await`
-- Verify no infinite loops
-
----
-
-## Integration Testing (Future)
-
-### Recommended Tools
-
-- **E2E:** Detox or Maestro
-- **Integration:** Testing Library with real Supabase
-- **Visual Regression:** Chromatic or Percy
-
-### Test Scenarios
-
-1. **Complete Favorite Flow**
-   - Toggle favorite → Navigate to history → Verify in favorites tab
-   - Rapid double-click → No race conditions
-
-2. **Auth Flow**
-   - Login → Load today's word → Mark as viewed
-   - Logout → Reset stores → Login as different user
-
-3. **RLS Policy Enforcement**
-   - User A cannot see User B's favorites
-   - User A cannot update User B's history
+**Решение:**
+- Убедитесь, что все моки возвращают Promise
+- Проверьте отсутствие пропущенных `async/await`
+- Убедитесь, что нет бесконечных циклов
 
 ---
 
-## Coverage Goals
+## Интеграционное тестирование (будущее)
 
-### Current Coverage
+### Рекомендуемые инструменты
+
+- **E2E:** Detox или Maestro
+- **Интеграционное:** Testing Library с реальным Supabase
+- **Визуальная регрессия:** Chromatic или Percy
+
+### Тестовые сценарии
+
+1. **Полный поток избранного**
+   - Переключить избранное → Перейти к истории → Проверить во вкладке избранного
+   - Быстрый двойной клик → Нет состояний гонки
+
+2. **Поток авторизации**
+   - Вход → Загрузка слова дня → Отметка как просмотренное
+   - Выход → Сброс сторов → Вход другим пользователем
+
+3. **Проверка политик RLS**
+   - Пользователь A не может видеть избранное пользователя B
+   - Пользователь A не может обновить историю пользователя B
+
+---
+
+## Цели покрытия
+
+### Текущее покрытие
 
 ```
 Statements   : 60% (service layer)
@@ -380,7 +380,7 @@ Functions    : 70% (public methods)
 Lines        : 65% (excluding types)
 ```
 
-### Target Coverage
+### Целевое покрытие
 
 ```
 Statements   : 80%
@@ -389,37 +389,37 @@ Functions    : 85%
 Lines        : 80%
 ```
 
-### Critical Files (100% Coverage Required)
+### Критические файлы (требуется 100% покрытие)
 
 - `lib/word-history-service.ts`
-- `store/word-store.ts` (state management)
+- `store/word-store.ts` (управление состоянием)
 - `lib/auth-service.ts`
 
 ---
 
-## References
+## Ссылки
 
-- [Jest Documentation](https://jestjs.io/)
+- [Документация Jest](https://jestjs.io/)
 - [jest-expo](https://docs.expo.dev/guides/testing-with-jest/)
 - [Testing Library](https://testing-library.com/docs/react-native-testing-library/intro/)
-- [Supabase Testing Guide](https://supabase.com/docs/guides/getting-started/testing)
+- [Руководство по тестированию Supabase](https://supabase.com/docs/guides/getting-started/testing)
 
 ---
 
-## Changelog
+## История изменений
 
-### 2026-01-20 - Initial Setup
+### 2026-01-20 — Начальная настройка
 
-- ✅ Configured Jest with `jest-expo` preset
-- ✅ Created 36 unit tests (12 service + 24 store)
-- ✅ Documented RLS-First pattern validation
-- ✅ Added test scripts to `package.json`
-- ✅ Created mock infrastructure for Supabase
+- ✅ Настроен Jest с пресетом `jest-expo`
+- ✅ Создано 36 модульных тестов (12 сервисных + 24 стор)
+- ✅ Задокументирована валидация паттерна RLS-First
+- ✅ Добавлены скрипты тестирования в `package.json`
+- ✅ Создана инфраструктура моков для Supabase
 
 ---
 
-**Next Steps:**
-1. Add integration tests with real Supabase (local instance)
-2. Increase coverage for edge cases
-3. Add E2E tests with Detox
-4. Set up CI/CD with GitHub Actions
+**Следующие шаги:**
+1. Добавить интеграционные тесты с реальным Supabase (локальный инстанс)
+2. Увеличить покрытие граничных случаев
+3. Добавить E2E-тесты с Detox
+4. Настроить CI/CD с GitHub Actions

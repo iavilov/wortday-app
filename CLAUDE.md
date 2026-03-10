@@ -1,36 +1,33 @@
-# Wortday — AI Assistant Instructions
+# Wortday
 
-## Project
+## Проект
 
-German learning app with "Word of the Day" micro-learning.
-Stack: React Native (Expo SDK 52), Supabase, Zustand, NativeWind.
-Platforms: iOS, Android, Web (PWA).
+Приложение для изучения немецкого — «Слово дня».
+Стек: React Native (Expo SDK 52), Supabase, Zustand, NativeWind.
+Платформы: iOS, Android, Web (PWA).
 
-## Communication
+## Язык
 
-- Reasoning & Explanations: Russian
-- Code, Comments, Docs: English
+- Рассуждения и документация: русский
+- Код и комментарии: английский
 
-## Key Constraints
+## Ключевые правила
 
-- **No hardcoded values** — use `constants/design-tokens.ts` for colors/sizes/fonts
-- **No direct Supabase** — use `lib/*-service.ts` service layer
-- **No hardcoded text** — use `t('key', lang)` from `constants/translations.ts`
-- **No `any` types** — use proper types from `types/`
-- **No inline interfaces** — define in `types/` directory
-- **Always handle** loading/error states
-- **Always check** platform differences (iOS/Android/Web)
-- **Always use** `@/` import alias
+- **Дизайн-токены** — `constants/design-tokens.ts` (цвета, размеры, шрифты)
+- **Сервисный слой** — `lib/*-service.ts` (без прямых вызовов Supabase)
+- **Переводы UI** — `t('key', lang)` из `constants/translations.ts`
+- **Типы** — определять в `types/` (без inline интерфейсов)
+- **Импорты** — алиас `@/`
 
-## Documentation
+## Документация
 
-| Area | File |
-|------|------|
-| Coding standards | `docs/coding-conventions.md` |
-| Auth system | `docs/auth-flow.md` |
-| Database schema | `docs/database-schema.md` |
-| Tech stack | `docs/tech-stack.md` |
-| PWA setup | `docs/pwa-setup.md` |
-| Project roadmap | `docs/project-status.md` |
+| Область | Файл |
+|---------|------|
+| Стандарты кода | `docs/coding-conventions.md` |
+| Аутентификация | `docs/auth-flow.md` |
+| Схема БД | `docs/database-schema.md` |
+| Технический стек | `docs/tech-stack.md` |
+| PWA | `docs/pwa-setup.md` |
+| Дорожная карта | `docs/project-status.md` |
 
-Read the relevant doc before making changes to that area.
+Читай соответствующий документ перед изменениями.

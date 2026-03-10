@@ -1,87 +1,87 @@
-# Word History Flow
+# Поток истории слов
 
-This document describes the "Word of the Day" mechanics and history system in Wortday.
+Этот документ описывает механику «Слово дня» и систему истории в Wortday.
 
-## Core Concepts
+## Основные концепции
 
-### 1. Word of the Day (Cyclic Rotation)
+### 1. Слово дня (циклическая ротация)
 
-The app shows one word per day based on the user's registration date and selected level.
+Приложение показывает одно слово в день на основе даты регистрации пользователя и выбранного уровня.
 
-**Key Features:**
-- Linear progression: Day 1, Day 2, Day 3, ..., ∞
-- Cyclic rotation when reaching the end of available words
-- Level-specific sequences (each level has its own word pool)
+**Ключевые особенности:**
+- Линейная прогрессия: День 1, День 2, День 3, ..., ∞
+- Циклическая ротация при достижении конца доступных слов
+- Последовательности, специфичные для уровня (каждый уровень имеет свой пул слов)
 
-**Cyclic Formula:**
+**Формула циклической ротации:**
 ```javascript
 sequence_number = ((day_number - 1) % total_words_in_level) + 1
 ```
 
-**Examples:**
+**Примеры:**
 
-| User Day | Total Words | Calculated Sequence | Result |
-|----------|-------------|---------------------|--------|
-| 1        | 365         | ((1-1) % 365) + 1   | 1      |
-| 10       | 365         | ((10-1) % 365) + 1  | 10     |
-| 365      | 365         | ((365-1) % 365) + 1 | 365    |
-| 366      | 365         | ((366-1) % 365) + 1 | 1      |
-| 400      | 365         | ((400-1) % 365) + 1 | 35     |
+| День пользователя | Всего слов | Рассчитанная последовательность | Результат |
+|-------------------|------------|--------------------------------|-----------|
+| 1                 | 365        | ((1-1) % 365) + 1              | 1         |
+| 10                | 365        | ((10-1) % 365) + 1             | 10        |
+| 365               | 365        | ((365-1) % 365) + 1            | 365       |
+| 366               | 365        | ((366-1) % 365) + 1            | 1         |
+| 400               | 365        | ((400-1) % 365) + 1            | 35        |
 
-### 2. History Conveyor
+### 2. Конвейер истории
 
-The history screen shows a "conveyor" of words - all words from day 1 to the current day.
+Экран истории показывает «конвейер» слов — все слова от дня 1 до текущего дня.
 
-**Important:** The conveyor is **NOT** based on which words the user has viewed, but on their registration date.
+**Важно:** Конвейер **НЕ** основан на том, какие слова пользователь просмотрел, а на дате его регистрации.
 
-**Formula:**
+**Формула:**
 ```javascript
 history_words = words with sequence_number from 1 to min(current_day, total_words_in_level)
 ```
 
-**Examples:**
+**Примеры:**
 
-- **Day 10**: History shows 10 words (sequence 1-10)
-- **Day 25**: History shows 25 words (sequence 1-25)
-- **Day 400** (with 365 total words): History shows 365 words (sequence 1-365)
+- **День 10**: История показывает 10 слов (последовательность 1-10)
+- **День 25**: История показывает 25 слов (последовательность 1-25)
+- **День 400** (при 365 словах всего): История показывает 365 слов (последовательность 1-365)
 
-### 3. Automatic View Tracking
+### 3. Автоматическое отслеживание просмотров
 
-When the user opens the main screen (`app/(tabs)/index.tsx`), the word is automatically marked as viewed in the database.
+Когда пользователь открывает главный экран (`app/(tabs)/index.tsx`), слово автоматически отмечается как просмотренное в базе данных.
 
-**Implementation:**
-- React effect triggers when `todayWord` is loaded
-- Calls `markWordAsViewed(wordId)` from word-store
-- Service layer upserts record in `user_words_history` table
-- Increments `times_reviewed` if record exists
+**Реализация:**
+- React effect срабатывает при загрузке `todayWord`
+- Вызывает `markWordAsViewed(wordId)` из word-store
+- Сервисный слой выполняет upsert записи в таблице `user_words_history`
+- Инкрементирует `times_reviewed`, если запись существует
 
-**Database Behavior:**
-- First view: Creates record with `times_reviewed = 1`
-- Subsequent views: Increments `times_reviewed`
-- Updates `learned_at` timestamp on each view
+**Поведение базы данных:**
+- Первый просмотр: Создаёт запись с `times_reviewed = 1`
+- Последующие просмотры: Инкрементирует `times_reviewed`
+- Обновляет метку времени `learned_at` при каждом просмотре
 
-### 4. Favorites System
+### 4. Система избранного
 
-Favorites are synced between AsyncStorage (offline) and Supabase database (online).
+Избранное синхронизируется между AsyncStorage (офлайн) и базой данных Supabase (онлайн).
 
-**Migration Flow:**
-1. On first app launch: Load favorites from AsyncStorage
-2. Check if migration flag `wortday-favorites-migrated` exists
-3. If not migrated: Call `migrateFavoritesToDatabase(favoriteIds)`
-4. Sync favorites from database to local state
-5. Set migration flag to prevent re-running
+**Поток миграции:**
+1. При первом запуске приложения: Загрузка избранного из AsyncStorage
+2. Проверка наличия флага миграции `wortday-favorites-migrated`
+3. Если не мигрировано: Вызов `migrateFavoritesToDatabase(favoriteIds)`
+4. Синхронизация избранного из базы данных в локальное состояние
+5. Установка флага миграции для предотвращения повторного запуска
 
-**Ongoing Sync:**
-- Toggle favorite → Optimistic local update
-- Save to AsyncStorage (offline support)
-- Sync to database via `toggleFavorite(wordId)`
-- On error: Rollback optimistic update
+**Постоянная синхронизация:**
+- Переключение избранного → Оптимистичное локальное обновление
+- Сохранение в AsyncStorage (офлайн-поддержка)
+- Синхронизация с базой данных через `toggleFavorite(wordId)`
+- При ошибке: Откат оптимистичного обновления
 
-## Implementation Details
+## Детали реализации
 
-### Service Layer (`lib/word-service.ts`)
+### Сервисный слой (`lib/word-service.ts`)
 
-**New Functions:**
+**Новые функции:**
 
 ```typescript
 // Get count of words for a level (used in cyclic calculation)
@@ -98,7 +98,7 @@ getWordsBySequenceRange(
 calculateCyclicSequence(dayNumber: number, totalWordsInLevel: number): number
 ```
 
-**Modified Function:**
+**Изменённая функция:**
 
 ```typescript
 // getTodayWord() now uses cyclic rotation
@@ -108,11 +108,11 @@ getTodayWord(level: LanguageLevel, registrationDate: string | null)
 // 3. Fetch word by cyclic sequence
 ```
 
-### Word History Service (`lib/word-history-service.ts`)
+### Сервис истории слов (`lib/word-history-service.ts`)
 
-New service layer for interacting with `user_words_history` table.
+Новый сервисный слой для взаимодействия с таблицей `user_words_history`.
 
-**Functions:**
+**Функции:**
 
 ```typescript
 // Mark word as viewed (upsert)
@@ -131,14 +131,14 @@ getUserHistory(): Promise<GetUserHistoryResult>
 migrateFavoritesToDatabase(favoriteIds: string[]): Promise<{success: boolean, error: string | null}>
 ```
 
-**Security:**
-- All functions check `supabase.auth.getUser()` before executing
-- Returns error if user is not authenticated
-- Relies on RLS policies for database-level security
+**Безопасность:**
+- Все функции проверяют `supabase.auth.getUser()` перед выполнением
+- Возвращают ошибку, если пользователь не авторизован
+- Полагаются на политики RLS для безопасности на уровне базы данных
 
-### State Management (`store/word-store.ts`)
+### Управление состоянием (`store/word-store.ts`)
 
-**New State:**
+**Новое состояние:**
 
 ```typescript
 interface WordStore {
@@ -151,72 +151,72 @@ interface WordStore {
 }
 ```
 
-**Modified Behavior:**
+**Изменённое поведение:**
 
-- `hydrate()`: Migrates favorites from AsyncStorage on first launch
-- `loadHistoryWords()`: Loads conveyor range (replaces `loadAllWords`)
-- `toggleFavorite()`: Syncs with database + optimistic updates
-- `getFavoriteWords()`: Now filters from `historyWords` instead of `allWords`
+- `hydrate()`: Мигрирует избранное из AsyncStorage при первом запуске
+- `loadHistoryWords()`: Загружает диапазон конвейера (заменяет `loadAllWords`)
+- `toggleFavorite()`: Синхронизирует с базой данных + оптимистичные обновления
+- `getFavoriteWords()`: Теперь фильтрует из `historyWords` вместо `allWords`
 
-## Edge Cases
+## Граничные случаи
 
-### 1. Level Change Mid-Journey
+### 1. Смена уровня в процессе обучения
 
-**Scenario:** User is on day 15, changes level from Beginner to Intermediate
+**Сценарий:** Пользователь на 15-м дне меняет уровень с Beginner на Intermediate
 
-**Current Behavior (MVP):**
-- History shows only the current level's words
-- Simplified approach: One level at a time in history
-- Database preserves all history records for future features
+**Текущее поведение (MVP):**
+- История показывает только слова текущего уровня
+- Упрощённый подход: Один уровень за раз в истории
+- База данных сохраняет все записи истории для будущих функций
 
-**Future Enhancement:**
-- Mixed history across levels
-- Visual indicators for level switches
+**Будущее улучшение:**
+- Смешанная история по уровням
+- Визуальные индикаторы переключения уровней
 
-### 2. Empty Dictionary for Level
+### 2. Пустой словарь для уровня
 
-**Handling:**
-- `getWordCountForLevel()` returns `count: 0`
-- `getTodayWord()` returns `{word: null, error: 'No words available'}`
-- UI shows "No words available" message
+**Обработка:**
+- `getWordCountForLevel()` возвращает `count: 0`
+- `getTodayWord()` возвращает `{word: null, error: 'No words available'}`
+- UI показывает сообщение «Нет доступных слов»
 
-### 3. Offline Mode
+### 3. Офлайн-режим
 
-**Favorites:**
-- Work via AsyncStorage (full offline support)
-- Sync to database when connection restored
+**Избранное:**
+- Работает через AsyncStorage (полная офлайн-поддержка)
+- Синхронизация с базой данных при восстановлении соединения
 
-**View Tracking:**
-- `markWordAsViewed()` fails silently
-- Doesn't block UI or show errors
-- Will sync on next online view
+**Отслеживание просмотров:**
+- `markWordAsViewed()` завершается молча с ошибкой
+- Не блокирует UI и не показывает ошибок
+- Синхронизируется при следующем онлайн-просмотре
 
-### 4. Migration Interruption
+### 4. Прерывание миграции
 
-**Scenario:** App crashes during favorites migration
+**Сценарий:** Приложение крашится во время миграции избранного
 
-**Handling:**
-- Migration flag set AFTER successful completion
-- Next app launch will retry migration
-- `upsert` operations are idempotent (safe to retry)
+**Обработка:**
+- Флаг миграции устанавливается ПОСЛЕ успешного завершения
+- Следующий запуск приложения повторит миграцию
+- Операции `upsert` идемпотентны (безопасно повторять)
 
-### 5. RLS Policy Blocks Write
+### 5. RLS блокирует запись
 
-**Handling:**
-- All service functions check `getUser()` first
-- Return `{success: false, error: 'Not authenticated'}`
-- UI handles gracefully (logs error, no alert)
+**Обработка:**
+- Все сервисные функции проверяют `getUser()` перед выполнением
+- Возвращают `{success: false, error: 'Not authenticated'}`
+- UI обрабатывает корректно (логирует ошибку, без всплывающих окон)
 
-### 6. User Views Same Word Multiple Times
+### 6. Пользователь просматривает одно слово несколько раз
 
-**Behavior:**
-- Each view increments `times_reviewed`
-- Updates `learned_at` to latest timestamp
-- Useful for future analytics
+**Поведение:**
+- Каждый просмотр инкрементирует `times_reviewed`
+- Обновляет `learned_at` до последней метки времени
+- Полезно для будущей аналитики
 
-## Database Schema
+## Схема базы данных
 
-### `user_words_history` Table
+### Таблица `user_words_history`
 
 ```sql
 CREATE TABLE user_words_history (
@@ -231,13 +231,13 @@ CREATE TABLE user_words_history (
 );
 ```
 
-**RLS Policies:**
-- Users can only access their own records
-- `user_id` filter enforced at database level
+**Политики RLS:**
+- Пользователи могут получить доступ только к своим записям
+- Фильтр `user_id` применяется на уровне базы данных
 
-## UI Flow
+## Поток UI
 
-### Main Screen (`app/(tabs)/index.tsx`)
+### Главный экран (`app/(tabs)/index.tsx`)
 
 ```javascript
 useEffect(() => {
@@ -252,7 +252,7 @@ useEffect(() => {
 }, [todayWord?.id, isLoading]);
 ```
 
-### History Screen (`app/(tabs)/history.tsx`)
+### Экран истории (`app/(tabs)/history.tsx`)
 
 ```javascript
 useEffect(() => {
@@ -262,69 +262,69 @@ useEffect(() => {
 const displayWords = activeTab === 'all' ? historyWords : getFavoriteWords();
 ```
 
-## Testing Checklist
+## Чек-лист тестирования
 
-### New User (Day 1)
-- [ ] Register → Select level
-- [ ] Open home → Shows word sequence_number=1
-- [ ] Check DB: `user_words_history` record exists with `times_reviewed=1`
-- [ ] Open history → Shows 1 word
+### Новый пользователь (День 1)
+- [ ] Регистрация → Выбор уровня
+- [ ] Открыть главную → Показывает слово sequence_number=1
+- [ ] Проверить БД: запись `user_words_history` существует с `times_reviewed=1`
+- [ ] Открыть историю → Показывает 1 слово
 
-### Existing User (Day 25)
-- [ ] Open home → Shows word sequence_number=25
-- [ ] Open history → Shows 25 words (sequence 1-25)
-- [ ] Add word #10 to favorites
-- [ ] Favorites tab → Shows 1 word
-- [ ] Check DB: `is_favorite=true` for word #10
+### Существующий пользователь (День 25)
+- [ ] Открыть главную → Показывает слово sequence_number=25
+- [ ] Открыть историю → Показывает 25 слов (последовательность 1-25)
+- [ ] Добавить слово #10 в избранное
+- [ ] Вкладка избранного → Показывает 1 слово
+- [ ] Проверить БД: `is_favorite=true` для слова #10
 
-### Cyclic Rotation (Day 400, 365 words)
-- [ ] Calculate: ((400-1) % 365) + 1 = 35
-- [ ] Open home → Shows word sequence_number=35
-- [ ] History → Shows 365 words (max for level)
+### Циклическая ротация (День 400, 365 слов)
+- [ ] Расчёт: ((400-1) % 365) + 1 = 35
+- [ ] Открыть главную → Показывает слово sequence_number=35
+- [ ] История → Показывает 365 слов (максимум для уровня)
 
-### Favorites Migration
-- [ ] Ensure AsyncStorage has old favorites (`wortday-favorites`)
-- [ ] Launch app → Automatic migration
-- [ ] Check DB: Records with `is_favorite=true`
-- [ ] Check flag: `wortday-favorites-migrated` exists
+### Миграция избранного
+- [ ] Убедиться, что AsyncStorage содержит старые избранные (`wortday-favorites`)
+- [ ] Запустить приложение → Автоматическая миграция
+- [ ] Проверить БД: Записи с `is_favorite=true`
+- [ ] Проверить флаг: `wortday-favorites-migrated` существует
 
-### Offline Mode
-- [ ] Disable internet
-- [ ] Add word to favorites → Works locally
-- [ ] Enable internet → Syncs to database automatically
+### Офлайн-режим
+- [ ] Отключить интернет
+- [ ] Добавить слово в избранное → Работает локально
+- [ ] Включить интернет → Автоматическая синхронизация с базой данных
 
-### Automatic View Tracking
-- [ ] Open home → Console shows "[Home] Auto-marking word as viewed"
-- [ ] Check DB: `times_reviewed=1`
-- [ ] Close and reopen → `times_reviewed=2`
+### Автоматическое отслеживание просмотров
+- [ ] Открыть главную → Консоль показывает "[Home] Auto-marking word as viewed"
+- [ ] Проверить БД: `times_reviewed=1`
+- [ ] Закрыть и открыть заново → `times_reviewed=2`
 
-## Future Enhancements
+## Будущие улучшения
 
-### Spaced Repetition System (SRS)
-- `next_review_date` field prepared
-- `ease_factor` field prepared
-- Algorithm TBD (SuperMemo, Leitner, custom)
+### Система интервального повторения (SRS)
+- Поле `next_review_date` подготовлено
+- Поле `ease_factor` подготовлено
+- Алгоритм определится позже (SuperMemo, Leitner, собственный)
 
-### Mixed Level History
-- Track level changes over time
-- Show visual indicators in history
-- "You switched to Intermediate on Day 15"
+### Смешанная история по уровням
+- Отслеживание смены уровней во времени
+- Визуальные индикаторы в истории
+- «Вы перешли на Intermediate на 15-й день»
 
-### Streak Tracking
-- Use `user_words_history` to calculate streaks
-- "7 days in a row" badges
-- Push notifications for streak maintenance
+### Отслеживание серий
+- Использование `user_words_history` для подсчёта серий
+- Значки «7 дней подряд»
+- Push-уведомления для поддержания серий
 
-### Analytics
-- Most reviewed words
-- Favorite word categories
-- Learning progress charts
+### Аналитика
+- Наиболее повторяемые слова
+- Категории избранных слов
+- Графики прогресса обучения
 
 ---
 
-**Status:** ✅ Implemented
-**Last Updated:** 2026-01-16
-**Related Files:**
+**Статус:** ✅ Реализовано
+**Последнее обновление:** 2026-01-16
+**Связанные файлы:**
 - `lib/word-service.ts`
 - `lib/word-history-service.ts`
 - `store/word-store.ts`

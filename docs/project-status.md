@@ -1,82 +1,82 @@
-# 📱 Wortday - "Wort des Tages" (Word of the Day)
+# 📱 Wortday — «Wort des Tages» (Слово дня)
 
-**Concept:** Aesthetic German language trainer focusing on micro-learning and visual appeal.  
-**Target Audience:** Russian-speaking expats and students (A1-C1) who appreciate design.  
-**Platforms:** iOS, Android, Web (PWA) — Universal App on React Native + Expo.
-
----
-
-## 🚀 Current Status: v1.0.2 (Unit Testing Setup)
-**Last Updated:** 20.01.2026
-
-### Key Achievements v1.0.0:
-
-#### Supabase Words Integration (NEW)
-✅ **Real Database Integration:**
-- Full migration from mock-data to Supabase `words` table
-- Word Service (`lib/word-service.ts`) for database interactions
-- Asynchronous word loading with error handling
-- Loading states for all screens
-
-✅ **Updated Components:**
-- `store/word-store.ts` - uses `word-service` instead of mock-data
-- `app/history/[id].tsx` - async loading with loading state
-- Fallback to the first word of the level if no word is found for the current day
-
-✅ **Production Ready:**
-- Unlimited number of words (sequence_number: 1, 2, 3, ..., ∞)
-- Proper error handling and logging
-- TypeScript typing for all requests
-
-**📄 Detailed Documentation:** See `docs/supabase-words-integration.md`
+**Концепция:** Эстетичный тренажёр немецкого языка с фокусом на микрообучение и визуальную привлекательность.
+**Целевая аудитория:** Русскоязычные экспаты и студенты (A1-C1), которые ценят дизайн.
+**Платформы:** iOS, Android, Web (PWA) — универсальное приложение на React Native + Expo.
 
 ---
 
-### Key Achievements v1.0.1:
+## 🚀 Текущий статус: v1.0.2 (Настройка модульного тестирования)
+**Последнее обновление:** 20.01.2026
 
-#### Stability & UI Improvements
-✅ **No Data Flickering:**
-- Implemented `reset()` methods for all stores
-- Proper cleanup on logout prevents showing previous user's data
+### Ключевые достижения v1.0.0:
 
-✅ **Smoother Auth Flow:**
-- Improved `AuthGuard` in `_layout.tsx` to wait for profile loading
-- Added proper loading indicators during auth initialization
+#### Интеграция слов с Supabase (НОВОЕ)
+✅ **Реальная интеграция с базой данных:**
+- Полная миграция с mock-данных на таблицу `words` в Supabase
+- Word Service (`lib/word-service.ts`) для взаимодействия с базой данных
+- Асинхронная загрузка слов с обработкой ошибок
+- Состояния загрузки для всех экранов
 
-✅ **Optimistic UI:**
-- Instant feedback when toggling favorites
-- Validated with direct store subscription in components
+✅ **Обновлённые компоненты:**
+- `store/word-store.ts` — использует `word-service` вместо mock-данных
+- `app/history/[id].tsx` — асинхронная загрузка с состоянием загрузки
+- Откат к первому слову уровня, если для текущего дня слово не найдено
+
+✅ **Готовность к продакшену:**
+- Неограниченное количество слов (sequence_number: 1, 2, 3, ..., ∞)
+- Корректная обработка ошибок и логирование
+- TypeScript-типизация для всех запросов
+
+**📄 Подробная документация:** См. `docs/supabase-words-integration.md`
 
 ---
 
-### Key Achievements v1.0.2:
+### Ключевые достижения v1.0.1:
 
-#### Unit Testing Infrastructure (NEW)
-✅ **Jest Configuration:**
-- Configured Jest with `jest-expo` preset for React Native
-- Created test infrastructure with mocks and helpers
-- 36 unit tests passing (12 service layer + 24 store tests)
+#### Стабильность и улучшения интерфейса
+✅ **Без мерцания данных:**
+- Реализованы методы `reset()` для всех хранилищ
+- Корректная очистка при выходе предотвращает отображение данных предыдущего пользователя
 
-✅ **Service Layer Tests:**
-- `toggleFavorite` - RLS-First pattern validation
-- Verified NO race conditions (`getSession()` not called)
-- Authentication error handling
-- Performance tests (< 50ms with mocks)
+✅ **Более плавный поток авторизации:**
+- Улучшен `AuthGuard` в `_layout.tsx` для ожидания загрузки профиля
+- Добавлены корректные индикаторы загрузки при инициализации авторизации
 
-✅ **Store Tests:**
-- State management (`isFavorite`, `favoriteIds`)
-- Reset functionality (all fields)
-- Edge cases (special characters, empty sets)
-- Playback state management
+✅ **Оптимистичный UI:**
+- Мгновенная обратная связь при переключении избранного
+- Проверено через прямую подписку на хранилище в компонентах
 
-✅ **Documentation:**
-- Created `docs/testing-guide.md` with best practices
-- Added test scripts to `package.json`
-- Documented limitations and integration test recommendations
+---
 
-**📄 Detailed Documentation:** See `docs/testing-guide.md`
+### Ключевые достижения v1.0.2:
 
-**New Files:**
+#### Инфраструктура модульного тестирования (НОВОЕ)
+✅ **Конфигурация Jest:**
+- Настроен Jest с пресетом `jest-expo` для React Native
+- Создана тестовая инфраструктура с моками и хелперами
+- 36 модульных тестов проходят (12 сервисного слоя + 24 тестов хранилищ)
+
+✅ **Тесты сервисного слоя:**
+- `toggleFavorite` — валидация паттерна RLS-First
+- Подтверждено отсутствие race condition (`getSession()` не вызывается)
+- Обработка ошибок авторизации
+- Тесты производительности (< 50 мс с моками)
+
+✅ **Тесты хранилищ:**
+- Управление состоянием (`isFavorite`, `favoriteIds`)
+- Функциональность сброса (все поля)
+- Граничные случаи (специальные символы, пустые множества)
+- Управление состоянием воспроизведения
+
+✅ **Документация:**
+- Создан `docs/testing-guide.md` с лучшими практиками
+- Добавлены тестовые скрипты в `package.json`
+- Задокументированы ограничения и рекомендации по интеграционным тестам
+
+**📄 Подробная документация:** См. `docs/testing-guide.md`
+
+**Новые файлы:**
 ```
 jest.config.js                           # Jest configuration
 __tests__/setup.ts                       # Global test setup
@@ -87,7 +87,7 @@ __tests__/store/word-store.test.ts          # 24 store tests
 docs/testing-guide.md                   # Testing documentation
 ```
 
-**Test Commands:**
+**Команды для тестирования:**
 ```bash
 npm test                 # Run all tests
 npm run test:watch       # Watch mode for TDD
@@ -96,35 +96,35 @@ npm run test:coverage    # Coverage report
 
 ---
 
-### Key Achievements v0.9.0:
+### Ключевые достижения v0.9.0:
 
-#### Auth Screens & Protected Routes (NEW)
-✅ **Login/Register/Reset Screens:**
-- Login screen with Email/Password, Apple, Google
-- Register screen with password validation
-- Password Reset flow with email magic link
-- Neobrutalism design (fully based on tokens)
+#### Экраны авторизации и защищённые маршруты (НОВОЕ)
+✅ **Экраны Login/Register/Reset:**
+- Экран входа с Email/Password, Apple, Google
+- Экран регистрации с валидацией пароля
+- Поток сброса пароля через magic link по email
+- Дизайн в стиле Neobrutalism (полностью на основе токенов)
 
-✅ **Auth Guard (Protected Routes):**
-- Automatic blocking of unauthorized users
-- Redirect to `/auth/login` for all protected routes
-- Priority logic: Auth → Onboarding → Main App
-- Sign Out → Login screen
+✅ **Auth Guard (защищённые маршруты):**
+- Автоматическая блокировка неавторизованных пользователей
+- Редирект на `/auth/login` для всех защищённых маршрутов
+- Логика приоритетов: Auth → Onboarding → Основное приложение
+- Sign Out → экран входа
 
-✅ **Apple Sign In Mock Mode:**
-- Environment variable `EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=true`
-- Testing without an Apple Developer account
-- Auto-generated mock users
-- Easy migration to production
+✅ **Мок-режим Apple Sign In:**
+- Переменная окружения `EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=true`
+- Тестирование без аккаунта Apple Developer
+- Автогенерация мок-пользователей
+- Простая миграция на продакшен
 
 ✅ **Google OAuth:**
-- WebBrowser integration for mobile
-- OAuth flow for Web
-- Deep linking callbacks (ready for configuration)
+- Интеграция WebBrowser для мобильных
+- OAuth-поток для Web
+- Deep linking callbacks (готовы к настройке)
 
-**📄 Detailed Documentation:** See `docs/auth-flow.md`
+**📄 Подробная документация:** См. `docs/auth-flow.md`
 
-**New Files:**
+**Новые файлы:**
 ```
 app/auth/login.tsx         - Login UI (Email/Apple/Google)
 app/auth/register.tsx      - Registration form
@@ -134,35 +134,35 @@ app/auth/reset-password.tsx - Password reset flow
 
 ---
 
-### Key Achievements v0.8.0:
+### Ключевые достижения v0.8.0:
 
-#### Authorization System (Auth System)
-✅ **Multi-Provider Authentication:**
-- Email/Password — standard authentication
-- Sign in with Apple — iOS (Apple requirement)
-- Google Sign-In — OAuth flow
+#### Система авторизации (Auth System)
+✅ **Мультипровайдерная аутентификация:**
+- Email/Password — стандартная аутентификация
+- Sign in with Apple — iOS (требование Apple)
+- Google Sign-In — OAuth-поток
 
-✅ **Supabase Integration:**
-- Supabase Client with AsyncStorage for cross-platform sessions
-- Automatic token refresh
-- Auth State Synchronization via `onAuthStateChange`
+✅ **Интеграция с Supabase:**
+- Supabase Client с AsyncStorage для кроссплатформенных сессий
+- Автоматическое обновление токенов
+- Синхронизация Auth State через `onAuthStateChange`
 
-✅ **Account Management UI:**
-- Cross-platform Settings → Account screen
-- Auth Provider Badge (Email/Apple/Google visual indication)
-- Platform-specific UI (Security section only for Email on Web)
-- Delete Account function (Apple App Store requirement)
-- Export Data (GDPR compliance)
+✅ **UI управления аккаунтом:**
+- Кроссплатформенный экран Settings → Account
+- Auth Provider Badge (визуальная индикация Email/Apple/Google)
+- Платформо-специфичный UI (раздел Security только для Email на Web)
+- Функция удаления аккаунта (требование Apple App Store)
+- Экспорт данных (соответствие GDPR)
 
-✅ **Database Schema:**
-- `public.users` table with user profiles
-- Auto-create profile trigger on registration
-- RLS policies for data security
-- RPC function `delete_user_account()` with SECURITY DEFINER
+✅ **Схема базы данных:**
+- Таблица `public.users` с профилями пользователей
+- Триггер автосоздания профиля при регистрации
+- RLS-политики для безопасности данных
+- RPC-функция `delete_user_account()` с SECURITY DEFINER
 
-**📄 Detailed Documentation:** See `docs/auth-flow.md`
+**📄 Подробная документация:** См. `docs/auth-flow.md`
 
-**Files:**
+**Файлы:**
 ```
 types/auth.ts              - TypeScript types and helpers
 lib/supabase-client.ts     - Singleton Supabase client
@@ -173,20 +173,20 @@ app/settings/account.tsx   - Account screen UI
 
 ---
 
-### Key Achievements v0.7.0:
+### Ключевые достижения v0.7.0:
 
-#### 1. Sequence-Based Words (Linear Word System)
-- `sequence_number` (1, 2, 3, ..., ∞) instead of cyclical `day_number`
-- Scalability: unlimited number of words
+#### 1. Слова на основе последовательности (линейная система слов)
+- `sequence_number` (1, 2, 3, ..., ∞) вместо циклического `day_number`
+- Масштабируемость: неограниченное количество слов
 
-#### 2. Push Notifications (iOS/Android)
-- `expo-notifications` with local daily repeating triggers
-- Notification time settings
-- Settings persistence
+#### 2. Push-уведомления (iOS/Android)
+- `expo-notifications` с локальными ежедневными повторяющимися триггерами
+- Настройка времени уведомлений
+- Сохранение настроек
 
 ---
 
-### Project Architecture (Current)
+### Архитектура проекта (текущая)
 
 ```
 wortday/
@@ -239,146 +239,146 @@ wortday/
 
 ---
 
-## 🛠️ What Works (v1.0.0)
+## 🛠️ Что работает (v1.0.0)
 
-### Functionality:
-✅ **Supabase Words** — real data from DB (NEW v1.0.0)  
-✅ **Word Service** — asynchronous word loading (NEW v1.0.0)  
-✅ **Unlimited Content** — unlimited number of words (NEW v1.0.0)  
-✅ **Supabase Auth** — Email, Apple, Google  
-✅ **Account Management** — profile, sign out, delete account  
-✅ **Auth State Sync** — automatic state updates  
-✅ **Onboarding Flow** — initial setup  
-✅ **Level System** — word difficulty selection (beginner/intermediate/advanced)  
-✅ **Multilingualism** — full localization in RU, UK, EN, DE  
-✅ **Push Notifications** — iOS/Android daily reminders  
-✅ **Favorites** — add/remove words  
+### Функциональность:
+✅ **Supabase Words** — реальные данные из БД (НОВОЕ v1.0.0)
+✅ **Word Service** — асинхронная загрузка слов (НОВОЕ v1.0.0)
+✅ **Безлимитный контент** — неограниченное количество слов (НОВОЕ v1.0.0)
+✅ **Supabase Auth** — Email, Apple, Google
+✅ **Управление аккаунтом** — профиль, выход, удаление аккаунта
+✅ **Синхронизация Auth State** — автоматическое обновление состояния
+✅ **Onboarding Flow** — первоначальная настройка
+✅ **Система уровней** — выбор сложности слов (начинающий/средний/продвинутый)
+✅ **Мультиязычность** — полная локализация на RU, UK, EN, DE
+✅ **Push-уведомления** — ежедневные напоминания iOS/Android
+✅ **Избранное** — добавление/удаление слов
 
 ### UI/UX:
-✅ **Auth Provider Badge** — visual indication for Email/Apple/Google (NEW v0.8.0)  
-✅ **Platform-specific UI** — different elements for Web/iOS (NEW v0.8.0)  
-✅ **Neobrutalism Design** — consistent style  
-✅ **Animations** — smooth transitions  
-✅ **Haptic Feedback** — tactile feedback on iOS  
+✅ **Auth Provider Badge** — визуальная индикация для Email/Apple/Google (НОВОЕ v0.8.0)
+✅ **Платформо-специфичный UI** — различные элементы для Web/iOS (НОВОЕ v0.8.0)
+✅ **Дизайн Neobrutalism** — единый стиль
+✅ **Анимации** — плавные переходы
+✅ **Haptic Feedback** — тактильная обратная связь на iOS
 
-### Technical:
-✅ **Word Service** — service layer for DB interactions (NEW v1.0.0)
-✅ **Async Data Loading** — loading states for all screens (NEW v1.0.0)
-✅ **Supabase Client** — with AsyncStorage for sessions
-✅ **Auth Store** — Zustand with onAuthStateChange
-✅ **Word Store** — Zustand with real-time database sync (UPDATED v1.0.0)
-✅ **Unit Tests** — 36 tests with Jest (NEW v1.0.2)
-✅ **RLS-First Pattern** — validated with tests (NEW v1.0.2)
-✅ **TypeScript** — full typing
-✅ **Expo Router** — file-based navigation
-✅ **NativeWind v4** — Tailwind CSS for RN
-
----
-
-## 🐛 Known Issues
-
-### Current Limitations:
-✅ ~~Mock Data~~ — **SOLVED in v1.0.0**: Integration with Supabase  
-⚠️ **Apple Sign In** — mock mode (Apple Developer account required for production)  
-⚠️ **Google OAuth** — requires configuration in Google Cloud Console  
-⚠️ **Email Confirmation** — disabled in Supabase for quick testing  
-⚠️ **No Audio** — word pronunciation not implemented  
-⚠️ **No Offline Cache** — internet required to load words  
+### Техническое:
+✅ **Word Service** — сервисный слой для взаимодействия с БД (НОВОЕ v1.0.0)
+✅ **Асинхронная загрузка данных** — состояния загрузки для всех экранов (НОВОЕ v1.0.0)
+✅ **Supabase Client** — с AsyncStorage для сессий
+✅ **Auth Store** — Zustand с onAuthStateChange
+✅ **Word Store** — Zustand с синхронизацией базы данных в реальном времени (ОБНОВЛЕНО v1.0.0)
+✅ **Модульные тесты** — 36 тестов с Jest (НОВОЕ v1.0.2)
+✅ **Паттерн RLS-First** — провалидирован тестами (НОВОЕ v1.0.2)
+✅ **TypeScript** — полная типизация
+✅ **Expo Router** — файловая навигация
+✅ **NativeWind v4** — Tailwind CSS для RN
 
 ---
 
-## 🎯 Roadmap
+## 🐛 Известные проблемы
 
-### v0.8.0 — Auth System + Account Management ✅ COMPLETED
-- [x] Supabase Client with AsyncStorage
-- [x] Auth Store with onAuthStateChange listener
+### Текущие ограничения:
+✅ ~~Mock-данные~~ — **РЕШЕНО в v1.0.0**: Интеграция с Supabase
+⚠️ **Apple Sign In** — мок-режим (требуется аккаунт Apple Developer для продакшена)
+⚠️ **Google OAuth** — требуется настройка в Google Cloud Console
+⚠️ **Подтверждение Email** — отключено в Supabase для быстрого тестирования
+⚠️ **Нет аудио** — произношение слов не реализовано
+⚠️ **Нет офлайн-кеша** — для загрузки слов требуется интернет
+
+---
+
+## 🎯 Дорожная карта
+
+### v0.8.0 — Auth System + управление аккаунтом ✅ ЗАВЕРШЕНО
+- [x] Supabase Client с AsyncStorage
+- [x] Auth Store с листенером onAuthStateChange
 - [x] Auth Service (signIn, signUp, signOut, deleteAccount)
-- [x] Types for auth (User, UserProfile, AuthProvider)
-- [x] Account Screen with platform-specific UI
-- [x] Delete Account (Apple requirement)
-- [x] Auth Provider Badge component
-- [x] Translations for account section
-- [x] Updated DB schema (docs/database-schema.md)
+- [x] Типы для авторизации (User, UserProfile, AuthProvider)
+- [x] Экран Account с платформо-специфичным UI
+- [x] Удаление аккаунта (требование Apple)
+- [x] Компонент Auth Provider Badge
+- [x] Переводы для раздела аккаунта
+- [x] Обновлённая схема БД (docs/database-schema.md)
 
 ---
 
-### v0.9.0 — Auth Screens ✅ COMPLETED
-- [x] Login screen (Email/Password, Apple, Google)
-- [x] Register screen with validation
-- [x] Password reset flow
-- [x] Protected routes (auth guard in `_layout.tsx`)
-- [x] Apple Sign In mock mode
-- [x] Google OAuth integration
+### v0.9.0 — Экраны авторизации ✅ ЗАВЕРШЕНО
+- [x] Экран входа (Email/Password, Apple, Google)
+- [x] Экран регистрации с валидацией
+- [x] Поток сброса пароля
+- [x] Защищённые маршруты (auth guard в `_layout.tsx`)
+- [x] Мок-режим Apple Sign In
+- [x] Интеграция Google OAuth
 - [x] Sign Out/Delete Account → `/auth/login`
-- [x] Translations for auth section (RU/UK/EN/DE)
-- [x] Platform-specific UI (Web: window.confirm, Mobile: Alert)
-- [x] Deep linking structure for OAuth callbacks
+- [x] Переводы для раздела авторизации (RU/UK/EN/DE)
+- [x] Платформо-специфичный UI (Web: window.confirm, Mobile: Alert)
+- [x] Структура deep linking для OAuth callbacks
 
 ---
 
-### v1.0.0 — Supabase Words Integration ✅ COMPLETED
-- [x] Word Service for DB interaction
-- [x] Migration mock-data → Supabase
-- [x] Async loading with error handling
-- [x] Loading states for all screens
-- [x] TypeScript typing for all requests
-- [x] Fallback logic (first word of the level)
-- [x] Updated documentation
+### v1.0.0 — Интеграция слов с Supabase ✅ ЗАВЕРШЕНО
+- [x] Word Service для взаимодействия с БД
+- [x] Миграция mock-data → Supabase
+- [x] Асинхронная загрузка с обработкой ошибок
+- [x] Состояния загрузки для всех экранов
+- [x] TypeScript-типизация для всех запросов
+- [x] Логика отката (первое слово уровня)
+- [x] Обновлённая документация
 
 ---
 
-### v1.0.1 — Stability & Fixes ✅ COMPLETED
-- [x] Fixed "Auth session missing" error on login screen
-- [x] Fixed user data flickering on logout/login (store reset)
-- [x] Implemented proper loading state during auth initialization
-- [x] Added Optimistic UI updates for Favorites (instant heart toggle)
+### v1.0.1 — Стабильность и исправления ✅ ЗАВЕРШЕНО
+- [x] Исправлена ошибка «Auth session missing» на экране входа
+- [x] Исправлено мерцание данных пользователя при выходе/входе (сброс хранилища)
+- [x] Реализовано корректное состояние загрузки при инициализации авторизации
+- [x] Добавлены оптимистичные обновления UI для избранного (мгновенное переключение сердечка)
 
 ---
 
-### v1.0.2 — Unit Testing Setup ✅ COMPLETED
-- [x] Configured Jest with `jest-expo` preset
-- [x] Created test infrastructure (mocks, helpers, setup)
-- [x] Implemented 36 unit tests (12 service + 24 store)
-- [x] RLS-First pattern validation tests
-- [x] State management tests (isFavorite, reset)
-- [x] Documentation (`docs/testing-guide.md`)
-- [x] Added test scripts to package.json (test, test:watch, test:coverage)
+### v1.0.2 — Настройка модульного тестирования ✅ ЗАВЕРШЕНО
+- [x] Настроен Jest с пресетом `jest-expo`
+- [x] Создана тестовая инфраструктура (моки, хелперы, setup)
+- [x] Реализовано 36 модульных тестов (12 сервисных + 24 тестов хранилищ)
+- [x] Тесты валидации паттерна RLS-First
+- [x] Тесты управления состоянием (isFavorite, reset)
+- [x] Документация (`docs/testing-guide.md`)
+- [x] Добавлены тестовые скрипты в package.json (test, test:watch, test:coverage)
 
 ---
 
-### v1.1.0 — Production Auth Setup (Priority 1)
-- [ ] Apple Developer account + setup
-- [ ] Google Cloud Console OAuth credentials
-- [ ] Email Confirmation in Supabase
-- [ ] Populated database: 1095+ words (365+ × 3 levels)
+### v1.1.0 — Настройка продакшен-авторизации (Приоритет 1)
+- [ ] Аккаунт Apple Developer + настройка
+- [ ] OAuth-креденшалы Google Cloud Console
+- [ ] Подтверждение Email в Supabase
+- [ ] Заполненная база данных: 1095+ слов (365+ x 3 уровня)
 
 ---
 
-### v1.2.0 — Enhanced Features
-- [ ] Real-time favorites sync via Supabase Realtime
-- [ ] Offline mode with local cache (AsyncStorage)
-- [ ] Prefetching the next word
-- [ ] User words history (user_words_history table)
+### v1.2.0 — Расширенные возможности
+- [ ] Синхронизация избранного в реальном времени через Supabase Realtime
+- [ ] Офлайн-режим с локальным кешем (AsyncStorage)
+- [ ] Предзагрузка следующего слова
+- [ ] История слов пользователя (таблица user_words_history)
 
 ---
 
-### v1.1.0 — Audio & Media
-- [ ] TTS integration for pronunciation
-- [ ] Caching audio files
-- [ ] Supabase Storage for media
+### v1.1.0 — Аудио и медиа
+- [ ] Интеграция TTS для произношения
+- [ ] Кеширование аудиофайлов
+- [ ] Supabase Storage для медиа
 
 ---
 
-### v1.2.0 — Gamification
-- [ ] Streak system
-- [ ] Achievements (badges)
-- [ ] Progress statistics
+### v1.2.0 — Геймификация
+- [ ] Система стриков
+- [ ] Достижения (бейджи)
+- [ ] Статистика прогресса
 
 ---
 
-## 🔧 Development
+## 🔧 Разработка
 
-### Environment Variables:
+### Переменные окружения:
 ```env
 EXPO_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
@@ -387,7 +387,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
 EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=true  # false in production
 ```
 
-### Running the project:
+### Запуск проекта:
 ```bash
 npm install
 npm run web    # Web
@@ -395,63 +395,63 @@ npm run ios    # iOS
 npm run android # Android
 ```
 
-### Creating tables in Supabase:
-1. Open Supabase Dashboard → SQL Editor
-2. Execute SQL from `docs/database-schema.md` in order:
-   - Step 1: Tables
-   - Step 2: Indexes
-   - Step 3: RLS Policies
-   - Step 4: Functions & Triggers
+### Создание таблиц в Supabase:
+1. Откройте Supabase Dashboard → SQL Editor
+2. Выполните SQL из `docs/database-schema.md` в порядке:
+   - Шаг 1: Таблицы
+   - Шаг 2: Индексы
+   - Шаг 3: RLS-политики
+   - Шаг 4: Функции и триггеры
 
 ---
 
-## 🔗 Technologies
+## 🔗 Технологии
 
-**Core:**
+**Основные:**
 - React Native 0.81.5
 - Expo SDK 54
 - TypeScript 5.9.2
 
-**Backend:**
+**Бэкенд:**
 - Supabase (Auth, Database, RLS)
 - @supabase/supabase-js 2.x
 
-**State:**
+**Состояние:**
 - Zustand 5.0.9 (auth-store, settings-store, word-store)
 - @react-native-async-storage/async-storage
 
 **UI:**
 - NativeWind v4 (Tailwind CSS)
 - react-native-reanimated 4.1.1
-- lucide-react-native (icons)
+- lucide-react-native (иконки)
 
-**Navigation:**
+**Навигация:**
 - Expo Router 6.0.19
 
-**Testing:**
+**Тестирование:**
 - Jest 29.7.0
 - jest-expo 54.0.16
 
 ---
 
-**Last Updated:** 20.01.2026
-**Version:** 1.0.2 (Unit Testing Setup)
-**Status:** ✅ Production ready - highly stable with test coverage
-**Next Milestone:** v1.1.0 — Apple/Google OAuth production credentials + Content population
+**Последнее обновление:** 20.01.2026
+**Версия:** 1.0.2 (Настройка модульного тестирования)
+**Статус:** ✅ Готов к продакшену — высокая стабильность с покрытием тестами
+**Следующая веха:** v1.1.0 — Продакшен-креденшалы Apple/Google OAuth + наполнение контентом
 
 ---
 
-## 📚 Documentation Structure
+## 📚 Структура документации
 
-The project documentation is organized in the following files:
+Документация проекта организована в следующих файлах:
 
-- **CLAUDE.md** (root) - Main router for Claude Code with quick reference
-- **docs/project-status.md** - This file: project history, status, and roadmap
-- **docs/auth-flow.md** - Complete authentication system documentation
-- **docs/database-schema.md** - Supabase database schema and RLS policies
-- **docs/tech-stack.md** - Technology stack and architecture decisions
-- **docs/coding-conventions.md** - React Native coding standards and patterns
-- **docs/supabase-words-integration.md** - Words service integration guide
-- **docs/supabase-race-conditions.md** - RLS-First pattern and race condition solutions
-- **docs/testing-guide.md** - Unit testing setup and best practices (NEW v1.0.2)
-- **docs/ai-workflow-guide.md** - Best practices for AI collaboration
+- **CLAUDE.md** (корень) — Основной маршрутизатор для Claude Code с кратким справочником
+- **docs/project-status.md** — Этот файл: история проекта, статус и дорожная карта
+- **docs/auth-flow.md** — Полная документация системы аутентификации
+- **docs/database-schema.md** — Схема базы данных Supabase и RLS-политики
+- **docs/tech-stack.md** — Технологический стек и архитектурные решения
+- **docs/coding-conventions.md** — Стандарты кодирования React Native и паттерны
+- **docs/supabase-words-integration.md** — Руководство по интеграции сервиса слов
+- **docs/supabase-race-conditions.md** — Паттерн RLS-First и решения race condition
+- **docs/testing-guide.md** — Настройка модульного тестирования и лучшие практики (НОВОЕ v1.0.2)
+- **docs/ai-workflow-guide.md** — Лучшие практики для совместной работы с ИИ

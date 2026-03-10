@@ -1,69 +1,69 @@
-# Supabase Integration - Words Migration
+# Интеграция с Supabase — Миграция слов
 
-**Version:** 1.0.0  
-**Date:** 14.01.2026  
-**Status:** ✅ Completed
-
----
-
-## 📋 Overview
-
-Completed migration from local mock data (`lib/mock-data.ts`) to real Supabase database integration for word content.
+**Версия:** 1.0.0
+**Дата:** 14.01.2026
+**Статус:** ✅ Завершено
 
 ---
 
-## ✅ Changes Made
+## 📋 Обзор
 
-### 1. Created Word Service (`lib/word-service.ts`)
-New service layer for interacting with Supabase `words` table:
-
-**Functions:**
-- `getTodayWord(level, registrationDate)` - Fetches word based on user's level and day number
-- `getAllWords()` - Fetches all words (for history/library)
-- `getWordById(id)` - Fetches single word by ID
-- `getWordsByLevel(level)` - Fetches all words for specific level
-- `getUserDayNumber(registrationDate)` - Calculates current day number (same logic as before)
-
-**Features:**
-- Proper error handling with descriptive messages
-- Fallback to first word of level if no word found for current day
-- Async/await pattern matching `auth-service.ts`
-- Console logging for debugging
+Выполнена миграция с локальных тестовых данных (`lib/mock-data.ts`) на реальную интеграцию с базой данных Supabase для контента слов.
 
 ---
 
-### 2. Updated Word Store (`store/word-store.ts`)
+## ✅ Внесённые изменения
 
-**Changes:**
-- ✅ Replaced `import { getAllWords, getTodayWord } from '@/lib/mock-data'`
-- ✅ With `import * as wordService from '@/lib/word-service'`
-- ✅ Updated `loadTodayWord()` to use async `wordService.getTodayWord()`
-- ✅ Updated `loadAllWords()` to use async `wordService.getAllWords()`
-- ✅ Added error handling for database failures
-- ✅ Removed artificial 500ms delay (not needed with real DB)
+### 1. Создан сервис слов (`lib/word-service.ts`)
+Новый сервисный слой для взаимодействия с таблицей Supabase `words`:
 
----
+**Функции:**
+- `getTodayWord(level, registrationDate)` — получает слово на основе уровня пользователя и номера дня
+- `getAllWords()` — получает все слова (для истории/библиотеки)
+- `getWordById(id)` — получает одно слово по ID
+- `getWordsByLevel(level)` — получает все слова для конкретного уровня
+- `getUserDayNumber(registrationDate)` — вычисляет текущий номер дня (та же логика, что и раньше)
 
-### 3. Updated History Detail Page (`app/history/[id].tsx`)
-
-**Changes:**
-- ✅ Replaced `getWordById` from mock-data with `wordService.getWordById`
-- ✅ Converted to async component with `useState` and `useEffect`
-- ✅ Added loading state with `ActivityIndicator`
-- ✅ Proper TypeScript typing: `Word | null` instead of `any`
+**Особенности:**
+- Корректная обработка ошибок с описательными сообщениями
+- Fallback на первое слово уровня, если слово для текущего дня не найдено
+- Паттерн async/await, совпадающий с `auth-service.ts`
+- Консольное логирование для отладки
 
 ---
 
-## 🔄 Migration Impact
+### 2. Обновлён стор слов (`store/word-store.ts`)
 
-### Before (Mock Data):
+**Изменения:**
+- ✅ Заменён `import { getAllWords, getTodayWord } from '@/lib/mock-data'`
+- ✅ На `import * as wordService from '@/lib/word-service'`
+- ✅ Обновлён `loadTodayWord()` для использования асинхронного `wordService.getTodayWord()`
+- ✅ Обновлён `loadAllWords()` для использования асинхронного `wordService.getAllWords()`
+- ✅ Добавлена обработка ошибок при сбоях базы данных
+- ✅ Удалена искусственная задержка 500мс (не нужна с реальной БД)
+
+---
+
+### 3. Обновлена страница деталей истории (`app/history/[id].tsx`)
+
+**Изменения:**
+- ✅ Заменён `getWordById` из mock-data на `wordService.getWordById`
+- ✅ Преобразован в асинхронный компонент с `useState` и `useEffect`
+- ✅ Добавлено состояние загрузки с `ActivityIndicator`
+- ✅ Корректная типизация TypeScript: `Word | null` вместо `any`
+
+---
+
+## 🔄 Влияние миграции
+
+### До (тестовые данные):
 ```typescript
 // Synchronous, hardcoded 9 words
 const word = getTodayWord(level, registrationDate);
 const allWords = getAllWords();
 ```
 
-### After (Supabase):
+### После (Supabase):
 ```typescript
 // Asynchronous, unlimited words from database
 const { word, error } = await wordService.getTodayWord(level, registrationDate);
@@ -72,64 +72,64 @@ const { words, error } = await wordService.getAllWords();
 
 ---
 
-## 🗂️ Files Modified
+## 🗂️ Изменённые файлы
 
-1. ✅ `/lib/word-service.ts` - **CREATED** (new service layer)
-2. ✅ `/store/word-store.ts` - Replaced mock-data with word-service
-3. ✅ `/app/history/[id].tsx` - Made async, added loading state
-
----
-
-## 📦 Dependencies
-
-No new dependencies required. Uses existing:
-- `@supabase/supabase-js` (already installed)
-- `supabase` client from `lib/supabase-client.ts`
+1. ✅ `/lib/word-service.ts` — **СОЗДАН** (новый сервисный слой)
+2. ✅ `/store/word-store.ts` — mock-data заменён на word-service
+3. ✅ `/app/history/[id].tsx` — сделан асинхронным, добавлено состояние загрузки
 
 ---
 
-## 🧪 Testing Checklist
+## 📦 Зависимости
 
-- [ ] Main screen loads today's word from database
-- [ ] Loading states appear correctly
-- [ ] Error handling works (disconnect network)
-- [ ] History screen shows all words from database
-- [ ] Favorites filter works
-- [ ] Word detail page loads individual words
-- [ ] Level switching loads correct words
-- [ ] Day progression works (registration_date logic)
+Новые зависимости не требуются. Используются существующие:
+- `@supabase/supabase-js` (уже установлен)
+- клиент `supabase` из `lib/supabase-client.ts`
 
 ---
 
-## 🐛 Potential Issues
+## 🧪 Чек-лист тестирования
 
-### Issue: "No word found"
-**Cause:** Database doesn't have word for current day/level  
-**Solution:** Service falls back to first word of level automatically
-
-### Issue: Slow loading
-**Cause:** Network latency  
-**Solution:** Loading states implemented, consider adding cache layer in future
-
-### Issue: Offline mode
-**Cause:** No internet connection  
-**Solution:** Error handling shows message, future: implement offline cache
+- [ ] Главный экран загружает слово дня из базы данных
+- [ ] Состояния загрузки отображаются корректно
+- [ ] Обработка ошибок работает (отключение сети)
+- [ ] Экран истории показывает все слова из базы данных
+- [ ] Фильтр избранного работает
+- [ ] Страница деталей слова загружает отдельные слова
+- [ ] Переключение уровня загружает правильные слова
+- [ ] Прогрессия по дням работает (логика registration_date)
 
 ---
 
-## 🚀 Next Steps (Future Enhancements)
+## 🐛 Возможные проблемы
 
-1. **Offline Cache:** Store recently viewed words in AsyncStorage
-2. **Prefetching:** Load next day's word in background
-3. **Optimistic Updates:** Update UI before server confirmation
-4. **Real-time Sync:** Use Supabase Realtime for favorites across devices
-5. **Analytics:** Track which words are most viewed/favorited
+### Проблема: «Слово не найдено»
+**Причина:** В базе данных нет слова для текущего дня/уровня
+**Решение:** Сервис автоматически откатывается к первому слову уровня
+
+### Проблема: Медленная загрузка
+**Причина:** Сетевая задержка
+**Решение:** Реализованы состояния загрузки, в будущем рассмотреть добавление слоя кэширования
+
+### Проблема: Офлайн-режим
+**Причина:** Отсутствие интернет-соединения
+**Решение:** Обработка ошибок показывает сообщение, в будущем: реализовать офлайн-кэш
 
 ---
 
-## 📊 Database Schema Reference
+## 🚀 Следующие шаги (будущие улучшения)
 
-**Table:** `words`
+1. **Офлайн-кэш:** Хранить недавно просмотренные слова в AsyncStorage
+2. **Предзагрузка:** Загружать слово следующего дня в фоновом режиме
+3. **Оптимистичные обновления:** Обновлять UI до подтверждения сервера
+4. **Синхронизация в реальном времени:** Использовать Supabase Realtime для синхронизации избранного между устройствами
+5. **Аналитика:** Отслеживать наиболее просматриваемые/добавляемые в избранное слова
+
+---
+
+## 📊 Справка по схеме базы данных
+
+**Таблица:** `words`
 
 ```sql
 CREATE TABLE words (
@@ -149,16 +149,16 @@ CREATE TABLE words (
 );
 ```
 
-**Required Indexes:**
-- `idx_words_level_sequence` on (level, sequence_number) - **CRITICAL for getTodayWord**
-- `idx_words_level` on (level)
-- `idx_words_sequence_number` on (sequence_number)
+**Необходимые индексы:**
+- `idx_words_level_sequence` на (level, sequence_number) — **КРИТИЧНО для getTodayWord**
+- `idx_words_level` на (level)
+- `idx_words_sequence_number` на (sequence_number)
 
-**RLS Policy:**
-- Public read access: `CREATE POLICY "Words are publicly readable" ON words FOR SELECT USING (true);`
+**Политика RLS:**
+- Публичный доступ на чтение: `CREATE POLICY "Words are publicly readable" ON words FOR SELECT USING (true);`
 
 ---
 
-**Status:** ✅ Integration Complete  
-**Production Ready:** Yes (requires populated database)  
-**Breaking Changes:** None (same public API)
+**Статус:** ✅ Интеграция завершена
+**Готовность к продакшену:** Да (требуется заполненная база данных)
+**Критические изменения:** Нет (тот же публичный API)

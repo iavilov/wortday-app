@@ -1,39 +1,39 @@
-# Authentication System Implementation
+# Система аутентификации — реализация
 
-**Version:** 0.9.0  
-**Last Updated:** 14.01.2026
-
----
-
-## 📋 Overview
-
-Complete documentation of the Wortday authentication system supporting Email/Password, Sign in with Apple (with mock mode), and Google Sign-In. Includes protected routes (Auth Guard), auth UI screens, and a full account management flow.
+**Версия:** 0.9.0
+**Последнее обновление:** 14.01.2026
 
 ---
 
-## 🏗️ Architecture
+## Обзор
 
-### System Components
+Полная документация системы аутентификации Wortday с поддержкой Email/Password, Sign in with Apple (с mock-режимом) и Google Sign-In. Включает защищённые маршруты (Auth Guard), экраны аутентификации и полный процесс управления аккаунтом.
+
+---
+
+## Архитектура
+
+### Компоненты системы
 
 ```
-types/auth.ts              → TypeScript types and helpers
-lib/supabase-client.ts     → Supabase client with AsyncStorage
-lib/auth-service.ts        → Auth functions (signIn, signUp, Apple mock, etc.)
+types/auth.ts              → TypeScript-типы и вспомогательные функции
+lib/supabase-client.ts     → Supabase-клиент с AsyncStorage
+lib/auth-service.ts        → Функции авторизации (signIn, signUp, Apple mock и т.д.)
 store/auth-store.ts        → Zustand store + onAuthStateChange
 app/_layout.tsx            → Auth Guard + setupAuthListener()
-app/auth/login.tsx         → Login screen (Email/Apple/Google)
-app/auth/register.tsx      → Registration screen
-app/auth/reset-password.tsx → Password reset flow
-app/settings/account.tsx   → Account management UI
+app/auth/login.tsx         → Экран входа (Email/Apple/Google)
+app/auth/register.tsx      → Экран регистрации
+app/auth/reset-password.tsx → Восстановление пароля
+app/settings/account.tsx   → Интерфейс управления аккаунтом
 ```
 
 ---
 
-## 🔐 Supported Providers
+## Поддерживаемые провайдеры
 
 ### 1. Email/Password
 
-**Registration:**
+**Регистрация:**
 ```typescript
 import { signUpWithEmail } from '@/lib/auth-service';
 
@@ -44,7 +44,7 @@ const { user, error } = await signUpWithEmail({
 });
 ```
 
-**Login:**
+**Вход:**
 ```typescript
 import { signInWithEmail } from '@/lib/auth-service';
 
@@ -54,7 +54,7 @@ const { user, error } = await signInWithEmail({
 });
 ```
 
-**Password Reset:**
+**Сброс пароля:**
 ```typescript
 import { sendPasswordResetEmail } from '@/lib/auth-service';
 
@@ -65,11 +65,11 @@ const { success, error } = await sendPasswordResetEmail('user@example.com');
 
 ### 2. Sign in with Apple
 
-**⚠️ CRITICAL FEATURE: Apple provides `fullName` ONLY on first authentication!**
+**ВАЖНО: Apple предоставляет `fullName` ТОЛЬКО при первой аутентификации!**
 
-**🧪 MOCK MODE:** A mock mode is available for testing without an Apple Developer account.
+**Mock-режим:** доступен для тестирования без Apple Developer аккаунта.
 
-**Implementation:**
+**Реализация:**
 ```typescript
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { signInWithApple } from '@/lib/auth-service';
@@ -90,7 +90,7 @@ const { user, error } = await signInWithApple({
 });
 ```
 
-**Saving displayName (critical!):**
+**Сохранение displayName (критически важно!):**
 ```typescript
 // In lib/auth-service.ts
 if (displayName && data.user) {
@@ -106,15 +106,15 @@ if (displayName && data.user) {
 ```
 
 **Apple Private Relay:**
-- Email looks like `***@privaterelay.appleid.com`
-- `is_private_email` flag is automatically set by the trigger
-- UI shows "Private Email" badge
+- Email выглядит как `***@privaterelay.appleid.com`
+- Флаг `is_private_email` устанавливается автоматически через триггер
+- В интерфейсе отображается бейдж «Private Email»
 
 ---
 
 ### 3. Google Sign-In
 
-**OAuth Flow:**
+**OAuth-процесс:**
 ```typescript
 import { signInWithGoogle } from '@/lib/auth-service';
 
@@ -128,12 +128,12 @@ if (url) {
 ```
 
 **Deep Linking:**
-Redirect URLs configured in Supabase Dashboard:
-- `wortday://auth/callback` (mobile)
-- `http://localhost:8081` (dev)
-- `https://wortday.com` (production)
+Redirect URL настроены в Supabase Dashboard:
+- `wortday://auth/callback` (мобильное приложение)
+- `http://localhost:8081` (разработка)
+- `https://wortday.com` (продакшн)
 
-**Mock Mode (for development):**
+**Mock-режим (для разработки):**
 ```typescript
 // .env
 EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=true
@@ -149,44 +149,44 @@ export const isAppleMockEnabled = () => {
 // Display Name: 'Mock Apple User'
 ```
 
-**Migration to Production:**
-1. Get Apple Developer account
-2. Configure App ID with Sign in with Apple
-3. Add credentials to Supabase Dashboard
-4. Set `EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=false`
+**Переход на продакшн:**
+1. Получить Apple Developer аккаунт
+2. Настроить App ID с возможностью Sign in with Apple
+3. Добавить учётные данные в Supabase Dashboard
+4. Установить `EXPO_PUBLIC_APPLE_SIGN_IN_MOCK=false`
 
 ---
 
-## 🎨 Auth Screens UI
+## Экраны аутентификации
 
-### Login Screen (`app/auth/login.tsx`)
+### Экран входа (`app/auth/login.tsx`)
 
-**Features:**
-- Email/Password inputs with validation
-- "Show/Hide Password" toggle
-- "Forgot Password?" → Password Reset
-- "Continue with Apple" (iOS only, mock support)
-- "Continue with Google" (OAuth flow)
-- "Create Account" → Register screen
-- Neobrutalism design (borderRadius.LARGE for card)
+**Возможности:**
+- Поля Email/Password с валидацией
+- Переключатель «Показать/Скрыть пароль»
+- «Забыли пароль?» — переход к сбросу пароля
+- «Continue with Apple» (только iOS, поддержка mock-режима)
+- «Continue with Google» (OAuth-процесс)
+- «Создать аккаунт» — переход на экран регистрации
+- Дизайн в стиле Neobrutalism (borderRadius.LARGE для карточки)
 
-**Validation:**
+**Валидация:**
 ```typescript
 - Email: regex /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 - Password: minimum 6 characters
 - Auto-redirect after successful login (Auth Guard)
 ```
 
-### Register Screen (`app/auth/register.tsx`)
+### Экран регистрации (`app/auth/register.tsx`)
 
-**Features:**
-- Email/Password/Confirm Password
-- Password strength validation
-- Passwords match check
-- Success message → Login screen
-- "Already have an account?" link
+**Возможности:**
+- Email/Password/Подтверждение пароля
+- Валидация сложности пароля
+- Проверка совпадения паролей
+- Сообщение об успехе — переход на экран входа
+- Ссылка «Уже есть аккаунт?»
 
-**Validation:**
+**Валидация:**
 ```typescript
 - Email format validation
 - Password ≥ 6 characters
@@ -194,26 +194,26 @@ export const isAppleMockEnabled = () => {
 - Supabase email confirmation (optional)
 ```
 
-### Password Reset (`app/auth/reset-password.tsx`)
+### Сброс пароля (`app/auth/reset-password.tsx`)
 
-**Flow:**
-1. User enters email
-2. Supabase sends magic link
-3. Success screen with instructions
-4. User clicks link
-5. Supabase password reset form
+**Процесс:**
+1. Пользователь вводит email
+2. Supabase отправляет magic link
+3. Экран успеха с инструкциями
+4. Пользователь нажимает на ссылку
+5. Форма сброса пароля Supabase
 
-**Platform-specific redirects:**
+**Платформозависимые редиректы:**
 - Web: `{origin}/auth/reset-password`
 - Mobile: `wortday://auth/reset-password`
 
 ---
 
-## 🛡️ Auth Guard (Protected Routes)
+## Auth Guard (защищённые маршруты)
 
-### Implementation in `app/_layout.tsx`
+### Реализация в `app/_layout.tsx`
 
-**Priority Logic:**
+**Логика приоритетов:**
 ```typescript
 // Priority 1: Auth Guard
 if (!isAuthenticated && !inAuthFlow) {
@@ -234,7 +234,7 @@ if (isAuthenticated && !hasCompletedOnboarding && !inOnboarding) {
 }
 ```
 
-**Route Configuration:**
+**Конфигурация маршрутов:**
 ```typescript
 <Stack>
   <Stack.Screen name="auth/login" />
@@ -247,34 +247,34 @@ if (isAuthenticated && !hasCompletedOnboarding && !inOnboarding) {
 </Stack>
 ```
 
-**Automatic Redirects:**
-- Unauthorized → `/auth/login`
-- After login → `/onboarding` (if not completed)
-- After onboarding → `/(tabs)`
-- After logout → `/auth/login`
+**Автоматические редиректы:**
+- Неавторизованный пользователь — `/auth/login`
+- После входа — `/onboarding` (если не пройден)
+- После onboarding — `/(tabs)`
+- После выхода — `/auth/login`
 
 ---
 
-## 🗄️ Database Schema
+## Схема базы данных
 
-### Table `public.users`
+### Таблица `public.users`
 
-**Important:** This is NOT `auth.users`, but a public profiles table.
+**Важно:** это НЕ `auth.users`, а публичная таблица профилей.
 
-| Field | Type | Description |
+| Поле | Тип | Описание |
 |------|-----|----------|
-| `id` | UUID | PK, link to `auth.users.id` |
-| `email` | TEXT | Can be NULL (Apple) |
-| `display_name` | TEXT | User name (Apple only 1 time!) |
+| `id` | UUID | PK, связь с `auth.users.id` |
+| `email` | TEXT | Может быть NULL (Apple) |
+| `display_name` | TEXT | Имя пользователя (Apple — только 1 раз!) |
 | `auth_provider` | TEXT | 'email' \| 'apple' \| 'google' |
 | `is_private_email` | BOOLEAN | Apple Private Relay |
 | `translation_language` | TEXT | 'ru' \| 'uk' \| 'en' \| 'de' |
 | `language_level` | TEXT | 'beginner' \| 'intermediate' \| 'advanced' |
-| `registration_date` | DATE | Registration date |
-| `notifications_enabled` | BOOLEAN | Notifications enabled |
-| `notification_time` | TIME | Notification time |
+| `registration_date` | DATE | Дата регистрации |
+| `notifications_enabled` | BOOLEAN | Уведомления включены |
+| `notification_time` | TIME | Время уведомлений |
 
-### Trigger: Auto-create profile
+### Триггер: автоматическое создание профиля
 
 ```sql
 CREATE OR REPLACE FUNCTION handle_new_user()
@@ -297,19 +297,19 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 ```
 
-**What the trigger does:**
-1. Automatically creates a record in `public.users` upon registration
-2. Extracts `auth_provider` from `raw_app_meta_data`
-3. Extracts `display_name` from `raw_user_meta_data` (if available)
-4. Determines `is_private_email` by email domain
+**Что делает триггер:**
+1. Автоматически создаёт запись в `public.users` при регистрации
+2. Извлекает `auth_provider` из `raw_app_meta_data`
+3. Извлекает `display_name` из `raw_user_meta_data` (при наличии)
+4. Определяет `is_private_email` по домену email
 
 ---
 
-## 🔄 Auth State Synchronization
+## Синхронизация состояния аутентификации
 
-### onAuthStateChange Listener
+### Слушатель onAuthStateChange
 
-**Initialization in `app/_layout.tsx`:**
+**Инициализация в `app/_layout.tsx`:**
 ```typescript
 import { setupAuthListener } from '@/store/auth-store';
 
@@ -319,7 +319,7 @@ useEffect(() => {
 }, []);
 ```
 
-**Handled Events:**
+**Обрабатываемые события:**
 ```typescript
 supabase.auth.onAuthStateChange(async (event, session) => {
   switch (event) {
@@ -353,7 +353,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 });
 ```
 
-### Store Structure
+### Структура хранилища
 
 ```typescript
 interface AuthStore {
@@ -378,11 +378,11 @@ interface AuthStore {
 
 ---
 
-## 🗑️ Delete Account (Apple Requirement)
+## Удаление аккаунта (требование Apple)
 
-**Apple App Store Requirement:** The app MUST provide an option to delete the account within the app.
+**Требование Apple App Store:** приложение ОБЯЗАНО предоставлять возможность удаления аккаунта внутри приложения.
 
-### RPC Function
+### RPC-функция
 
 ```sql
 CREATE OR REPLACE FUNCTION delete_user_account()
@@ -391,25 +391,25 @@ DECLARE
   current_user_id UUID;
 BEGIN
   current_user_id := auth.uid();
-  
+
   IF current_user_id IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
-  
+
   -- Delete data in correct order
   DELETE FROM user_words_history WHERE user_id = current_user_id;
   DELETE FROM user_streaks WHERE user_id = current_user_id;
   DELETE FROM users WHERE id = current_user_id;
-  
+
   -- Delete auth record (invalidates ALL tokens)
   DELETE FROM auth.users WHERE id = current_user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
-**SECURITY DEFINER** allows the function to delete a record from `auth.users` (bypassing RLS).
+**SECURITY DEFINER** позволяет функции удалять запись из `auth.users` (в обход RLS).
 
-### Client Implementation
+### Реализация на клиенте
 
 ```typescript
 const handleDeleteAccount = async () => {
@@ -435,16 +435,16 @@ const handleDeleteAccount = async () => {
 
 ---
 
-## 🎨 UI Components
+## UI-компоненты
 
 ### AuthProviderBadge
 
-Visual indication of the auth provider:
+Визуальная индикация провайдера аутентификации:
 
 ```typescript
-function AuthProviderBadge({ provider, isPrivateEmail }: { 
-  provider: string; 
-  isPrivateEmail?: boolean 
+function AuthProviderBadge({ provider, isPrivateEmail }: {
+  provider: string;
+  isPrivateEmail?: boolean
 }) {
   const badgeConfig = {
     email: { Icon: Mail, bg: Colors.accentBlue, text: 'Email' },
@@ -462,7 +462,7 @@ function AuthProviderBadge({ provider, isPrivateEmail }: {
 }
 ```
 
-### Platform-Specific UI
+### Платформозависимый интерфейс
 
 ```typescript
 // Security section only for Email auth on Web
@@ -480,8 +480,8 @@ function AuthProviderBadge({ provider, isPrivateEmail }: {
 // Info for Apple/Google
 {authProvider !== 'email' && (
   <Text>
-    {authProvider === 'apple' 
-      ? 'Managed via Apple ID' 
+    {authProvider === 'apple'
+      ? 'Managed via Apple ID'
       : 'Managed via Google'}
   </Text>
 )}
@@ -489,11 +489,11 @@ function AuthProviderBadge({ provider, isPrivateEmail }: {
 
 ---
 
-## 🎯 Account Management
+## Управление аккаунтом
 
-### Sign Out Flow
+### Процесс выхода из аккаунта
 
-**Implementation in `app/settings/account.tsx`:**
+**Реализация в `app/settings/account.tsx`:**
 ```typescript
 const handleSignOut = async () => {
   // Web: window.confirm (Alert.alert supports buttons only on mobile)
@@ -520,16 +520,16 @@ const handleSignOut = async () => {
 };
 ```
 
-**What happens:**
-1. User presses "Sign Out"
-2. Confirmation (platform-specific)
-3. `supabase.auth.signOut()` → session clearance
-4. `onAuthStateChange` → event 'SIGNED_OUT'
-5. Auth Guard → redirect to `/auth/login`
+**Что происходит:**
+1. Пользователь нажимает «Выйти»
+2. Подтверждение (зависит от платформы)
+3. `supabase.auth.signOut()` — очистка сессии
+4. `onAuthStateChange` — событие 'SIGNED_OUT'
+5. Auth Guard — редирект на `/auth/login`
 
-### Delete Account Flow
+### Процесс удаления аккаунта
 
-**Similar logic with RPC:**
+**Аналогичная логика с RPC:**
 ```typescript
 const result = await deleteAccount(); // RPC: delete_user_account()
 if (result.success) {
@@ -539,37 +539,37 @@ if (result.success) {
 
 ---
 
-## 🔒 Row Level Security (RLS)
+## Row Level Security (RLS)
 
-### Users Table Policies
+### Политики таблицы Users
 
 ```sql
 -- SELECT: Only own profile
-CREATE POLICY "Users can view own profile" 
-  ON users FOR SELECT 
+CREATE POLICY "Users can view own profile"
+  ON users FOR SELECT
   USING (auth.uid() = id);
 
 -- INSERT: Only for self
-CREATE POLICY "Users can insert own profile" 
-  ON users FOR INSERT 
+CREATE POLICY "Users can insert own profile"
+  ON users FOR INSERT
   WITH CHECK (auth.uid() = id);
 
 -- UPDATE: Only own profile
-CREATE POLICY "Users can update own profile" 
-  ON users FOR UPDATE 
+CREATE POLICY "Users can update own profile"
+  ON users FOR UPDATE
   USING (auth.uid() = id);
 
 -- DELETE: Only own profile
-CREATE POLICY "Users can delete own profile" 
-  ON users FOR DELETE 
+CREATE POLICY "Users can delete own profile"
+  ON users FOR DELETE
   USING (auth.uid() = id);
 ```
 
 ---
 
-## 🧪 Testing
+## Тестирование
 
-### Test User Creation
+### Создание тестового пользователя
 
 ```typescript
 // In Supabase Dashboard → Authentication → Users → Add User
@@ -577,118 +577,118 @@ CREATE POLICY "Users can delete own profile"
 // Password: test1234
 ```
 
-### Test Scenarios
+### Тестовые сценарии
 
-1. **Email Registration:**
-   - Registration → check profile creation
-   - Login → check session retrieval
-   - Logout → check state clearance
+1. **Регистрация по Email:**
+   - Регистрация — проверить создание профиля
+   - Вход — проверить получение сессии
+   - Выход — проверить очистку состояния
 
 2. **Apple Sign In:**
-   - First login → `fullName` must be saved
-   - Second login → `fullName` already in DB
-   - Private Relay → badge is displayed
+   - Первый вход — `fullName` должен быть сохранён
+   - Повторный вход — `fullName` уже в базе данных
+   - Private Relay — бейдж отображается
 
-3. **Profile Update:**
-   - Change `translation_language`
-   - Change `language_level`
-   - Check persistence in DB
+3. **Обновление профиля:**
+   - Изменить `translation_language`
+   - Изменить `language_level`
+   - Проверить сохранение в БД
 
-4. **Delete Account:**
-   - Delete → check cascade deletion
-   - Login attempt → should error
-
----
-
-## 🐛 Troubleshooting
-
-### Apple fullName is not saving
-
-**Issue:** `display_name` in DB remains NULL after Apple Sign In.
-
-**Solution:**
-1. Verify `AppleAuthenticationScope.FULL_NAME` is requested
-2. Increase delay in `setTimeout()` to 1500ms
-3. Check logs: `console.log('[Auth] Saved Apple display name')`
-
-### Session does not update automatically
-
-**Issue:** UI does not update after login/logout.
-
-**Solution:**
-1. Verify `setupAuthListener()` is called in `app/_layout.tsx`
-2. Verify subscription does not unsubscribe prematurely
-3. Check logs: `console.log('[Auth Event]:', event)`
-
-### RLS blocks requests
-
-**Issue:** `new row violates row-level security policy`
-
-**Solution:**
-1. Verify `auth.uid()` returns correct UUID
-2. Verify policies are created correctly
-3. Temporarily disable RLS for testing: `ALTER TABLE users DISABLE ROW LEVEL SECURITY;`
-
-### DELETE account not working
-
-**Issue:** Error when calling `delete_user_account()`
-
-**Solution:**
-1. Verify function created with `SECURITY DEFINER`
-2. Verify user authenticated: `auth.uid()` not NULL
-3. Verify cascade constraints in tables
+4. **Удаление аккаунта:**
+   - Удалить — проверить каскадное удаление
+   - Попытка входа — должна вернуть ошибку
 
 ---
 
-## 📋 Production Checklist
+## Устранение неполадок
 
-### Auth Screens & UI ✅
-- [x] Login screen (Email/Apple/Google)
-- [x] Register screen with validation
-- [x] Password reset flow
-- [x] Neobrutalism design tokens
-- [x] Platform-specific UI (Web/iOS/Android)
-- [x] Loading states
-- [x] Error handling
-- [x] Translations (RU/UK/EN/DE)
+### fullName от Apple не сохраняется
 
-### Auth Guard & Routing ✅
-- [x] Protected routes in `_layout.tsx`
-- [x] Automatic redirects
-- [x] Auth state synchronization
-- [x] Sign Out → `/auth/login`
-- [x] Delete Account → `/auth/login`
+**Проблема:** `display_name` в БД остаётся NULL после Apple Sign In.
 
-### Apple Sign In 🔶
-- [x] Mock mode for development
-- [x] Environment variable `EXPO_PUBLIC_APPLE_SIGN_IN_MOCK`
-- [ ] Apple Developer account ($99/year)
-- [ ] App ID with Sign in with Apple capability
-- [ ] Credentials in Supabase Dashboard
-- [ ] Production mode (`MOCK=false`)
+**Решение:**
+1. Убедиться, что запрашивается `AppleAuthenticationScope.FULL_NAME`
+2. Увеличить задержку в `setTimeout()` до 1500 мс
+3. Проверить логи: `console.log('[Auth] Saved Apple display name')`
 
-### Google OAuth 🔶
-- [x] OAuth flow implementation
-- [x] WebBrowser for mobile
-- [ ] Google Cloud Console credentials
-- [ ] Authorized redirect URIs
-- [ ] Credentials in Supabase Dashboard
+### Сессия не обновляется автоматически
 
-### Database & Security ✅
-- [x] RLS policies
-- [x] Delete Account RPC function
-- [x] Auto-create profile trigger
-- [ ] Email Confirmation (currently disabled)
+**Проблема:** интерфейс не обновляется после входа/выхода.
 
-### Production Deploy ⏳
-- [ ] Deep Linking tested on real devices
-- [ ] Analytics events (signUp, signIn, signOut)
-- [ ] Privacy Policy and Terms of Service links
-- [ ] Production builds (iOS/Android)
+**Решение:**
+1. Убедиться, что `setupAuthListener()` вызывается в `app/_layout.tsx`
+2. Убедиться, что подписка не отменяется преждевременно
+3. Проверить логи: `console.log('[Auth Event]:', event)`
+
+### RLS блокирует запросы
+
+**Проблема:** `new row violates row-level security policy`
+
+**Решение:**
+1. Убедиться, что `auth.uid()` возвращает корректный UUID
+2. Убедиться, что политики созданы правильно
+3. Временно отключить RLS для тестирования: `ALTER TABLE users DISABLE ROW LEVEL SECURITY;`
+
+### Удаление аккаунта не работает
+
+**Проблема:** ошибка при вызове `delete_user_account()`
+
+**Решение:**
+1. Убедиться, что функция создана с `SECURITY DEFINER`
+2. Убедиться, что пользователь аутентифицирован: `auth.uid()` не NULL
+3. Проверить каскадные ограничения в таблицах
 
 ---
 
-## 🔗 Useful Links
+## Чеклист для продакшна
+
+### Экраны аутентификации и интерфейс
+- [x] Экран входа (Email/Apple/Google)
+- [x] Экран регистрации с валидацией
+- [x] Процесс сброса пароля
+- [x] Дизайн-токены Neobrutalism
+- [x] Платформозависимый интерфейс (Web/iOS/Android)
+- [x] Состояния загрузки
+- [x] Обработка ошибок
+- [x] Переводы (RU/UK/EN/DE)
+
+### Auth Guard и маршрутизация
+- [x] Защищённые маршруты в `_layout.tsx`
+- [x] Автоматические редиректы
+- [x] Синхронизация состояния аутентификации
+- [x] Выход — `/auth/login`
+- [x] Удаление аккаунта — `/auth/login`
+
+### Apple Sign In
+- [x] Mock-режим для разработки
+- [x] Переменная окружения `EXPO_PUBLIC_APPLE_SIGN_IN_MOCK`
+- [ ] Apple Developer аккаунт ($99/год)
+- [ ] App ID с возможностью Sign in with Apple
+- [ ] Учётные данные в Supabase Dashboard
+- [ ] Продакшн-режим (`MOCK=false`)
+
+### Google OAuth
+- [x] Реализация OAuth-процесса
+- [x] WebBrowser для мобильных устройств
+- [ ] Учётные данные Google Cloud Console
+- [ ] Авторизованные redirect URI
+- [ ] Учётные данные в Supabase Dashboard
+
+### База данных и безопасность
+- [x] Политики RLS
+- [x] RPC-функция удаления аккаунта
+- [x] Триггер автоматического создания профиля
+- [ ] Подтверждение Email (в данный момент отключено)
+
+### Развёртывание в продакшн
+- [ ] Deep Linking протестирован на реальных устройствах
+- [ ] События аналитики (signUp, signIn, signOut)
+- [ ] Ссылки на Политику конфиденциальности и Условия использования
+- [ ] Продакшн-сборки (iOS/Android)
+
+---
+
+## Полезные ссылки
 
 - [Supabase Auth Docs](https://supabase.com/docs/guides/auth)
 - [Apple Sign In Guidelines](https://developer.apple.com/sign-in-with-apple/)
@@ -697,6 +697,6 @@ CREATE POLICY "Users can delete own profile"
 
 ---
 
-**Last Updated:** 14.01.2026  
-**Version:** 0.9.0 (Auth Screens + Auth Guard)  
-**Status:** ✅ Ready for testing, ⏳ Pending Apple/Google credentials for production
+**Последнее обновление:** 14.01.2026
+**Версия:** 0.9.0 (Экраны аутентификации + Auth Guard)
+**Статус:** Готово к тестированию, ожидаются учётные данные Apple/Google для продакшна
