@@ -6,8 +6,9 @@
       "args": ["-y", "chrome-devtools-mcp@latest"]
     },
     "supabase": {
-      "type": "http",
-      "url": "https://mcp.supabase.com/mcp"
+      "type": "stdio",
+      "command": "/Users/admin/.nvm/versions/node/v22.22.0/bin/npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest", "--access-token", "${SUPABASE_ACCESS_TOKEN}"]
     }
   }
 }
