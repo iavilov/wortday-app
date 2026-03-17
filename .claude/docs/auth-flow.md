@@ -1,7 +1,7 @@
 # Система аутентификации — реализация
 
-**Версия:** 0.9.0
-**Последнее обновление:** 14.01.2026
+**Версия:** 1.0.3
+**Последнее обновление:** 17.03.2026
 
 ---
 
@@ -222,7 +222,8 @@ if (!isAuthenticated && !inAuthFlow) {
 }
 
 // Priority 2: Authenticated users shouldn't see auth screens
-if (isAuthenticated && inAuthFlow) {
+// BUT only if onboarding is completed (otherwise Priority 3 handles it)
+if (isAuthenticated && inAuthFlow && hasCompletedOnboarding) {
   router.replace('/(tabs)'); // Redirect to app
   return;
 }
@@ -243,9 +244,11 @@ if (isAuthenticated && !hasCompletedOnboarding && !inOnboarding) {
   <Stack.Screen name="onboarding" />
   <Stack.Screen name="(tabs)" />      // Protected
   <Stack.Screen name="settings" />    // Protected
-  <Stack.Screen name="history" />     // Protected
+  <Stack.Screen name="word" />        // Protected (word detail)
 </Stack>
 ```
+
+> **ВАЖНО (v1.0.3):** Ранее маршрут назывался `history`, что вызывало конфликт с `app/(tabs)/history.tsx` в Expo Router. Переименован в `word` для устранения конфликта.
 
 **Автоматические редиректы:**
 - Неавторизованный пользователь — `/auth/login`
@@ -309,32 +312,57 @@ CREATE TRIGGER on_auth_user_created
 
 ### Слушатель onAuthStateChange
 
-**Инициализация в `app/_layout.tsx`:**
+**Инициализация в `app/_layout.tsx` (обновлено v1.0.3):**
+
+> **ВАЖНО:** Listener настраивается ДО `initializeAuth()` в одном `useEffect`, чтобы перехватить `INITIAL_SESSION` от `getSession()`.
+
 ```typescript
 import { setupAuthListener } from '@/store/auth-store';
 
 useEffect(() => {
+  // Setup listener FIRST so it catches INITIAL_SESSION from getSession()
   const subscription = setupAuthListener();
-  return () => subscription.unsubscribe();
+
+  const init = async () => {
+    await Promise.all([
+      hydrateSettings(),
+      hydrateWords(),
+      initializeAuth(),
+    ]);
+    await initializeNotifications();
+    setIsReady(true);
+  };
+  init();
+
+  return () => { subscription.unsubscribe(); };
 }, []);
 ```
 
-**Обрабатываемые события:**
+**Обрабатываемые события (обновлено v1.0.3):**
 ```typescript
 supabase.auth.onAuthStateChange(async (event, session) => {
   switch (event) {
     case 'SIGNED_IN':
+      // Show loader only for initial sign-in (not token refresh)
+      const isReauth = currentState.isAuthenticated && currentState.session !== null;
+      if (!isReauth) setLoading(true);
       setSession(session);
-      // Delay for successful profile creation
-      setTimeout(() => fetchProfile(), 500);
+      await fetchProfile();
+      await wordStore.syncFavoritesFromDB();
+      setLoading(false);
       break;
 
     case 'SIGNED_OUT':
       setSession(null);
       setProfile(null);
+      setLoading(false);
+      // CRITICAL: Clear all stores to prevent data leakage
+      useWordStore.getState().reset();
+      useSettingsStore.getState().reset();
       break;
 
     case 'TOKEN_REFRESHED':
+      // Silent token refresh — no loader
       setSession(session);
       break;
 
@@ -345,13 +373,22 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
     case 'INITIAL_SESSION':
       if (session) {
+        setLoading(true);
         setSession(session);
         await fetchProfile();
+        await wordStore.syncFavoritesFromDB();
+        setLoading(false);
       }
       break;
   }
 });
 ```
+
+> **Изменения v1.0.3:**
+> - `SIGNED_IN`: убран `setTimeout`, добавлен `syncFavoritesFromDB`, защита от показа loader при token refresh
+> - `SIGNED_OUT`: добавлена очистка `word-store` и `settings-store` (предотвращает мерцание данных)
+> - `INITIAL_SESSION`: добавлен `syncFavoritesFromDB` для синхронизации избранного при старте
+> - `initialize()`: удалён дублирующий `fetchProfile()` (обрабатывается через `INITIAL_SESSION`)
 
 ### Структура хранилища
 
@@ -629,6 +666,16 @@ CREATE POLICY "Users can delete own profile"
 2. Убедиться, что политики созданы правильно
 3. Временно отключить RLS для тестирования: `ALTER TABLE users DISABLE ROW LEVEL SECURITY;`
 
+### История не отображается / исчезает после неактивности (v1.0.3)
+
+**Проблема:** На Web `http://localhost:8081/history` не показывает историю, или данные появляются и пропадают.
+
+**Корневая причина:** Конфликт маршрутов Expo Router — `app/(tabs)/history.tsx` и `app/history/_layout.tsx` оба резолвились в URL `/history`. Expo Router на Web мог рендерить Stack из `app/history/` (без index route) вместо tab-экрана.
+
+**Решение:** Переименование `app/history/` → `app/word/`. Ссылки обновлены на `/word/${id}`.
+
+**Вторая причина (исчезновение):** При истечении сессии срабатывал `SIGNED_OUT`, но stores не очищались, оставляя stale state. Исправлено добавлением `reset()` для word-store и settings-store в обработчик `SIGNED_OUT`.
+
 ### Удаление аккаунта не работает
 
 **Проблема:** ошибка при вызове `delete_user_account()`
@@ -697,6 +744,6 @@ CREATE POLICY "Users can delete own profile"
 
 ---
 
-**Последнее обновление:** 14.01.2026
-**Версия:** 0.9.0 (Экраны аутентификации + Auth Guard)
+**Последнее обновление:** 17.03.2026
+**Версия:** 1.0.3 (Рефакторинг auth lifecycle + очистка stores)
 **Статус:** Готово к тестированию, ожидаются учётные данные Apple/Google для продакшна

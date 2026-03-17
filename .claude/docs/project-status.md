@@ -6,8 +6,8 @@
 
 ---
 
-## 🚀 Текущий статус: v1.0.2 (Настройка модульного тестирования)
-**Последнее обновление:** 20.01.2026
+## 🚀 Текущий статус: v1.0.3 (Стабильность и рефакторинг архитектуры)
+**Последнее обновление:** 17.03.2026
 
 ### Ключевые достижения v1.0.0:
 
@@ -196,6 +196,9 @@ wortday/
 │   │   ├── history.tsx          # History/Word Library
 │   │   ├── settings.tsx         # Main Settings
 │   │   └── _layout.tsx          # Tab Bar configuration
+│   ├── word/
+│   │   ├── [id].tsx             # Word Detail Page (RENAMED v1.0.3)
+│   │   └── _layout.tsx          # Word Stack Layout
 │   ├── settings/
 │   │   ├── account.tsx          # Account (NEW v0.8.0)
 │   │   ├── language.tsx         # Interface Language Selection
@@ -346,6 +349,21 @@ wortday/
 
 ---
 
+### v1.0.3 — Стабильность и рефакторинг архитектуры ✅ ЗАВЕРШЕНО
+- [x] Исправлен баг: история не отображалась на Web из-за конфликта маршрутов Expo Router
+- [x] Переименование `app/history/` → `app/word/` для устранения конфликта с `app/(tabs)/history.tsx`
+- [x] Исправлено исчезновение данных после неактивности (очистка stores при `SIGNED_OUT`)
+- [x] Устранён race condition в инициализации: два `useEffect` объединены в один
+- [x] Удалён дублирующий `fetchProfile()` из `initialize()` (обрабатывается `INITIAL_SESSION`)
+- [x] Замена `getUser()` на `getSession()` в `word-store.hydrate()` (race condition Supabase)
+- [x] Добавлен NaN guard в `loadHistoryWords` для невалидного `registrationDate`
+- [x] `reset-password.tsx` переведён на `auth-service` (без прямых вызовов Supabase)
+- [x] `SIGNED_OUT` event теперь корректно очищает `word-store` и `settings-store`
+- [x] `deleteAccount()` теперь очищает все stores при удалении аккаунта
+- [x] Верифицировано через Chrome DevTools: 0 ошибок, 10 слов загружаются корректно
+
+---
+
 ### v1.1.0 — Настройка продакшен-авторизации (Приоритет 1)
 - [ ] Аккаунт Apple Developer + настройка
 - [ ] OAuth-креденшалы Google Cloud Console
@@ -434,9 +452,9 @@ npm run android # Android
 
 ---
 
-**Последнее обновление:** 20.01.2026
-**Версия:** 1.0.2 (Настройка модульного тестирования)
-**Статус:** ✅ Готов к продакшену — высокая стабильность с покрытием тестами
+**Последнее обновление:** 17.03.2026
+**Версия:** 1.0.3 (Стабильность и рефакторинг архитектуры)
+**Статус:** ✅ Готов к продакшену — стабильная архитектура, 36 тестов, верифицировано через DevTools
 **Следующая веха:** v1.1.0 — Продакшен-креденшалы Apple/Google OAuth + наполнение контентом
 
 ---
