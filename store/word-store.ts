@@ -1,22 +1,22 @@
+import { supabase } from '@/lib/supabase-client';
 import { storage } from '@/lib/storage';
 import * as wordHistoryService from '@/lib/word-history-service';
 import * as wordService from '@/lib/word-service';
+import { useSettingsStore } from '@/store/settings-store';
 import { Word } from '@/types/word';
 import { create } from 'zustand';
 
 interface WordStore {
   todayWord: Word | null;
-  allWords: Word[]; // Deprecated - use historyWords instead
-  historyWords: Word[]; // Conveyor: words from day 1 to current_day
+  historyWords: Word[];
   favoriteIds: Set<string>;
-  lastVisitDate: string | null;
   isLoading: boolean;
   error: string | null;
   _hasHydrated: boolean;
   _hasMigratedFavorites: boolean;
+  _toggleInProgress: Record<string, boolean>;
 
   loadTodayWord: () => Promise<void>;
-  loadAllWords: () => Promise<void>; // Deprecated - use loadHistoryWords instead
   loadHistoryWords: () => Promise<void>;
   markWordAsViewed: (wordId: string) => Promise<void>;
   syncFavoritesFromDB: () => Promise<void>;
@@ -36,14 +36,13 @@ const FAVORITES_MIGRATED_KEY = 'wortday-favorites-migrated';
 
 export const useWordStore = create<WordStore>((set, get) => ({
   todayWord: null,
-  allWords: [],
   historyWords: [],
   favoriteIds: new Set<string>(),
-  lastVisitDate: null,
   isLoading: false,
   error: null,
   _hasHydrated: false,
   _hasMigratedFavorites: false,
+  _toggleInProgress: {},
   isPlaying: false,
   playbackSpeed: 1.0,
 
@@ -54,10 +53,10 @@ export const useWordStore = create<WordStore>((set, get) => ({
       const stored = await storage.getItem(FAVORITES_KEY);
       const localFavorites = stored ? JSON.parse(stored) : [];
 
-      // Check if user is authenticated before syncing with DB
-      const { data: { user } } = await (await import('@/lib/supabase-client')).supabase.auth.getUser();
+      // Use getSession() instead of getUser() to avoid race conditions
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (user) {
+      if (session?.user) {
         // Check if migration already happened
         const migrated = await storage.getItem(FAVORITES_MIGRATED_KEY);
 
@@ -93,51 +92,50 @@ export const useWordStore = create<WordStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Get the current level and registration date from settings
-      const { languageLevel, registrationDate } = (await import('@/store/settings-store')).useSettingsStore.getState();
+      const { languageLevel, registrationDate } = useSettingsStore.getState();
 
       const { word, error } = await wordService.getTodayWord(languageLevel, registrationDate);
 
       if (error) {
-        set({
-          error,
-          isLoading: false,
-          todayWord: null
-        });
+        set({ error, isLoading: false, todayWord: null });
         return;
       }
 
       set({ todayWord: word, isLoading: false });
-
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to load word',
-        isLoading: false
+        isLoading: false,
       });
     }
-  },
-
-  // Deprecated: Use loadHistoryWords instead
-  loadAllWords: async () => {
-    console.warn('[WordStore] loadAllWords is deprecated, use loadHistoryWords instead');
-    await get().loadHistoryWords();
   },
 
   // Load history conveyor: words from day 1 to current_day
   loadHistoryWords: async () => {
     try {
-      const { languageLevel, registrationDate } = (await import('@/store/settings-store')).useSettingsStore.getState();
+      const { languageLevel, registrationDate } = useSettingsStore.getState();
 
       console.log(`[WordStore] loadHistoryWords: registrationDate="${registrationDate}", level="${languageLevel}"`);
 
       // Calculate current day number
       const currentDay = wordService.getUserDayNumber(registrationDate);
 
+      // Guard against NaN (invalid registrationDate)
+      if (!Number.isFinite(currentDay) || currentDay < 1) {
+        console.error('[WordStore] Invalid currentDay:', currentDay, '— skipping load');
+        return;
+      }
+
       // Get word count to determine range limit
       const { count: totalWords, error: countError } = await wordService.getWordCountForLevel(languageLevel);
 
       if (countError) {
         console.error('[WordStore] Failed to get word count:', countError);
+        return;
+      }
+
+      if (totalWords === 0) {
+        console.warn('[WordStore] No words in DB for level:', languageLevel);
         return;
       }
 
@@ -153,7 +151,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
         return;
       }
 
-      set({ historyWords: words, allWords: words });
+      set({ historyWords: words });
       console.log(`[WordStore] Loaded ${words.length} words for history conveyor`);
     } catch (error) {
       console.error('[WordStore] Failed to load history words:', error);
@@ -180,8 +178,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       const { favoriteIds, error } = await wordHistoryService.getFavoriteIds();
 
       if (error) {
-        console.error('[WordStore] ❌ Failed to sync favorites from DB:', error);
-        // Don't throw - fail gracefully
+        console.error('[WordStore] Failed to sync favorites from DB:', error);
         return;
       }
 
@@ -191,10 +188,9 @@ export const useWordStore = create<WordStore>((set, get) => ({
       // Persist to AsyncStorage for offline mode
       await storage.setItem(FAVORITES_KEY, JSON.stringify(favoriteIds));
 
-      console.log(`[WordStore] ✅ Synced ${favoriteIds.length} favorites from database`);
+      console.log(`[WordStore] Synced ${favoriteIds.length} favorites from database`);
     } catch (error) {
-      console.error('[WordStore] ❌ Exception in syncFavoritesFromDB:', error);
-      // Fail gracefully - don't crash the app
+      console.error('[WordStore] Exception in syncFavoritesFromDB:', error);
     }
   },
 
@@ -202,18 +198,16 @@ export const useWordStore = create<WordStore>((set, get) => ({
     console.log('[WordStore] toggleFavorite CALLED with wordId:', wordId);
 
     // Check if a toggle is already in progress for this word
-    const state = get();
-    if ((state as any)._toggleInProgress?.[wordId]) {
-      console.warn('[WordStore] Toggle already in progress for', wordId, '- ignoring duplicate call');
+    if (get()._toggleInProgress[wordId]) {
+      console.warn('[WordStore] Toggle already in progress for', wordId, '— ignoring');
       return;
     }
 
     // Mark toggle as in progress
-    (state as any)._toggleInProgress = { ...((state as any)._toggleInProgress || {}), [wordId]: true };
+    set({ _toggleInProgress: { ...get()._toggleInProgress, [wordId]: true } });
 
     const currentFavorites = get().favoriteIds;
     const wasFavorite = currentFavorites.has(wordId);
-    console.log('[WordStore] Current state - wasFavorite:', wasFavorite, 'total favorites:', currentFavorites.size);
 
     // Optimistic update
     const newFavorites = new Set(currentFavorites);
@@ -224,61 +218,47 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
 
     set({ favoriteIds: newFavorites });
-    console.log('[WordStore] Optimistic update complete, newFavorites.size:', newFavorites.size);
 
     // Persist to AsyncStorage for offline mode
     try {
       await storage.setItem(FAVORITES_KEY, JSON.stringify([...newFavorites]));
-      console.log('[WordStore] Saved to AsyncStorage successfully');
     } catch (e) {
       console.error('[WordStore] Failed to save favorites to storage:', e);
-      return; // Early exit if AsyncStorage fails
+      return;
     }
 
     // Sync with database
-    console.log('[WordStore] Calling wordHistoryService.toggleFavorite...');
     try {
       const { success, is_favorite, error } = await wordHistoryService.toggleFavorite(wordId);
-      console.log('[WordStore] Service returned:', { success, is_favorite, error });
 
       if (!success) {
-        console.error('[WordStore] ❌ Failed to sync favorite to DB:', error);
+        console.error('[WordStore] Failed to sync favorite to DB:', error);
         // Rollback optimistic update
         set({ favoriteIds: currentFavorites });
         await storage.setItem(FAVORITES_KEY, JSON.stringify([...currentFavorites]));
-        console.log('[WordStore] Rolled back to previous state');
-      } else {
-        // SUCCESS - verify is_favorite matches expectation
-        const expectedFavorite = !wasFavorite;
-        if (is_favorite !== expectedFavorite) {
-          console.warn('[WordStore] ⚠️ DB state mismatch! Expected:', expectedFavorite, 'Got:', is_favorite);
-        }
-
-        // Sync local state with DB truth (just in case)
-        const correctFavorites = new Set(currentFavorites);
-        if (is_favorite) {
-          correctFavorites.add(wordId);
-        } else {
-          correctFavorites.delete(wordId);
-        }
-        set({ favoriteIds: correctFavorites });
-        await storage.setItem(FAVORITES_KEY, JSON.stringify([...correctFavorites]));
-
-        console.log(`[WordStore] ✅ Synced favorite to DB: ${wordId} = ${is_favorite}`);
+        return;
       }
+
+      // Sync local state with DB truth
+      const correctFavorites = new Set(currentFavorites);
+      if (is_favorite) {
+        correctFavorites.add(wordId);
+      } else {
+        correctFavorites.delete(wordId);
+      }
+      set({ favoriteIds: correctFavorites });
+      await storage.setItem(FAVORITES_KEY, JSON.stringify([...correctFavorites]));
+
+      console.log(`[WordStore] Synced favorite to DB: ${wordId} = ${is_favorite}`);
     } catch (error) {
-      console.error('[WordStore] ❌ Exception in toggleFavorite:', error);
+      console.error('[WordStore] Exception in toggleFavorite:', error);
       // Rollback optimistic update
       set({ favoriteIds: currentFavorites });
       await storage.setItem(FAVORITES_KEY, JSON.stringify([...currentFavorites]));
-      console.log('[WordStore] Rolled back due to exception');
     } finally {
-      // Always clear the in-progress flag
-      const state = get();
-      const inProgress = { ...((state as any)._toggleInProgress || {}) };
-      delete inProgress[wordId];
-      (state as any)._toggleInProgress = inProgress;
-      console.log('[WordStore] Toggle completed for', wordId);
+      // Clear the in-progress flag
+      const { [wordId]: _, ...rest } = get()._toggleInProgress;
+      set({ _toggleInProgress: rest });
     }
   },
 
@@ -297,15 +277,14 @@ export const useWordStore = create<WordStore>((set, get) => ({
   reset: () => {
     set({
       todayWord: null,
-      allWords: [],
       historyWords: [],
       favoriteIds: new Set<string>(),
-      lastVisitDate: null,
       isLoading: false,
       error: null,
       _hasHydrated: false,
       _hasMigratedFavorites: false,
+      _toggleInProgress: {},
       isPlaying: false,
     });
-  }
+  },
 }));

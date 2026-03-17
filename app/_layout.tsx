@@ -44,8 +44,11 @@ export default function RootLayout() {
     IBMPlexSans_700Bold,
   });
 
-  // Hydrate stores, initialize auth, and initialize notifications on mount
+  // Single initialization: setup listener → hydrate stores → init auth
   useEffect(() => {
+    // Setup listener FIRST so it catches INITIAL_SESSION from getSession()
+    const subscription = setupAuthListener();
+
     const init = async () => {
       await Promise.all([
         hydrateSettings(),
@@ -59,11 +62,7 @@ export default function RootLayout() {
       setIsReady(true);
     };
     init();
-  }, []);
 
-  // Setup auth state listener
-  useEffect(() => {
-    const subscription = setupAuthListener();
     return () => {
       subscription.unsubscribe();
     };
@@ -148,7 +147,7 @@ export default function RootLayout() {
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="settings" options={{ headerShown: false }} />
-          <Stack.Screen name="history" options={{ headerShown: false }} />
+          <Stack.Screen name="word" options={{ headerShown: false }} />
         </Stack>
       </View>
       <StatusBar style="auto" />

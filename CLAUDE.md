@@ -61,7 +61,3 @@ npm run android    # Android Emulator
 npm run lint       # ESLint
 npm test           # Jest unit tests
 ```
-
-## Git
-
-Префиксы: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`

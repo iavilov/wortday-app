@@ -2,7 +2,7 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Border, Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
-import { supabase } from '@/lib/supabase-client';
+import { sendPasswordResetEmail } from '@/lib/auth-service';
 import { useSettingsStore } from '@/store/settings-store';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
@@ -36,11 +36,9 @@ export default function ResetPasswordScreen() {
         setIsLoading(true);
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: 'wortday://reset-password',
-            });
+            const { success, error } = await sendPasswordResetEmail(email);
 
-            if (error) throw error;
+            if (!success) throw new Error(error || 'Failed to send reset link');
 
             setEmailSent(true);
         } catch (error: any) {

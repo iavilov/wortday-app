@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase-client';
+import { useSettingsStore } from '@/store/settings-store';
 import {
   AuthProvider,
   mapDbProfile,
@@ -98,9 +99,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           user,
           isAuthenticated: true,
         });
-
-        // Fetch profile data
-        await get().fetchProfile();
+        // Profile fetching is handled by the auth listener's INITIAL_SESSION event
       }
 
       set({ isLoading: false, isInitialized: true });
@@ -137,7 +136,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       // Sync all user settings from DB to settings-store
       // This ensures DB is the single source of truth and prevents stale AsyncStorage data
-      const settingsStore = (await import('@/store/settings-store')).useSettingsStore.getState();
+      const settingsStore = useSettingsStore.getState();
 
       if (data.registration_date) {
         const dbDate = data.registration_date; // Already in YYYY-MM-DD format from DB
@@ -253,6 +252,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isLoading: false,
       });
 
+      // Clear stores
+      const { useWordStore } = await import('@/store/word-store');
+      useWordStore.getState().reset();
+      useSettingsStore.getState().reset();
+
       return { success: true };
     } catch (error) {
       console.error('[Auth] Delete account error:', error);
@@ -357,6 +361,17 @@ export function setupAuthListener() {
         setSession(null);
         setProfile(null);
         setLoading(false);
+
+        // Clear stores on any sign-out (including natural session expiry)
+        try {
+          const { useWordStore } = await import('@/store/word-store');
+          const { useSettingsStore } = await import('@/store/settings-store');
+          useWordStore.getState().reset();
+          useSettingsStore.getState().reset();
+          console.log('[Auth] Cleared stores on SIGNED_OUT event');
+        } catch (error) {
+          console.error('[Auth] Failed to clear stores on SIGNED_OUT:', error);
+        }
         break;
 
       case 'TOKEN_REFRESHED':

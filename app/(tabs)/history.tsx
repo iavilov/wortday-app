@@ -11,7 +11,7 @@ import { ARTICLE_COLORS, Article, PART_OF_SPEECH_COLORS } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { ArrowRight, Search } from 'lucide-react-native';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -176,7 +176,7 @@ export default function HistoryScreen() {
 
                 return (
                   <BrutalButton
-                    onPress={() => router.push(`/history/${item.id}`)}
+                    onPress={() => router.push(`/word/${item.id}`)}
                     borderWidth={Border.primary}
                     borderRadius={borderRadius.LARGE}
                     shadowOffset={4}

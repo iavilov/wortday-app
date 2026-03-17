@@ -40,7 +40,7 @@ export default function WordDetailPage() {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/history');
+      router.replace('/(tabs)/history');
     }
   };
 
