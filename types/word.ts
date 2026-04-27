@@ -61,5 +61,15 @@ export interface Word {
   media: WordMedia;
 }
 
+/**
+ * Response from `get_today_word` RPC
+ */
+export interface TodayWordResponse {
+  word: Word | null;
+  day_number: number;
+  total_words: number;
+  exhausted: boolean;
+}
+
 export const ARTICLE_COLORS = articleColors;
 export const PART_OF_SPEECH_COLORS = partOfSpeechColors;

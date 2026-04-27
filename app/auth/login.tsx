@@ -5,10 +5,16 @@ import { t } from '@/constants/translations';
 import { useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { createBrutalShadow } from '@/utils/platform-styles';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Alert, Platform, Text, TextInput, View } from 'react-native';
+
+// Expo Go cannot register the wortday:// custom URI scheme, which Apple's
+// ASWebAuthenticationSession requires to close the OAuth browser. Detect it
+// so we can surface a clear message instead of a broken flow.
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -91,20 +97,54 @@ export default function LoginScreen() {
     };
 
     const handleGoogleSignIn = async () => {
+        if (Platform.OS !== 'web' && isExpoGo) {
+            Alert.alert(
+                t('auth.googleNotInExpoGoTitle', translationLanguage),
+                t('auth.googleNotInExpoGoMessage', translationLanguage),
+            );
+            return;
+        }
+
         const { signInWithGoogle } = await import('@/lib/auth-service');
+        const { supabase } = await import('@/lib/supabase-client');
         const WebBrowser = await import('expo-web-browser');
 
         const result = await signInWithGoogle();
 
-        if (result.url) {
-            // Open OAuth URL in browser
-            if (Platform.OS === 'web') {
-                window.location.href = result.url;
-            } else {
-                await WebBrowser.openAuthSessionAsync(result.url, 'wortday://auth/callback');
-            }
-        } else {
+        if (!result.url || !result.redirectTo) {
             Alert.alert(t('auth.loginError', translationLanguage), result.error || 'Unknown error');
+            return;
+        }
+
+        if (Platform.OS === 'web') {
+            window.location.href = result.url;
+            return;
+        }
+
+        // Open OAuth URL and wait for the user to complete sign-in.
+        // The browser closes when Supabase redirects to result.redirectTo
+        // with a `?code=...` query param (PKCE flow).
+        const browserResult = await WebBrowser.openAuthSessionAsync(result.url, result.redirectTo);
+
+        if (browserResult.type !== 'success' || !browserResult.url) {
+            // User canceled or system dismissed the browser
+            return;
+        }
+
+        // Exchange the auth code for a real session.
+        // supabase-js will fire onAuthStateChange('SIGNED_IN'), which the
+        // auth listener uses to fetch the profile and route the user in.
+        const code = new URL(browserResult.url).searchParams.get('code');
+        if (!code) {
+            console.error('[Login] OAuth redirect URL has no `code` param:', browserResult.url);
+            Alert.alert(t('auth.loginError', translationLanguage), 'Missing auth code');
+            return;
+        }
+
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+            console.error('[Login] exchangeCodeForSession error:', error);
+            Alert.alert(t('auth.loginError', translationLanguage), error.message);
         }
     };
 

@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/design-tokens';
+import * as Haptics from 'expo-haptics';
 import React, { useEffect } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import Animated, {
     interpolateColor,
     useAnimatedStyle,
@@ -44,9 +45,16 @@ export const BrutalSwitch = ({
         transform: [{ translateX: translateX.value }],
     }));
 
+    const handlePress = () => {
+        if (Platform.OS !== 'web') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+        onValueChange(!value);
+    };
+
     return (
         <Pressable
-            onPress={() => onValueChange(!value)}
+            onPress={handlePress}
             style={styles.container}
         >
             <Animated.View style={[styles.track, animatedStyle]}>

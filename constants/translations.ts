@@ -76,6 +76,24 @@ export const UI_TRANSLATIONS = {
             en: 'Audio pronunciation will be available in upcoming releases.',
             de: 'Audio-Aussprache wird in kommenden Versionen verfügbar sein.',
         },
+        exhaustedTitle: {
+            ru: 'Ты прошёл все слова уровня',
+            uk: 'Ти пройшов усі слова рівня',
+            en: 'You\'ve mastered every word at this level',
+            de: 'Du hast alle Wörter dieser Stufe gemeistert',
+        },
+        exhaustedSubtitle: {
+            ru: 'Время идти дальше — выбери следующий уровень.',
+            uk: 'Час іти далі — обери наступний рівень.',
+            en: 'Time to level up — pick a new level.',
+            de: 'Zeit, eine Stufe weiterzugehen — wähle ein neues Niveau.',
+        },
+        exhaustedChangeLevel: {
+            ru: 'Сменить уровень',
+            uk: 'Змінити рівень',
+            en: 'Change level',
+            de: 'Niveau ändern',
+        },
     },
     history: {
         search: {
@@ -703,6 +721,18 @@ export const UI_TRANSLATIONS = {
             uk: 'Помилка реєстрації',
             en: 'Registration error',
             de: 'Registrierungsfehler',
+        },
+        googleNotInExpoGoTitle: {
+            ru: 'Google вход недоступен в Expo Go',
+            uk: 'Google вхід недоступний у Expo Go',
+            en: 'Google sign-in unavailable in Expo Go',
+            de: 'Google-Anmeldung in Expo Go nicht verfügbar',
+        },
+        googleNotInExpoGoMessage: {
+            ru: 'Используй вход через Email или Apple ID. Google заработает в production-сборке (TestFlight / App Store).',
+            uk: 'Скористайся входом через Email або Apple ID. Google запрацює у production-збірці (TestFlight / App Store).',
+            en: 'Use Email or Apple Sign-In. Google will work in production builds (TestFlight / App Store).',
+            de: 'Nutze E-Mail oder Apple-Anmeldung. Google funktioniert im Produktions-Build (TestFlight / App Store).',
         },
     },
 } as const;

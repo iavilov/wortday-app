@@ -27,10 +27,12 @@ jest.mock('@/lib/word-history-service', () => ({
 }));
 
 jest.mock('@/lib/word-service', () => ({
-  getTodayWord: jest.fn(() => Promise.resolve({ word: null, error: null })),
+  getTodayWord: jest.fn(() => Promise.resolve({
+    data: { word: null, day_number: 1, total_words: 0, exhausted: false },
+    error: null,
+  })),
   getWordCountForLevel: jest.fn(() => Promise.resolve({ count: 10, error: null })),
   getWordsBySequenceRange: jest.fn(() => Promise.resolve({ words: [], error: null })),
-  getUserDayNumber: jest.fn(() => 1),
 }));
 
 jest.mock('@/store/settings-store', () => ({
@@ -45,7 +47,7 @@ jest.mock('@/store/settings-store', () => ({
 jest.mock('@/lib/supabase-client', () => ({
   supabase: {
     auth: {
-      getUser: jest.fn(() => Promise.resolve({ data: { user: { id: 'test-user' } } })),
+      getSession: jest.fn(() => Promise.resolve({ data: { session: { user: { id: 'test-user' } } } })),
     },
   },
 }));

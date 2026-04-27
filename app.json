@@ -27,7 +27,9 @@
       "bundler": "metro",
       "build": {
         "babel": {
-          "include": ["@expo/vector-icons"]
+          "include": [
+            "@expo/vector-icons"
+          ]
         }
       },
       "name": "Wortday",
@@ -56,11 +58,19 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e573169d-2854-4075-8fd0-3cf412208dc9"
+      }
+    },
+    "owner": "avilov"
   }
 }

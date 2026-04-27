@@ -16,10 +16,10 @@ import "../global.css";
 
 import { Colors } from '@/constants/design-tokens';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { initializeNotifications } from '@/lib/notifications';
 import { setupAuthListener, useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
+import * as Notifications from 'expo-notifications';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -56,15 +56,24 @@ export default function RootLayout() {
         initializeAuth(),
       ]);
 
-      // Initialize notifications (iOS/Android only)
-      await initializeNotifications();
-
       setIsReady(true);
     };
     init();
 
+    // Tap on a delivered push → deep-link to the word screen if payload
+    // includes a wordId, otherwise fall through to home.
+    const responseSub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { wordId?: string } | undefined;
+      if (data?.wordId) {
+        router.push(`/word/${data.wordId}`);
+      } else {
+        router.push('/(tabs)');
+      }
+    });
+
     return () => {
       subscription.unsubscribe();
+      responseSub.remove();
     };
   }, []);
 

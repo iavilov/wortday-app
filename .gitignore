@@ -55,3 +55,6 @@ app-example
 coverage/
 *.lcov
 
+# TTS test artifacts (local-only experiments)
+tts-test/
+

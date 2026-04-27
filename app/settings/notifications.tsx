@@ -5,11 +5,8 @@ import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Border, Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
-import {
-  getNotificationSettings,
-  requestNotificationPermissions,
-  saveNotificationSettings,
-} from '@/lib/notifications';
+import * as pushService from '@/lib/push-notifications-service';
+import { useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -18,86 +15,106 @@ import { useEffect, useState } from 'react';
 import { Alert, Platform, ScrollView, Text, View } from 'react-native';
 import Animated, { Easing, FadeInDown, FadeOutUp } from 'react-native-reanimated';
 
+const DEFAULT_TIME = '09:00';
+
+function parseTime(timeString: string): Date {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  const date = new Date();
+  date.setHours(Number.isFinite(hours) ? hours : 9, Number.isFinite(minutes) ? minutes : 0, 0, 0);
+  return date;
+}
+
+function formatTime(date: Date): string {
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
 export default function NotificationsScreen() {
   const { translationLanguage } = useSettingsStore();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [notificationTime, setNotificationTime] = useState(new Date());
+  const profile = useAuthStore(s => s.profile);
+  const fetchProfile = useAuthStore(s => s.fetchProfile);
+
+  const [notificationsEnabled, setNotificationsEnabled] = useState(profile?.notifications_enabled ?? false);
+  const [notificationTime, setNotificationTime] = useState(parseTime(profile?.notification_time ?? DEFAULT_TIME));
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [hasPermission, setHasPermission] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isBusy, setIsBusy] = useState(false);
 
-  // Load settings on mount
+  // Sync local UI when the DB profile changes (e.g. after fetchProfile)
   useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    try {
-      const settings = await getNotificationSettings();
-      setNotificationsEnabled(settings.enabled);
-
-      // Parse time string to Date object
-      const [hours, minutes] = settings.time.split(':');
-      const date = new Date();
-      date.setHours(parseInt(hours, 10));
-      date.setMinutes(parseInt(minutes, 10));
-      setNotificationTime(date);
-
-      // Check permission status
-      const permission = await requestNotificationPermissions();
-      setHasPermission(permission);
-    } catch (error) {
-      console.error('Failed to load notification settings:', error);
-    } finally {
-      setIsLoading(false);
+    if (profile) {
+      setNotificationsEnabled(profile.notifications_enabled);
+      setNotificationTime(parseTime(profile.notification_time ?? DEFAULT_TIME));
     }
-  };
+  }, [profile?.notifications_enabled, profile?.notification_time]);
 
   const handleToggleNotifications = async (value: boolean) => {
-    if (value && !hasPermission) {
-      // Request permission
-      const granted = await requestNotificationPermissions();
-      if (!granted) {
-        Alert.alert(
-          t('notifications.permissionDenied', translationLanguage),
-          t('notifications.permissionMessage', translationLanguage)
-        );
+    if (isBusy) return;
+
+    // Optimistic UI: flip the switch immediately so the spring animation runs.
+    // Network/permission work is reconciled in the background; on failure we
+    // revert the state and surface an alert.
+    setNotificationsEnabled(value);
+    setIsBusy(true);
+
+    try {
+      if (value) {
+        const status = await pushService.requestPermissions();
+        if (status !== 'granted') {
+          setNotificationsEnabled(false);
+          Alert.alert(
+            t('notifications.permissionDenied', translationLanguage),
+            t('notifications.permissionMessage', translationLanguage),
+          );
+          return;
+        }
+
+        const tokenResult = await pushService.registerPushToken();
+        if (!tokenResult.success) {
+          setNotificationsEnabled(false);
+          Alert.alert(t('common.error', translationLanguage), tokenResult.error ?? '');
+          return;
+        }
+
+        const enableResult = await pushService.setNotificationsEnabled(true);
+        if (!enableResult.success) {
+          setNotificationsEnabled(false);
+          Alert.alert(t('common.error', translationLanguage), enableResult.error ?? '');
+          return;
+        }
+      } else {
+        const enableResult = await pushService.setNotificationsEnabled(false);
+        if (!enableResult.success) {
+          setNotificationsEnabled(true);
+          Alert.alert(t('common.error', translationLanguage), enableResult.error ?? '');
+          return;
+        }
+        if (profile?.id) {
+          await pushService.unregisterPushToken(profile.id);
+        }
+      }
+
+      await fetchProfile();
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleTimeChange = async (_event: unknown, selectedDate?: Date) => {
+    if (Platform.OS === 'android') setShowTimePicker(false);
+    if (!selectedDate) return;
+
+    setNotificationTime(selectedDate);
+    if (notificationsEnabled) {
+      const result = await pushService.updateNotificationTime(formatTime(selectedDate));
+      if (!result.success) {
+        Alert.alert(t('common.error', translationLanguage), result.error ?? '');
         return;
       }
-      setHasPermission(true);
-    }
-
-    setNotificationsEnabled(value);
-    const timeString = formatTime(notificationTime);
-    await saveNotificationSettings(value, timeString);
-  };
-
-  const handleTimeChange = (event: any, selectedDate?: Date) => {
-    // On Android, picker closes after selection
-    if (Platform.OS === 'android') {
-      setShowTimePicker(false);
-    }
-
-    if (selectedDate) {
-      setNotificationTime(selectedDate);
-      const timeString = formatTime(selectedDate);
-      if (notificationsEnabled) {
-        saveNotificationSettings(true, timeString);
-      }
+      await fetchProfile();
     }
   };
 
-  const formatTime = (date: Date): string => {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  };
-
-  const openTimePicker = () => {
-    setShowTimePicker(true);
-  };
-
-  // Early return for web platform
   if (Platform.OS === 'web') {
     return (
       <ScreenLayout>
@@ -133,18 +150,6 @@ export default function NotificationsScreen() {
             </View>
           </ContentContainer>
         </ScrollView>
-      </ScreenLayout>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <ScreenLayout>
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-text-muted text-base font-w-medium">
-            {t('common.loading', translationLanguage)}
-          </Text>
-        </View>
       </ScreenLayout>
     );
   }
@@ -203,9 +208,8 @@ export default function NotificationsScreen() {
               </Text>
             </View>
 
-            {/* Time Picker Button */}
             <BrutalButton
-              onPress={openTimePicker}
+              onPress={() => setShowTimePicker(true)}
               shadowOffset={4}
               borderRadius={borderRadius.MEDIUM}
               style={{ width: '100%' }}
@@ -219,12 +223,13 @@ export default function NotificationsScreen() {
               </View>
             </BrutalButton>
 
-            {/* Timezone Caption */}
             <Text className="text-text-muted text-xs font-w-medium mt-2">
-              {t('notifications.timezone', translationLanguage).replace('{zone}', 'CET')}
+              {t('notifications.timezone', translationLanguage).replace(
+                '{zone}',
+                Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+              )}
             </Text>
 
-            {/* Native Time Picker */}
             {showTimePicker && (
               <>
                 {Platform.OS === 'ios' ? (
@@ -269,7 +274,6 @@ export default function NotificationsScreen() {
           </ContentContainer>
         )}
 
-        {/* Info Card */}
         <ContentContainer>
           <View
             className="w-full p-5 flex-row"

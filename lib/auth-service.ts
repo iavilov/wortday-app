@@ -8,6 +8,14 @@ import { supabase } from '@/lib/supabase-client';
 import { AppleCredential, SignInData, SignUpData } from '@/types/auth';
 import { Platform } from 'react-native';
 
+// Custom URI scheme registered for the production iOS/Android build.
+// Apple's ASWebAuthenticationSession (used by openAuthSessionAsync) requires
+// a custom scheme — it ignores https callbacks. This URL works in production
+// and development builds but NOT in Expo Go (Expo Go cannot register custom
+// schemes). The login screen detects Expo Go and blocks Google sign-in there.
+// Must be present in Supabase Auth → URL Configuration → Redirect URLs.
+const NATIVE_OAUTH_REDIRECT = 'wortday://auth/callback';
+
 // Check if Apple Sign In mock is enabled
 export const isAppleMockEnabled = () => {
   return process.env.EXPO_PUBLIC_APPLE_SIGN_IN_MOCK === 'true';
@@ -132,24 +140,29 @@ export async function signInWithApple(credential: AppleCredential) {
 }
 
 // Sign in with Google (OAuth)
+// Returns the OAuth URL plus the redirectTo we asked Supabase to use,
+// so the caller can pass the same redirect to WebBrowser.openAuthSessionAsync.
 export async function signInWithGoogle() {
-  const redirectUrl = Platform.OS === 'web'
+  const redirectTo = Platform.OS === 'web'
     ? window.location.origin
-    : 'wortday://auth/callback';
+    : NATIVE_OAUTH_REDIRECT;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: redirectUrl,
+      redirectTo,
+      // Prevent supabase-js from trying to do its own redirect on web —
+      // we always open the URL ourselves.
+      skipBrowserRedirect: true,
     },
   });
 
   if (error) {
     console.error('[Auth] Google sign in error:', error);
-    return { url: null, error: error.message };
+    return { url: null, redirectTo: null, error: error.message };
   }
 
-  return { url: data.url, error: null };
+  return { url: data.url, redirectTo, error: null };
 }
 
 // Sign out

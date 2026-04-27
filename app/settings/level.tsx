@@ -4,6 +4,7 @@ import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
+import * as userProfileService from '@/lib/user-profile-service';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import { LEVEL_OPTIONS, LanguageLevel } from '@/types/settings';
@@ -17,10 +18,13 @@ export default function LevelScreen() {
 
 
     const handleSelectLevel = async (level: LanguageLevel) => {
+        if (level === languageLevel) return;
+
         setLanguageLevel(level);
-        // Refresh the today's word immediately to match the new level
+        // Reset day counter on the server: language_level + level_started_at = today
+        await userProfileService.updateLanguageLevel(level);
+        // Refresh today's word for the new level (RPC reads fresh level_started_at)
         await loadTodayWord();
-        // Removed auto-back as per user request
     };
 
     const getLevelBadgeColor = (code: LanguageLevel) => {

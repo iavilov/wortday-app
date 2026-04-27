@@ -12,6 +12,9 @@ interface WordStore {
   favoriteIds: Set<string>;
   isLoading: boolean;
   error: string | null;
+  dayNumber: number;
+  totalWords: number;
+  exhausted: boolean;
   _hasHydrated: boolean;
   _hasMigratedFavorites: boolean;
   _toggleInProgress: Record<string, boolean>;
@@ -40,6 +43,9 @@ export const useWordStore = create<WordStore>((set, get) => ({
   favoriteIds: new Set<string>(),
   isLoading: false,
   error: null,
+  dayNumber: 0,
+  totalWords: 0,
+  exhausted: false,
   _hasHydrated: false,
   _hasMigratedFavorites: false,
   _toggleInProgress: {},
@@ -92,16 +98,28 @@ export const useWordStore = create<WordStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const { languageLevel, registrationDate } = useSettingsStore.getState();
+      const { data: { session } } = await supabase.auth.getSession();
 
-      const { word, error } = await wordService.getTodayWord(languageLevel, registrationDate);
-
-      if (error) {
-        set({ error, isLoading: false, todayWord: null });
+      if (!session?.user) {
+        console.warn('[WordStore] loadTodayWord: not authenticated');
+        set({ isLoading: false, todayWord: null, exhausted: false, dayNumber: 0, totalWords: 0 });
         return;
       }
 
-      set({ todayWord: word, isLoading: false });
+      const { data, error } = await wordService.getTodayWord(session.user.id);
+
+      if (error || !data) {
+        set({ error: error || 'Failed to load word', isLoading: false, todayWord: null });
+        return;
+      }
+
+      set({
+        todayWord: data.word,
+        dayNumber: data.day_number,
+        totalWords: data.total_words,
+        exhausted: data.exhausted,
+        isLoading: false,
+      });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to load word',
@@ -110,39 +128,24 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
   },
 
-  // Load history conveyor: words from day 1 to current_day
+  // Load history conveyor: words from day 1 to current_day (capped at totalWords)
   loadHistoryWords: async () => {
     try {
-      const { languageLevel, registrationDate } = useSettingsStore.getState();
+      const { languageLevel } = useSettingsStore.getState();
 
-      console.log(`[WordStore] loadHistoryWords: registrationDate="${registrationDate}", level="${languageLevel}"`);
+      // Ensure dayNumber/totalWords are populated before computing range
+      if (get().dayNumber < 1 || get().totalWords < 1) {
+        await get().loadTodayWord();
+      }
 
-      // Calculate current day number
-      const currentDay = wordService.getUserDayNumber(registrationDate);
+      const { dayNumber, totalWords } = get();
 
-      // Guard against NaN (invalid registrationDate)
-      if (!Number.isFinite(currentDay) || currentDay < 1) {
-        console.error('[WordStore] Invalid currentDay:', currentDay, '— skipping load');
+      if (dayNumber < 1 || totalWords < 1) {
+        console.log('[WordStore] loadHistoryWords: still no day info, skipping');
         return;
       }
 
-      // Get word count to determine range limit
-      const { count: totalWords, error: countError } = await wordService.getWordCountForLevel(languageLevel);
-
-      if (countError) {
-        console.error('[WordStore] Failed to get word count:', countError);
-        return;
-      }
-
-      if (totalWords === 0) {
-        console.warn('[WordStore] No words in DB for level:', languageLevel);
-        return;
-      }
-
-      // Conveyor shows words from 1 to min(currentDay, totalWords)
-      const toSequence = Math.min(currentDay, totalWords);
-
-      console.log(`[WordStore] Loading history conveyor: level=${languageLevel}, day=${currentDay}, totalWords=${totalWords}, range=1-${toSequence}`);
+      const toSequence = Math.min(dayNumber, totalWords);
 
       const { words, error } = await wordService.getWordsBySequenceRange(languageLevel, 1, toSequence);
 
@@ -152,7 +155,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       }
 
       set({ historyWords: words });
-      console.log(`[WordStore] Loaded ${words.length} words for history conveyor`);
+      console.log(`[WordStore] Loaded ${words.length} history words (level=${languageLevel}, range=1-${toSequence})`);
     } catch (error) {
       console.error('[WordStore] Failed to load history words:', error);
     }
@@ -281,6 +284,9 @@ export const useWordStore = create<WordStore>((set, get) => ({
       favoriteIds: new Set<string>(),
       isLoading: false,
       error: null,
+      dayNumber: 0,
+      totalWords: 0,
+      exhausted: false,
       _hasHydrated: false,
       _hasMigratedFavorites: false,
       _toggleInProgress: {},

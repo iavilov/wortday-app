@@ -197,6 +197,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   signOut: async () => {
     try {
       set({ isLoading: true });
+
+      // Unregister push tokens BEFORE signOut so RLS still authorizes the delete.
+      // Server cron would otherwise keep sending pushes for a logged-out account
+      // until the device re-registers. Natural session expiry isn't covered here
+      // (no signOut action runs) — accepted gap.
+      const currentUserId = get().user?.id;
+      if (currentUserId) {
+        try {
+          const { unregisterPushToken } = await import('@/lib/push-notifications-service');
+          await unregisterPushToken(currentUserId);
+        } catch (error) {
+          console.error('[Auth] Failed to unregister push token on signOut:', error);
+        }
+      }
+
       await supabase.auth.signOut();
 
       // Clear auth state
@@ -350,6 +365,15 @@ export function setupAuthListener() {
           const wordStore = (await import('@/store/word-store')).useWordStore.getState();
           await wordStore.syncFavoritesFromDB();
           console.log('[Auth] Synced user data after sign-in');
+
+          // If the user already opted into notifications on another device,
+          // re-register this device's token + timezone so server cron can
+          // reach them here too.
+          const profile = useAuthStore.getState().profile;
+          if (profile?.notifications_enabled) {
+            const { registerPushToken } = await import('@/lib/push-notifications-service');
+            registerPushToken();
+          }
         } catch (error) {
           console.error('[Auth] Failed to fetch profile on SIGNED_IN:', error);
         } finally {

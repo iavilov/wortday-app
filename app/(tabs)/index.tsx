@@ -11,12 +11,14 @@ import { getWordContent } from '@/lib/i18n-helpers';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import { Share2 } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Share, Text, View } from 'react-native';
 
 export default function Index() {
-  const { todayWord, isLoading, loadTodayWord, toggleFavorite, favoriteIds, markWordAsViewed } = useWordStore();
+  const router = useRouter();
+  const { todayWord, isLoading, exhausted, loadTodayWord, toggleFavorite, favoriteIds, markWordAsViewed } = useWordStore();
   const { translationLanguage, languageLevel, registrationDate } = useSettingsStore();
 
   // Load today's word when component mounts OR when level/registration date changes
@@ -42,6 +44,43 @@ export default function Index() {
           <Text className="text-text-muted mt-4 font-w-medium">
             {t('common.loading', translationLanguage)}
           </Text>
+        </View>
+      </ScreenLayout>
+    );
+  }
+
+  if (exhausted) {
+    return (
+      <ScreenLayout>
+        <View className="flex-1 justify-center items-center px-6">
+          <View
+            className="w-full p-6 items-center"
+            style={{
+              backgroundColor: Colors.surface,
+              borderWidth: 3,
+              borderColor: Colors.border,
+              borderRadius: borderRadius.LARGE,
+            }}
+          >
+            <Text className="text-2xl mb-2">🎓</Text>
+            <Text className="text-text-main font-w-bold text-xl text-center mb-3">
+              {t('home.exhaustedTitle', translationLanguage)}
+            </Text>
+            <Text className="text-text-muted font-w-medium text-base text-center mb-6">
+              {t('home.exhaustedSubtitle', translationLanguage)}
+            </Text>
+            <BrutalButton
+              onPress={() => router.push('/settings/level')}
+              borderRadius={borderRadius.MEDIUM}
+              borderWidth={3}
+              backgroundColor={Colors.primary}
+              contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 12 }}
+            >
+              <Text className="text-border font-w-bold uppercase text-sm">
+                {t('home.exhaustedChangeLevel', translationLanguage)}
+              </Text>
+            </BrutalButton>
+          </View>
         </View>
       </ScreenLayout>
     );
