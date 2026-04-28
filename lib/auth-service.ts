@@ -165,6 +165,20 @@ export async function signInWithGoogle() {
   return { url: data.url, redirectTo, error: null };
 }
 
+/**
+ * Exchange the OAuth `code` returned in the redirect URL for a real Supabase
+ * session. supabase-js fires `onAuthStateChange('SIGNED_IN')` on success, which
+ * the auth listener consumes to fetch the profile and route the user in.
+ */
+export async function completeOAuthSignIn(code: string): Promise<{ success: boolean; error: string | null }> {
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    console.error('[Auth] exchangeCodeForSession error:', error);
+    return { success: false, error: error.message };
+  }
+  return { success: true, error: null };
+}
+
 // Sign out
 export async function signOut() {
   const { error } = await supabase.auth.signOut();

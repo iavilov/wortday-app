@@ -16,6 +16,7 @@ export const palette = {
   articleDer: '#93C5FD',
   articleDie: '#F9A8D4',
   articleDas: '#6BCF7F',
+  borderMuted: '#D1D5DB',
 
   gray: {
     50: '#FAFAFA',

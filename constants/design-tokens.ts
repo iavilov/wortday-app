@@ -85,6 +85,7 @@ export const Colors = {
   textInverted: palette.cardBg,
 
   border: palette.ink,
+  borderMuted: palette.borderMuted,
 
   gray50: palette.gray[50],
   gray100: palette.gray[100],
@@ -158,13 +159,6 @@ export const shadows = {
   'brutal-hover': '6px 6px 0px 0px #121212',
   'brutal-active': '0px 0px 0px 0px #121212',
 };
-
-export const backgroundPattern = {
-  backgroundColor: palette.bgMain,
-  backgroundImage: 'radial-gradient(#121212 0.5px, transparent 0.5px)',
-  backgroundSize: '24px 24px',
-};
-
 
 export const Layout = {
   maxContentWidth: 432,

@@ -13,8 +13,10 @@ import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
 export default function LevelScreen() {
-    const { translationLanguage, languageLevel, setLanguageLevel } = useSettingsStore();
-    const { loadTodayWord } = useWordStore();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
+    const languageLevel = useSettingsStore(s => s.languageLevel);
+    const setLanguageLevel = useSettingsStore(s => s.setLanguageLevel);
+    const loadTodayWord = useWordStore(s => s.loadTodayWord);
 
 
     const handleSelectLevel = async (level: LanguageLevel) => {
@@ -28,7 +30,7 @@ export default function LevelScreen() {
     };
 
     const getLevelBadgeColor = (code: LanguageLevel) => {
-        return (Colors.levelColors as any)[code] || Colors.surface;
+        return Colors.levelColors[code] ?? Colors.surface;
     };
 
     const getLevelIcon = (code: LanguageLevel) => {
@@ -107,7 +109,7 @@ export default function LevelScreen() {
                                     style={{
                                         borderWidth: 2,
                                         borderRadius: borderRadius.ROUND,
-                                        borderColor: isSelected ? Colors.border : '#D1D5DB',
+                                        borderColor: isSelected ? Colors.border : Colors.borderMuted,
                                         backgroundColor: isSelected ? Colors.surface : 'transparent',
                                     }}
                                 >

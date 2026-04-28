@@ -77,30 +77,11 @@ export interface AppleCredential {
   email?: string | null;
 }
 
-// Helper to get display name
-export function getDisplayName(user: User | null, profile: UserProfile | null): string {
-  if (profile?.display_name) return profile.display_name;
-  if (user?.displayName) return user.displayName;
-  if (profile?.email) return profile.email.split('@')[0];
-  if (user?.email) return user.email.split('@')[0];
-  return 'User';
-}
-
 // Helper to get display email
 export function getDisplayEmail(user: User | null, profile: UserProfile | null): string {
   const email = profile?.email || user?.email;
   if (!email) return 'Hidden by Apple';
   return email;
-}
-
-// Helper to check if email is editable
-export function canEditEmail(authProvider: AuthProvider | undefined): boolean {
-  return authProvider === 'email';
-}
-
-// Helper to check if password is changeable
-export function canChangePassword(authProvider: AuthProvider | undefined): boolean {
-  return authProvider === 'email';
 }
 
 // Map Supabase user to our User type
@@ -119,8 +100,14 @@ export function mapSupabaseUser(supabaseUser: SupabaseUser | null): User | null 
   };
 }
 
+// Shape of a row from public.users as returned by Supabase REST.
+// `has_completed_onboarding` may be absent on legacy rows — keep it optional.
+type DbUserRow = Omit<UserProfile, 'has_completed_onboarding'> & {
+  has_completed_onboarding: boolean | null;
+};
+
 // Map DB profile to UserProfile
-export function mapDbProfile(dbProfile: any): UserProfile | null {
+export function mapDbProfile(dbProfile: DbUserRow | null): UserProfile | null {
   if (!dbProfile) return null;
 
   return {
@@ -132,7 +119,7 @@ export function mapDbProfile(dbProfile: any): UserProfile | null {
     translation_language: dbProfile.translation_language,
     language_level: dbProfile.language_level,
     registration_date: dbProfile.registration_date,
-    has_completed_onboarding: dbProfile.has_completed_onboarding || false,
+    has_completed_onboarding: dbProfile.has_completed_onboarding ?? false,
     notifications_enabled: dbProfile.notifications_enabled,
     notification_time: dbProfile.notification_time,
     created_at: dbProfile.created_at,

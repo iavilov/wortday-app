@@ -5,17 +5,18 @@ import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
 import { useSettingsStore } from '@/store/settings-store';
-import { LANGUAGE_OPTIONS } from '@/types/settings';
+import { LANGUAGE_OPTIONS, TranslationLanguage } from '@/types/settings';
 import { Check } from 'lucide-react-native';
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
 export default function LanguageScreen() {
-    const { translationLanguage, setTranslationLanguage } = useSettingsStore();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
+    const setTranslationLanguage = useSettingsStore(s => s.setTranslationLanguage);
 
 
-    const getLanguageBadgeColor = (code: string) => {
-        return (Colors.languageColors as any)[code] || Colors.surface;
+    const getLanguageBadgeColor = (code: TranslationLanguage) => {
+        return Colors.languageColors[code] ?? Colors.surface;
     };
 
     return (
@@ -80,7 +81,7 @@ export default function LanguageScreen() {
                                     style={{
                                         borderWidth: 2,
                                         borderRadius: borderRadius.ROUND,
-                                        borderColor: isSelected ? Colors.border : '#D1D5DB',
+                                        borderColor: isSelected ? Colors.border : Colors.borderMuted,
                                         backgroundColor: isSelected ? Colors.surface : 'transparent',
                                     }}
                                 >

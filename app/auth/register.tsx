@@ -2,18 +2,20 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Border, Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
+import { showAlert } from '@/lib/alert';
 import { useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, Text, TextInput, View } from 'react-native';
+import { Alert, Platform, Text, TextInput, View } from 'react-native';
 
 export default function RegisterScreen() {
     const router = useRouter();
-    const { translationLanguage } = useSettingsStore();
-    const { signUpWithEmail, isLoading } = useAuthStore();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
+    const signUpWithEmail = useAuthStore(s => s.signUpWithEmail);
+    const isLoading = useAuthStore(s => s.isLoading);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,22 +30,22 @@ export default function RegisterScreen() {
     const handleRegister = async () => {
         // Validation
         if (!email || !password || !confirmPassword) {
-            Alert.alert(t('auth.registerError', translationLanguage), 'Please fill in all fields');
+            showAlert(t('auth.registerError', translationLanguage), t('auth.fillAllFields', translationLanguage));
             return;
         }
 
         if (!validateEmail(email)) {
-            Alert.alert(t('auth.registerError', translationLanguage), t('auth.invalidEmail', translationLanguage));
+            showAlert(t('auth.registerError', translationLanguage), t('auth.invalidEmail', translationLanguage));
             return;
         }
 
         if (password.length < 6) {
-            Alert.alert(t('auth.registerError', translationLanguage), t('auth.passwordTooShort', translationLanguage));
+            showAlert(t('auth.registerError', translationLanguage), t('auth.passwordTooShort', translationLanguage));
             return;
         }
 
         if (password !== confirmPassword) {
-            Alert.alert(t('auth.registerError', translationLanguage), t('auth.passwordsDontMatch', translationLanguage));
+            showAlert(t('auth.registerError', translationLanguage), t('auth.passwordsDontMatch', translationLanguage));
             return;
         }
 
@@ -51,13 +53,21 @@ export default function RegisterScreen() {
         const result = await signUpWithEmail(email, password);
 
         if (result.success) {
-            Alert.alert(
-                t('auth.registerSuccess', translationLanguage),
-                'Please check your email to confirm your account',
-                [{ text: 'OK', onPress: () => router.replace('/auth/login') }]
-            );
+            const successTitle = t('auth.registerSuccess', translationLanguage);
+            const successBody = t('auth.registerEmailConfirm', translationLanguage);
+            if (Platform.OS === 'web') {
+                showAlert(successTitle, successBody);
+                router.replace('/auth/login');
+            } else {
+                Alert.alert(successTitle, successBody, [
+                    { text: 'OK', onPress: () => router.replace('/auth/login') },
+                ]);
+            }
         } else {
-            Alert.alert(t('auth.registerError', translationLanguage), result.error || 'Unknown error');
+            showAlert(
+                t('auth.registerError', translationLanguage),
+                result.error || t('common.unknownError', translationLanguage),
+            );
         }
     };
 
@@ -71,7 +81,7 @@ export default function RegisterScreen() {
                         {t('auth.register', translationLanguage)}
                     </Text>
                     <Text className="text-base font-w-medium text-text-muted text-center">
-                        Start learning German today!
+                        {t('auth.startLearning', translationLanguage)}
                     </Text>
                 </View>
 

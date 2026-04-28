@@ -21,8 +21,9 @@ import Animated from 'react-native-reanimated';
 export default function WordDetailPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { translationLanguage } = useSettingsStore();
-  const { toggleFavorite, isFavorite } = useWordStore();
+  const translationLanguage = useSettingsStore(s => s.translationLanguage);
+  const toggleFavorite = useWordStore(s => s.toggleFavorite);
+  const isFavorite = useWordStore(s => s.isFavorite);
   const [word, setWord] = useState<Word | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

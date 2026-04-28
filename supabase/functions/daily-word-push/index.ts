@@ -112,12 +112,16 @@ async function sendToExpo(messages: ExpoPushMessage[], owners: string[]): Promis
                 data?: Array<{ status: 'ok' | 'error'; id?: string; message?: string; details?: unknown }>;
             };
             const tickets = parsed.data ?? [];
+            // Don't log Expo push tokens (chunk[i].to) or owner UUIDs in plain text —
+            // log a stable short hash of the token so failures are still traceable
+            // by operators without leaking anything that targets a specific device.
+            const tokenHash = (token: string) => `…${token.slice(-6)}`;
             tickets.forEach((ticket, i) => {
                 if (ticket.status === 'ok') {
-                    console.log(`[daily-word-push] ticket ok id=${ticket.id} → ${chunk[i].to}`);
+                    console.log(`[daily-word-push] ticket ok id=${ticket.id} → token ${tokenHash(chunk[i].to)}`);
                 } else {
                     console.error(
-                        `[daily-word-push] ticket error → ${chunk[i].to}:`,
+                        `[daily-word-push] ticket error → token ${tokenHash(chunk[i].to)}:`,
                         ticket.message,
                         ticket.details,
                     );
@@ -163,13 +167,15 @@ Deno.serve(async () => {
 
     // Step 1 — resolve today's word per candidate (no side effects yet).
     const plans: Plan[] = [];
-    for (const c of list) {
+    for (let idx = 0; idx < list.length; idx++) {
+        const c = list[idx];
         const { data: rpc, error: rpcError } = await supabase.rpc('get_today_word', {
             p_user_id: c.user_id,
         });
 
         if (rpcError) {
-            console.error(`[daily-word-push] get_today_word failed for ${c.user_id}:`, rpcError);
+            // Log candidate index instead of user_id to avoid PII in function logs.
+            console.error(`[daily-word-push] get_today_word failed for candidate #${idx}:`, rpcError);
             plans.push({ candidate: c, word: null, status: 'failed', error: rpcError.message });
             continue;
         }

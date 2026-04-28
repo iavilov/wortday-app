@@ -2,6 +2,7 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Border, Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
+import { showAlert } from '@/lib/alert';
 import { useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { createBrutalShadow } from '@/utils/platform-styles';
@@ -9,7 +10,7 @@ import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, Platform, Text, TextInput, View } from 'react-native';
+import { Platform, Text, TextInput, View } from 'react-native';
 
 // Expo Go cannot register the wortday:// custom URI scheme, which Apple's
 // ASWebAuthenticationSession requires to close the OAuth browser. Detect it
@@ -18,8 +19,9 @@ const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreCl
 
 export default function LoginScreen() {
     const router = useRouter();
-    const { translationLanguage } = useSettingsStore();
-    const { signInWithEmail, isLoading } = useAuthStore();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
+    const signInWithEmail = useAuthStore(s => s.signInWithEmail);
+    const isLoading = useAuthStore(s => s.isLoading);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,12 +34,12 @@ export default function LoginScreen() {
     const handleLogin = async () => {
         // Validation
         if (!email || !password) {
-            Alert.alert(t('auth.loginError', translationLanguage), 'Please fill in all fields');
+            showAlert(t('auth.loginError', translationLanguage), t('auth.fillAllFields', translationLanguage));
             return;
         }
 
         if (!validateEmail(email)) {
-            Alert.alert(t('auth.loginError', translationLanguage), t('auth.invalidEmail', translationLanguage));
+            showAlert(t('auth.loginError', translationLanguage), t('auth.invalidEmail', translationLanguage));
             return;
         }
 
@@ -47,7 +49,7 @@ export default function LoginScreen() {
         if (result.success) {
             // Auth guard will redirect to /(tabs)
         } else {
-            Alert.alert(t('auth.loginError', translationLanguage), result.error || 'Unknown error');
+            showAlert(t('auth.loginError', translationLanguage), result.error || t('common.unknownError', translationLanguage));
         }
     };
 
@@ -60,7 +62,7 @@ export default function LoginScreen() {
             if (!result.error) {
                 // Auth guard will redirect to /(tabs)
             } else {
-                Alert.alert(t('auth.loginError', translationLanguage), result.error);
+                showAlert(t('auth.loginError', translationLanguage), result.error);
             }
             return;
         }
@@ -84,7 +86,7 @@ export default function LoginScreen() {
             if (!result.error) {
                 // Auth guard will redirect to /(tabs)
             } else {
-                Alert.alert(t('auth.loginError', translationLanguage), result.error);
+                showAlert(t('auth.loginError', translationLanguage), result.error);
             }
         } catch (error: any) {
             if (error.code === 'ERR_REQUEST_CANCELED') {
@@ -92,27 +94,26 @@ export default function LoginScreen() {
                 return;
             }
             console.error('[Login] Apple Sign In error:', error);
-            Alert.alert('Error', 'Apple Sign In failed');
+            showAlert(t('common.error', translationLanguage), t('auth.appleSignInFailed', translationLanguage));
         }
     };
 
     const handleGoogleSignIn = async () => {
         if (Platform.OS !== 'web' && isExpoGo) {
-            Alert.alert(
+            showAlert(
                 t('auth.googleNotInExpoGoTitle', translationLanguage),
                 t('auth.googleNotInExpoGoMessage', translationLanguage),
             );
             return;
         }
 
-        const { signInWithGoogle } = await import('@/lib/auth-service');
-        const { supabase } = await import('@/lib/supabase-client');
+        const { signInWithGoogle, completeOAuthSignIn } = await import('@/lib/auth-service');
         const WebBrowser = await import('expo-web-browser');
 
         const result = await signInWithGoogle();
 
         if (!result.url || !result.redirectTo) {
-            Alert.alert(t('auth.loginError', translationLanguage), result.error || 'Unknown error');
+            showAlert(t('auth.loginError', translationLanguage), result.error || t('common.unknownError', translationLanguage));
             return;
         }
 
@@ -137,14 +138,13 @@ export default function LoginScreen() {
         const code = new URL(browserResult.url).searchParams.get('code');
         if (!code) {
             console.error('[Login] OAuth redirect URL has no `code` param:', browserResult.url);
-            Alert.alert(t('auth.loginError', translationLanguage), 'Missing auth code');
+            showAlert(t('auth.loginError', translationLanguage), t('auth.missingAuthCode', translationLanguage));
             return;
         }
 
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        const { error } = await completeOAuthSignIn(code);
         if (error) {
-            console.error('[Login] exchangeCodeForSession error:', error);
-            Alert.alert(t('auth.loginError', translationLanguage), error.message);
+            showAlert(t('auth.loginError', translationLanguage), error);
         }
     };
 
@@ -158,7 +158,7 @@ export default function LoginScreen() {
                         {t('auth.login', translationLanguage)}
                     </Text>
                     <Text className="text-base font-w-medium text-text-muted text-center">
-                        Welcome back to Wortday!
+                        {t('auth.welcomeBack', translationLanguage)}
                     </Text>
                 </View>
 
@@ -268,7 +268,7 @@ export default function LoginScreen() {
                     {/* Divider */}
                     <View className="flex-row items-center my-4">
                         <View className="flex-1 h-0.5 bg-border" />
-                        <Text className="mx-4 text-xs font-w-bold text-text-muted uppercase">OR</Text>
+                        <Text className="mx-4 text-xs font-w-bold text-text-muted uppercase">{t('common.or', translationLanguage)}</Text>
                         <View className="flex-1 h-0.5 bg-border" />
                     </View>
 
@@ -276,7 +276,7 @@ export default function LoginScreen() {
                     {Platform.OS === 'ios' && (
                         <BrutalButton
                             onPress={handleAppleSignIn}
-                            backgroundColor="#000000"
+                            backgroundColor={Colors.border}
                             borderRadius={borderRadius.SMALL}
                             shadowOffset={3}
                             style={{ width: '100%', marginBottom: 12 }}

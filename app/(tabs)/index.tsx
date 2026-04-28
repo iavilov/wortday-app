@@ -19,8 +19,16 @@ import { ActivityIndicator, ScrollView, Share, Text, View } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
-  const { todayWord, isLoading, exhausted, loadTodayWord, toggleFavorite, favoriteIds, markWordAsViewed } = useWordStore();
-  const { translationLanguage, languageLevel, registrationDate } = useSettingsStore();
+  const todayWord = useWordStore(s => s.todayWord);
+  const isLoading = useWordStore(s => s.isLoading);
+  const exhausted = useWordStore(s => s.exhausted);
+  const favoriteIds = useWordStore(s => s.favoriteIds);
+  const loadTodayWord = useWordStore(s => s.loadTodayWord);
+  const toggleFavorite = useWordStore(s => s.toggleFavorite);
+  const markWordAsViewed = useWordStore(s => s.markWordAsViewed);
+  const translationLanguage = useSettingsStore(s => s.translationLanguage);
+  const languageLevel = useSettingsStore(s => s.languageLevel);
+  const registrationDate = useSettingsStore(s => s.registrationDate);
 
   // Load today's word when component mounts OR when level/registration date changes
   // This ensures correct word is shown when switching between accounts

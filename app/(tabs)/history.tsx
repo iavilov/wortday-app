@@ -19,7 +19,9 @@ type TabType = 'all' | 'favorites';
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const { translationLanguage, languageLevel, registrationDate } = useSettingsStore();
+  const translationLanguage = useSettingsStore(s => s.translationLanguage);
+  const languageLevel = useSettingsStore(s => s.languageLevel);
+  const registrationDate = useSettingsStore(s => s.registrationDate);
   const [activeTab, setActiveTab] = useState<TabType>('all');
 
   // Zustand reactive selectors - automatically re-render when dependencies change
@@ -164,8 +166,11 @@ export default function HistoryScreen() {
                 let stripColor = Colors.primary;
                 if (hasArticle && item.article && ARTICLE_COLORS[item.article as NonNullable<Article>]) {
                   stripColor = ARTICLE_COLORS[item.article as NonNullable<Article>].bg;
-                } else if (item.part_of_speech && (PART_OF_SPEECH_COLORS as any)[item.part_of_speech]) {
-                  stripColor = (PART_OF_SPEECH_COLORS as any)[item.part_of_speech].bg;
+                } else {
+                  const posKey = item.part_of_speech as keyof typeof PART_OF_SPEECH_COLORS | undefined;
+                  if (posKey && PART_OF_SPEECH_COLORS[posKey]) {
+                    stripColor = PART_OF_SPEECH_COLORS[posKey].bg;
+                  }
                 }
 
                 const displayWord = item.word_de;

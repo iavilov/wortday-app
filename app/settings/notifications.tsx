@@ -5,6 +5,7 @@ import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Border, Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
+import { showAlert } from '@/lib/alert';
 import * as pushService from '@/lib/push-notifications-service';
 import { useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
@@ -12,7 +13,7 @@ import { createBrutalShadow } from '@/utils/platform-styles';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Bell, ChevronDown, Clock, Lightbulb } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, ScrollView, Text, View } from 'react-native';
+import { Platform, ScrollView, Text, View } from 'react-native';
 import Animated, { Easing, FadeInDown, FadeOutUp } from 'react-native-reanimated';
 
 const DEFAULT_TIME = '09:00';
@@ -31,7 +32,7 @@ function formatTime(date: Date): string {
 }
 
 export default function NotificationsScreen() {
-  const { translationLanguage } = useSettingsStore();
+  const translationLanguage = useSettingsStore(s => s.translationLanguage);
   const profile = useAuthStore(s => s.profile);
   const fetchProfile = useAuthStore(s => s.fetchProfile);
 
@@ -62,7 +63,7 @@ export default function NotificationsScreen() {
         const status = await pushService.requestPermissions();
         if (status !== 'granted') {
           setNotificationsEnabled(false);
-          Alert.alert(
+          showAlert(
             t('notifications.permissionDenied', translationLanguage),
             t('notifications.permissionMessage', translationLanguage),
           );
@@ -72,21 +73,21 @@ export default function NotificationsScreen() {
         const tokenResult = await pushService.registerPushToken();
         if (!tokenResult.success) {
           setNotificationsEnabled(false);
-          Alert.alert(t('common.error', translationLanguage), tokenResult.error ?? '');
+          showAlert(t('common.error', translationLanguage), tokenResult.error ?? '');
           return;
         }
 
         const enableResult = await pushService.setNotificationsEnabled(true);
         if (!enableResult.success) {
           setNotificationsEnabled(false);
-          Alert.alert(t('common.error', translationLanguage), enableResult.error ?? '');
+          showAlert(t('common.error', translationLanguage), enableResult.error ?? '');
           return;
         }
       } else {
         const enableResult = await pushService.setNotificationsEnabled(false);
         if (!enableResult.success) {
           setNotificationsEnabled(true);
-          Alert.alert(t('common.error', translationLanguage), enableResult.error ?? '');
+          showAlert(t('common.error', translationLanguage), enableResult.error ?? '');
           return;
         }
         if (profile?.id) {
@@ -108,7 +109,7 @@ export default function NotificationsScreen() {
     if (notificationsEnabled) {
       const result = await pushService.updateNotificationTime(formatTime(selectedDate));
       if (!result.success) {
-        Alert.alert(t('common.error', translationLanguage), result.error ?? '');
+        showAlert(t('common.error', translationLanguage), result.error ?? '');
         return;
       }
       await fetchProfile();

@@ -7,7 +7,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 
 export default function RateScreen() {
-    const { translationLanguage } = useSettingsStore();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
 
     return (
         <ScreenLayout>

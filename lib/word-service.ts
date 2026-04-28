@@ -8,29 +8,6 @@ import { LanguageLevel } from '@/types/settings';
 import { TodayWordResponse, Word } from '@/types/word';
 
 /**
- * Get count of words for a specific level
- * Used for the history conveyor range cap.
- */
-export async function getWordCountForLevel(level: LanguageLevel): Promise<{ count: number; error: string | null }> {
-    try {
-        const { count, error } = await supabase
-            .from('words')
-            .select('*', { count: 'exact', head: true })
-            .eq('level', level);
-
-        if (error) {
-            console.error('[WordService] Error counting words:', error);
-            return { count: 0, error: error.message };
-        }
-
-        return { count: count || 0, error: null };
-    } catch (err) {
-        console.error('[WordService] Unexpected error:', err);
-        return { count: 0, error: 'Failed to count words' };
-    }
-}
-
-/**
  * Get words by sequence number range for a specific level
  * Used for the history "conveyor" (words from day 1 to current_day)
  */
@@ -102,29 +79,6 @@ export async function getTodayWord(
 }
 
 /**
- * Get all words (for history/favorites)
- */
-export async function getAllWords(): Promise<{ words: Word[]; error: string | null }> {
-    try {
-        const { data, error } = await supabase
-            .from('words')
-            .select('*')
-            .order('level', { ascending: true })
-            .order('sequence_number', { ascending: true });
-
-        if (error) {
-            console.error('[WordService] Error fetching all words:', error);
-            return { words: [], error: error.message };
-        }
-
-        return { words: data || [], error: null };
-    } catch (err) {
-        console.error('[WordService] Unexpected error:', err);
-        return { words: [], error: 'Failed to fetch words' };
-    }
-}
-
-/**
  * Get word by ID
  */
 export async function getWordById(id: string): Promise<{ word: Word | null; error: string | null }> {
@@ -144,28 +98,5 @@ export async function getWordById(id: string): Promise<{ word: Word | null; erro
     } catch (err) {
         console.error('[WordService] Unexpected error:', err);
         return { word: null, error: 'Failed to fetch word' };
-    }
-}
-
-/**
- * Get all words for a specific level
- */
-export async function getWordsByLevel(level: LanguageLevel): Promise<{ words: Word[]; error: string | null }> {
-    try {
-        const { data, error } = await supabase
-            .from('words')
-            .select('*')
-            .eq('level', level)
-            .order('sequence_number', { ascending: true });
-
-        if (error) {
-            console.error('[WordService] Error fetching words by level:', error);
-            return { words: [], error: error.message };
-        }
-
-        return { words: data || [], error: null };
-    } catch (err) {
-        console.error('[WordService] Unexpected error:', err);
-        return { words: [], error: 'Failed to fetch words' };
     }
 }

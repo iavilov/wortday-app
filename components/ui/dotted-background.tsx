@@ -30,7 +30,7 @@ export const DottedBackground = ({ children }: DottedBackgroundProps) => {
                             patternUnits="userSpaceOnUse"
                         >
                             {/* Dot in the pattern */}
-                            <Circle cx="12" cy="12" r="0.8" fill="#121212" fillOpacity={0.5} />
+                            <Circle cx="12" cy="12" r="0.8" fill={Colors.border} fillOpacity={0.5} />
                         </Pattern>
                     </Defs>
                     {/* Background rectangle with pattern */}

@@ -2,17 +2,18 @@ import { BrutalButton } from '@/components/ui/brutal-button';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Border, Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
+import { showAlert } from '@/lib/alert';
 import { sendPasswordResetEmail } from '@/lib/auth-service';
 import { useSettingsStore } from '@/store/settings-store';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Mail } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 
 export default function ResetPasswordScreen() {
     const router = useRouter();
-    const { translationLanguage } = useSettingsStore();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
 
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -24,12 +25,12 @@ export default function ResetPasswordScreen() {
 
     const handleResetPassword = async () => {
         if (!email) {
-            Alert.alert('Error', 'Please enter your email');
+            showAlert(t('common.error', translationLanguage), t('auth.emptyEmail', translationLanguage));
             return;
         }
 
         if (!validateEmail(email)) {
-            Alert.alert('Error', t('auth.invalidEmail', translationLanguage));
+            showAlert(t('common.error', translationLanguage), t('auth.invalidEmail', translationLanguage));
             return;
         }
 
@@ -38,12 +39,15 @@ export default function ResetPasswordScreen() {
         try {
             const { success, error } = await sendPasswordResetEmail(email);
 
-            if (!success) throw new Error(error || 'Failed to send reset link');
+            if (!success) throw new Error(error || t('auth.sendResetFailed', translationLanguage));
 
             setEmailSent(true);
         } catch (error: any) {
             console.error('[Reset Password] Error:', error);
-            Alert.alert('Error', error.message || 'Failed to send reset link');
+            showAlert(
+                t('common.error', translationLanguage),
+                error.message || t('auth.sendResetFailed', translationLanguage),
+            );
         } finally {
             setIsLoading(false);
         }
@@ -75,7 +79,7 @@ export default function ResetPasswordScreen() {
                         </View>
 
                         <Text className="text-2xl font-w-bold text-text-main text-center mb-3">
-                            Check Your Email
+                            {t('auth.checkEmailTitle', translationLanguage)}
                         </Text>
 
                         <Text className="text-base font-w-medium text-text-muted text-center mb-8 leading-6">
@@ -110,7 +114,7 @@ export default function ResetPasswordScreen() {
                         {t('auth.resetPassword', translationLanguage)}
                     </Text>
                     <Text className="text-base font-w-medium text-text-muted text-center">
-                        Enter your email to receive a reset link
+                        {t('auth.resetPasswordSubtitle', translationLanguage)}
                     </Text>
                 </View>
 

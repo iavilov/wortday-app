@@ -3,6 +3,7 @@ import { ScreenHeader } from '@/components/ui/screen-header';
 import { ScreenLayout } from '@/components/ui/screen-layout';
 import { Border, Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
+import { showAlert, showConfirm } from '@/lib/alert';
 import { useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { getDisplayEmail } from '@/types/auth';
@@ -10,81 +11,51 @@ import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
 import { LogOut, Trash2, User } from 'lucide-react-native';
 import React from 'react';
-import { Alert, Platform, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 export default function AccountScreen() {
-    const { translationLanguage } = useSettingsStore();
-    const { user, profile, isAuthenticated, signOut, deleteAccount, isLoading } = useAuthStore();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
+    const user = useAuthStore(s => s.user);
+    const profile = useAuthStore(s => s.profile);
+    const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+    const signOut = useAuthStore(s => s.signOut);
+    const deleteAccount = useAuthStore(s => s.deleteAccount);
+    const isLoading = useAuthStore(s => s.isLoading);
     const router = useRouter();
 
     const authProvider = profile?.auth_provider || user?.authProvider || 'email';
     const displayEmail = getDisplayEmail(user, profile);
 
     const handleSignOut = async () => {
-        const title = t('account.signOut', translationLanguage);
-        const message = t('account.signOutConfirm', translationLanguage) || 'Are you sure you want to sign out?';
-
-        if (Platform.OS === 'web') {
-            const confirmed = window.confirm(`${title}\n\n${message}`);
-            if (confirmed) {
-                await signOut();
-                router.replace('/auth/login');
-            }
-            return;
-        }
-
-        Alert.alert(
-            title,
-            message,
-            [
-                { text: t('account.cancel', translationLanguage), style: 'cancel' },
-                {
-                    text: t('account.signOut', translationLanguage),
-                    onPress: async () => {
-                        await signOut();
-                        router.replace('/auth/login');
-                    },
-                },
-            ]
-        );
+        const confirmed = await showConfirm({
+            title: t('account.signOut', translationLanguage),
+            message: t('account.signOutConfirm', translationLanguage),
+            confirmText: t('account.signOut', translationLanguage),
+            cancelText: t('account.cancel', translationLanguage),
+        });
+        if (!confirmed) return;
+        await signOut();
+        router.replace('/auth/login');
     };
 
     const handleDeleteAccount = async () => {
-        const title = t('account.deleteAccountConfirm', translationLanguage);
-        const message = t('account.deleteAccountWarning', translationLanguage);
-
-        if (Platform.OS === 'web') {
-            const confirmed = window.confirm(`${title}\n\n${message}`);
-            if (confirmed) {
-                const result = await deleteAccount();
-                if (result.success) {
-                    router.replace('/auth/login');
-                } else {
-                    Alert.alert('Error', result.error || 'Failed to delete account');
-                }
-            }
-            return;
+        const confirmed = await showConfirm({
+            title: t('account.deleteAccountConfirm', translationLanguage),
+            message: t('account.deleteAccountWarning', translationLanguage),
+            confirmText: t('account.delete', translationLanguage),
+            cancelText: t('account.cancel', translationLanguage),
+            destructive: true,
+        });
+        if (!confirmed) return;
+        const result = await deleteAccount();
+        if (result.success) {
+            router.replace('/auth/login');
+        } else {
+            showAlert(
+                t('common.error', translationLanguage),
+                result.error || t('auth.deleteAccountFailed', translationLanguage),
+            );
         }
-
-        Alert.alert(
-            title,
-            message,
-            [
-                { text: t('account.cancel', translationLanguage), style: 'cancel' },
-                {
-                    text: t('account.delete', translationLanguage),
-                    style: 'destructive',
-                    onPress: async () => {
-                        const result = await deleteAccount();
-                        if (result.success) {
-                            router.replace('/auth/login');
-                        } else {
-                            Alert.alert('Error', result.error || 'Failed to delete account');
-                        }
-                    },
-                },
-            ]
-        );
     };
 
     // Not logged in state

@@ -3,7 +3,7 @@ import { createBrutalShadow } from '@/utils/platform-styles';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { History, Layers, Settings } from 'lucide-react-native';
+import { History, Layers, Settings, type LucideProps } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
@@ -128,7 +128,7 @@ export const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) =>
 }
 
 // Separate component for animated content
-const AnimatedTabContent = ({ Icon, label, isFocused }: { Icon: any, label: string, isFocused: boolean }) => {
+const AnimatedTabContent = ({ Icon, label, isFocused }: { Icon: React.ComponentType<LucideProps>; label: string; isFocused: boolean }) => {
     const scale = useSharedValue(isFocused ? 1.05 : 1);
     const opacity = useSharedValue(isFocused ? 1 : 0.6);
 

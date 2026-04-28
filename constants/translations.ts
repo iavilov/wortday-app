@@ -310,6 +310,24 @@ export const UI_TRANSLATIONS = {
             en: 'Not found',
             de: 'Nicht gefunden',
         },
+        error: {
+            ru: 'Ошибка',
+            uk: 'Помилка',
+            en: 'Error',
+            de: 'Fehler',
+        },
+        or: {
+            ru: 'или',
+            uk: 'або',
+            en: 'OR',
+            de: 'ODER',
+        },
+        unknownError: {
+            ru: 'Неизвестная ошибка',
+            uk: 'Невідома помилка',
+            en: 'Unknown error',
+            de: 'Unbekannter Fehler',
+        },
     },
     error: {
         lostInTranslation: {
@@ -734,19 +752,91 @@ export const UI_TRANSLATIONS = {
             en: 'Use Email or Apple Sign-In. Google will work in production builds (TestFlight / App Store).',
             de: 'Nutze E-Mail oder Apple-Anmeldung. Google funktioniert im Produktions-Build (TestFlight / App Store).',
         },
+        welcomeBack: {
+            ru: 'С возвращением в Wortday!',
+            uk: 'Ласкаво просимо назад до Wortday!',
+            en: 'Welcome back to Wortday!',
+            de: 'Willkommen zurück bei Wortday!',
+        },
+        startLearning: {
+            ru: 'Начни учить немецкий сегодня!',
+            uk: 'Почни вчити німецьку сьогодні!',
+            en: 'Start learning German today!',
+            de: 'Beginne heute, Deutsch zu lernen!',
+        },
+        fillAllFields: {
+            ru: 'Заполните все поля',
+            uk: 'Заповніть усі поля',
+            en: 'Please fill in all fields',
+            de: 'Bitte füllen Sie alle Felder aus',
+        },
+        emptyEmail: {
+            ru: 'Введите email',
+            uk: 'Введіть email',
+            en: 'Please enter your email',
+            de: 'Bitte E-Mail eingeben',
+        },
+        appleSignInFailed: {
+            ru: 'Apple вход не удался',
+            uk: 'Вхід через Apple не вдався',
+            en: 'Apple Sign In failed',
+            de: 'Apple-Anmeldung fehlgeschlagen',
+        },
+        missingAuthCode: {
+            ru: 'Отсутствует код авторизации',
+            uk: 'Відсутній код авторизації',
+            en: 'Missing auth code',
+            de: 'Authentifizierungscode fehlt',
+        },
+        sendResetFailed: {
+            ru: 'Не удалось отправить ссылку для сброса',
+            uk: 'Не вдалося надіслати посилання для скидання',
+            en: 'Failed to send reset link',
+            de: 'Reset-Link konnte nicht gesendet werden',
+        },
+        registerEmailConfirm: {
+            ru: 'Проверьте email, чтобы подтвердить аккаунт',
+            uk: 'Перевірте email, щоб підтвердити акаунт',
+            en: 'Please check your email to confirm your account',
+            de: 'Bitte prüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen',
+        },
+        deleteAccountFailed: {
+            ru: 'Не удалось удалить аккаунт',
+            uk: 'Не вдалося видалити акаунт',
+            en: 'Failed to delete account',
+            de: 'Konto konnte nicht gelöscht werden',
+        },
+        checkEmailTitle: {
+            ru: 'Проверьте email',
+            uk: 'Перевірте email',
+            en: 'Check Your Email',
+            de: 'Prüfen Sie Ihre E-Mail',
+        },
+        resetPasswordSubtitle: {
+            ru: 'Введите email для получения ссылки сброса',
+            uk: 'Введіть email для отримання посилання скидання',
+            en: 'Enter your email to receive a reset link',
+            de: 'Geben Sie Ihre E-Mail ein, um einen Reset-Link zu erhalten',
+        },
     },
 } as const;
 
 export type TranslationKey = keyof typeof UI_TRANSLATIONS;
 
+// The translation tree is recursive (groups → leaves with per-language strings),
+// so we walk it with a permissive intermediate type and narrow at the leaf.
+type TranslationNode = string | { [key: string]: TranslationNode };
+
 export function t(path: string, lang: TranslationLanguage): string {
     const keys = path.split('.');
-    let current: any = UI_TRANSLATIONS;
+    let current: TranslationNode = UI_TRANSLATIONS as TranslationNode;
 
     for (const key of keys) {
-        if (current[key] === undefined) return path;
+        if (typeof current !== 'object' || current === null || !(key in current)) return path;
         current = current[key];
     }
 
-    return current[lang] || current['en'] || path;
+    if (typeof current !== 'object' || current === null) return path;
+    const leaf = current as Record<string, string>;
+    return leaf[lang] || leaf['en'] || path;
 }

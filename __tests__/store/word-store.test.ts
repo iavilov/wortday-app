@@ -31,7 +31,6 @@ jest.mock('@/lib/word-service', () => ({
     data: { word: null, day_number: 1, total_words: 0, exhausted: false },
     error: null,
   })),
-  getWordCountForLevel: jest.fn(() => Promise.resolve({ count: 10, error: null })),
   getWordsBySequenceRange: jest.fn(() => Promise.resolve({ words: [], error: null })),
 }));
 

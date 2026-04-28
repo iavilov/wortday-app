@@ -16,8 +16,11 @@ import { ScrollView, Text, View } from 'react-native';
  */
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { setLanguageLevel, setRegistrationDate, setHasCompletedOnboarding, translationLanguage } = useSettingsStore();
-  const { updateProfile } = useAuthStore();
+  const translationLanguage = useSettingsStore(s => s.translationLanguage);
+  const setLanguageLevel = useSettingsStore(s => s.setLanguageLevel);
+  const setRegistrationDate = useSettingsStore(s => s.setRegistrationDate);
+  const setHasCompletedOnboarding = useSettingsStore(s => s.setHasCompletedOnboarding);
+  const updateProfile = useAuthStore(s => s.updateProfile);
   const [selectedLevel, setSelectedLevel] = useState<LanguageLevel>('beginner');
 
   const handleComplete = async () => {
@@ -102,8 +105,9 @@ export default function OnboardingScreen() {
             <View className="space-y-3">
               {LEVEL_OPTIONS.map((option) => {
                 const isSelected = selectedLevel === option.code;
-                const levelKey = `onboarding.level${option.code.charAt(0).toUpperCase() + option.code.slice(1)}` as any;
-                const descKey = `${levelKey}Desc` as any;
+                const capitalized = option.code.charAt(0).toUpperCase() + option.code.slice(1);
+                const levelKey = `onboarding.level${capitalized}`;
+                const descKey = `${levelKey}Desc`;
 
                 return (
                   <BrutalButton

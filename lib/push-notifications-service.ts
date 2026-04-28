@@ -109,7 +109,7 @@ export async function registerPushToken(): Promise<{ success: boolean; error: st
             console.warn('[Push] Failed to update timezone:', tzError);
         }
 
-        console.log(`[Push] Registered token for ${session.user.id} (${platform}, tz=${timezone})`);
+        console.log(`[Push] Registered token (${platform}, tz=${timezone})`);
         return { success: true, error: null };
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to register push token';

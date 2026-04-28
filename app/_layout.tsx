@@ -10,12 +10,11 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 import "../global.css";
 
 import { Colors } from '@/constants/design-tokens';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { setupAuthListener, useAuthStore } from '@/store/auth-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
@@ -33,9 +32,15 @@ export default function RootLayout() {
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
 
-  const { hasCompletedOnboarding, _hasHydrated: settingsHydrated, hydrate: hydrateSettings } = useSettingsStore();
-  const { _hasHydrated: wordHydrated, hydrate: hydrateWords } = useWordStore();
-  const { initialize: initializeAuth, isInitialized: authInitialized, isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const hasCompletedOnboarding = useSettingsStore(s => s.hasCompletedOnboarding);
+  const settingsHydrated = useSettingsStore(s => s._hasHydrated);
+  const hydrateSettings = useSettingsStore(s => s.hydrate);
+  const wordHydrated = useWordStore(s => s._hasHydrated);
+  const hydrateWords = useWordStore(s => s.hydrate);
+  const initializeAuth = useAuthStore(s => s.initialize);
+  const authInitialized = useAuthStore(s => s.isInitialized);
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+  const authLoading = useAuthStore(s => s.isLoading);
 
   const [fontsLoaded] = useFonts({
     IBMPlexSans_400Regular,

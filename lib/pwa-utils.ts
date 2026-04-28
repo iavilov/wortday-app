@@ -41,7 +41,7 @@ export async function promptInstall(): Promise<boolean> {
   const deferredPrompt = (window as any).deferredPrompt;
 
   if (!deferredPrompt) {
-    console.log('Install prompt not available');
+    console.log('[PWAUtils] Install prompt not available');
     return false;
   }
 
@@ -50,15 +50,15 @@ export async function promptInstall(): Promise<boolean> {
     const choiceResult = await deferredPrompt.userChoice;
 
     if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+      console.log('[PWAUtils] User accepted the install prompt');
       (window as any).deferredPrompt = null;
       return true;
     } else {
-      console.log('User dismissed the install prompt');
+      console.log('[PWAUtils] User dismissed the install prompt');
       return false;
     }
   } catch (error) {
-    console.error('Error showing install prompt:', error);
+    console.error('[PWAUtils] Error showing install prompt:', error);
     return false;
   }
 }
@@ -114,7 +114,7 @@ export async function checkForUpdate(): Promise<boolean> {
     await registration.update();
     return true;
   } catch (error) {
-    console.error('Error checking for update:', error);
+    console.error('[PWAUtils] Error checking for update:', error);
     return false;
   }
 }
@@ -137,32 +137,4 @@ export function getDisplayMode(): 'browser' | 'standalone' | 'minimal-ui' | 'ful
     return 'minimal-ui';
   }
   return 'browser';
-}
-
-/**
- * Share content using Web Share API (if available)
- */
-export async function shareContent(data: {
-  title?: string;
-  text?: string;
-  url?: string;
-}): Promise<boolean> {
-  if (Platform.OS !== 'web') return false;
-
-  if (!navigator.share) {
-    console.log('Web Share API not supported');
-    return false;
-  }
-
-  try {
-    await navigator.share(data);
-    return true;
-  } catch (error) {
-    if ((error as Error).name === 'AbortError') {
-      console.log('Share cancelled');
-    } else {
-      console.error('Error sharing:', error);
-    }
-    return false;
-  }
 }

@@ -72,7 +72,9 @@ function SettingItem({ icon, iconBgColor, title, subtitle, onPress, showDivider 
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { userEmail, translationLanguage, languageLevel } = useSettingsStore();
+  const userEmail = useSettingsStore(s => s.userEmail);
+  const translationLanguage = useSettingsStore(s => s.translationLanguage);
+  const languageLevel = useSettingsStore(s => s.languageLevel);
 
   const currentLanguageName = LANGUAGE_OPTIONS.find(opt => opt.code === translationLanguage)?.nativeName || 'Russian';
   const currentLevelName = LEVEL_OPTIONS.find(opt => opt.code === languageLevel)?.name[translationLanguage] || 'Beginner';
