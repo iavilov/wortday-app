@@ -9,6 +9,7 @@ export const palette = {
   purple: '#C084FC',
   orange: '#FB923C',
   destructive: '#EF4444',
+  destructiveSoft: '#FFF1F1',
   vibrantGreen: '#00E090',
   lightGreen: '#86EFAC',
   lightBlue: '#93C5FD',
@@ -31,3 +32,14 @@ export const palette = {
     900: '#171717',
   },
 };
+
+export const role = {
+  action: palette.primary,
+  actionFg: palette.ink,
+  attention: palette.yellow,
+  meta: palette.pink,
+  progress: palette.blue,
+  destructive: palette.destructive,
+  destructiveSoft: palette.destructiveSoft,
+  info: palette.lightGreen,
+} as const;

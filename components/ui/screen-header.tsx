@@ -1,4 +1,6 @@
 import { Colors, Layout, borderRadius as tokensBorderRadius } from '@/constants/design-tokens';
+import { t } from '@/constants/translations';
+import { useSettingsStore } from '@/store/settings-store';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
@@ -38,6 +40,7 @@ export const ScreenHeader = ({
     ...props
 }: ScreenHeaderProps) => {
     const router = useRouter();
+    const translationLanguage = useSettingsStore(s => s.translationLanguage);
 
     // Determine the layout type based on props
     // State 1: secondary screen (showBackButton) -> align title right
@@ -102,6 +105,7 @@ export const ScreenHeader = ({
                             shadowOffset={2}
                             style={{ width: 48, height: 48 }}
                             contentContainerStyle={{ width: '100%', height: '100%' }}
+                            accessibilityLabel={t('common.back', translationLanguage)}
                         >
                             <ChevronLeft size={24} color={Colors.border} strokeWidth={2.5} />
                         </BrutalButton>

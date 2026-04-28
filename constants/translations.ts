@@ -94,6 +94,30 @@ export const UI_TRANSLATIONS = {
             en: 'Play example pronunciation',
             de: 'Aussprache des Beispiels anhören',
         },
+        favoriteA11y: {
+            ru: 'Добавить в избранное',
+            uk: 'Додати в обране',
+            en: 'Add to favorites',
+            de: 'Zu Favoriten hinzufügen',
+        },
+        unfavoriteA11y: {
+            ru: 'Убрать из избранного',
+            uk: 'Прибрати з обраного',
+            en: 'Remove from favorites',
+            de: 'Aus Favoriten entfernen',
+        },
+        toastFavorited: {
+            ru: 'Добавлено в избранное',
+            uk: 'Додано в обране',
+            en: 'Added to favorites',
+            de: 'Zu Favoriten hinzugefügt',
+        },
+        toastUnfavorited: {
+            ru: 'Убрано из избранного',
+            uk: 'Прибрано з обраного',
+            en: 'Removed from favorites',
+            de: 'Aus Favoriten entfernt',
+        },
     },
     history: {
         search: {
@@ -138,17 +162,29 @@ export const UI_TRANSLATIONS = {
             en: 'My Library',
             de: 'Meine Bibliothek',
         },
-        noFavorites: {
-            ru: 'Нет избранных слов',
-            uk: 'Немає обраних слів',
-            en: 'No favorite words',
-            de: 'Keine Favoriten',
+        emptyFavoritesTitle: {
+            ru: 'Пока нет избранных',
+            uk: 'Поки немає обраних',
+            en: 'No favorites yet',
+            de: 'Noch keine Favoriten',
         },
-        noHistory: {
+        emptyHistoryTitle: {
             ru: 'История пуста',
             uk: 'Історія порожня',
             en: 'History is empty',
             de: 'Verlauf ist leer',
+        },
+        noFavorites: {
+            ru: 'Нажмите на сердечко, чтобы сохранить слово сюда.',
+            uk: 'Натисніть на серце, щоб зберегти слово сюди.',
+            en: 'Tap the heart on any word to save it here.',
+            de: 'Tippe das Herz an, um ein Wort hier zu speichern.',
+        },
+        noHistory: {
+            ru: 'Слова, которые вы изучите, появятся здесь.',
+            uk: 'Слова, які ви вивчите, з’являться тут.',
+            en: 'Words you’ve seen will appear here.',
+            de: 'Hier erscheinen Wörter, die du gesehen hast.',
         },
         endOfList: {
             ru: 'Конец списка',
@@ -327,6 +363,12 @@ export const UI_TRANSLATIONS = {
             uk: 'Невідома помилка',
             en: 'Unknown error',
             de: 'Unbekannter Fehler',
+        },
+        back: {
+            ru: 'Назад',
+            uk: 'Назад',
+            en: 'Back',
+            de: 'Zurück',
         },
     },
     error: {

@@ -57,6 +57,7 @@ export const WordCard = ({
                     borderRadius={borderRadius.ROUND}
                     style={{ width: 44, height: 44 }}
                     contentContainerStyle={{ height: '100%' }}
+                    accessibilityLabel={t(isFavorite ? 'home.unfavoriteA11y' : 'home.favoriteA11y', translationLanguage)}
                 >
                     <Heart
                         size={22}
@@ -69,10 +70,11 @@ export const WordCard = ({
                 {onShare && (
                     <BrutalButton
                         onPress={onShare}
-                        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
+                        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8, minHeight: 44 }}
                         pressableStyle={{ flexDirection: 'row' }}
                         borderRadius={borderRadius.SMALL}
                         borderWidth={2}
+                        accessibilityLabel={t('home.share', translationLanguage)}
                     >
                         <Share2 size={18} color={Colors.border} strokeWidth={3} style={{ marginRight: 8 }} />
                         <Text className="text-border font-w-bold uppercase text-xs">
@@ -175,6 +177,7 @@ export const WordCard = ({
                             backgroundColor={Colors.accentYellow}
                             style={{ width: 36, height: 36 }}
                             contentContainerStyle={{ height: '100%' }}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                             accessibilityLabel={t('home.audioSentenceA11y', translationLanguage)}
                         >
                             <Volume2 size={16} color={Colors.border} strokeWidth={2.5} />
@@ -190,7 +193,7 @@ export const WordCard = ({
 
                 <View className="mt-4">
                     <Text
-                        className="text-[14px] text-text-muted font-w-regular opacity-70"
+                        className="text-[15px] text-text-muted font-w-regular opacity-70 leading-[22px]"
                         style={{ fontStyle: 'italic' }}
                     >
                         {content.exampleSentence.translation}
@@ -224,7 +227,7 @@ export const WordCard = ({
                         }}
                     />
 
-                    <Text className="text-[14px] text-text-main font-w-regular leading-[20px] mt-2">
+                    <Text className="text-[15px] text-text-main font-w-regular leading-[22px] mt-2">
                         {content.etymology.text || t('common.notFound', translationLanguage)}
                     </Text>
 

@@ -1,4 +1,5 @@
 import { BrutalButton } from '@/components/ui/brutal-button';
+import { BrutalEmpty } from '@/components/ui/brutal-empty';
 import { BrutalTag } from '@/components/ui/brutal-tag';
 import { ContentContainer } from '@/components/ui/content-container';
 import { ScreenHeader } from '@/components/ui/screen-header';
@@ -10,7 +11,7 @@ import { useWordStore } from '@/store/word-store';
 import { ARTICLE_COLORS, Article, PART_OF_SPEECH_COLORS } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { ArrowRight, Search } from 'lucide-react-native';
+import { ArrowRight, BookOpen, Heart, Search } from 'lucide-react-native';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -149,15 +150,18 @@ export default function HistoryScreen() {
               scrollEnabled={false}
               contentContainerStyle={{ paddingBottom: 20 }}
               ListEmptyComponent={
-                <View className="flex-1 justify-center items-center py-12">
-                  <Text
-                    className="text-text-muted text-center text-base font-medium"
-                  >
-                    {activeTab === 'favorites'
-                      ? t('history.noFavorites', translationLanguage)
-                      : t('history.noHistory', translationLanguage)}
-                  </Text>
-                </View>
+                <BrutalEmpty
+                  Icon={activeTab === 'favorites' ? Heart : BookOpen}
+                  title={t(
+                    activeTab === 'favorites' ? 'history.emptyFavoritesTitle' : 'history.emptyHistoryTitle',
+                    translationLanguage,
+                  )}
+                  description={t(
+                    activeTab === 'favorites' ? 'history.noFavorites' : 'history.noHistory',
+                    translationLanguage,
+                  )}
+                  iconBackground={activeTab === 'favorites' ? Colors.accentPink : Colors.accentYellow}
+                />
               }
               renderItem={({ item }) => {
                 const translation = item.translations[translationLanguage];

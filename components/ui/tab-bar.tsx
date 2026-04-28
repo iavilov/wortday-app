@@ -7,8 +7,10 @@ import { History, Layers, Settings, type LucideProps } from 'lucide-react-native
 import React, { useEffect, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
+    const insets = useSafeAreaInsets();
     const [containerWidth, setContainerWidth] = useState(Layout.maxContentWidth);
 
     const BORDER_WIDTH = Border.primary;
@@ -58,7 +60,13 @@ export const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) =>
                 pointerEvents="auto"
             />
 
-            <View style={styles.outerContainer} pointerEvents="box-none">
+            <View
+                style={[
+                    styles.outerContainer,
+                    { bottom: Math.max(16, insets.bottom + 8) },
+                ]}
+                pointerEvents="box-none"
+            >
                 <View
                     style={[
                         styles.container,
@@ -148,7 +156,7 @@ const AnimatedTabContent = ({ Icon, label, isFocused }: { Icon: React.ComponentT
                 <Icon
                     size={20}
                     color={Colors.border}
-                    strokeWidth={2.2}
+                    strokeWidth={isFocused ? 3 : 2.5}
                 />
             </View>
             <Text style={styles.label}>
@@ -169,7 +177,6 @@ const styles = StyleSheet.create({
     } as ViewStyle,
     outerContainer: {
         position: 'absolute',
-        bottom: 34,
         left: Layout.screenPadding,
         right: Layout.screenPadding,
         alignItems: 'center',

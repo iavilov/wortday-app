@@ -145,7 +145,7 @@ export default function NotificationsScreen() {
               <Text className="text-border text-base font-w-bold mb-2">
                 {t('notifications.notAvailableWeb', translationLanguage)}
               </Text>
-              <Text className="text-text-muted text-sm font-w-medium">
+              <Text className="text-text-muted text-base font-w-medium">
                 {t('notifications.notAvailableWebDescription', translationLanguage)}
               </Text>
             </View>
@@ -193,7 +193,7 @@ export default function NotificationsScreen() {
                 onValueChange={handleToggleNotifications}
               />
             </View>
-            <Text className="text-text-muted text-sm font-w-medium">
+            <Text className="text-text-muted text-base font-w-medium">
               {t('notifications.description', translationLanguage)}
             </Text>
           </View>
@@ -257,7 +257,7 @@ export default function NotificationsScreen() {
                       style={{ width: '100%' }}
                       contentContainerStyle={{ paddingVertical: 14 }}
                     >
-                      <Text className="text-border text-sm font-w-bold uppercase">
+                      <Text className="text-border text-base font-w-bold uppercase">
                         {t('settings.done', translationLanguage)}
                       </Text>
                     </BrutalButton>
@@ -287,7 +287,7 @@ export default function NotificationsScreen() {
             }}
           >
             <Lightbulb size={22} color={Colors.border} strokeWidth={2.5} className="mr-3 flex-shrink-0" />
-            <Text className="text-border text-sm font-w-bold flex-1">
+            <Text className="text-border text-base font-w-bold flex-1 leading-6">
               {t('notifications.info', translationLanguage)}
             </Text>
           </View>

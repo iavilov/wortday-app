@@ -230,6 +230,8 @@ export default function RegisterScreen() {
                         borderWidth={0}
                         shadowOffset={0}
                         backgroundColor="transparent"
+                        pressableStyle={{ paddingVertical: 12, paddingHorizontal: 8, minHeight: 44 }}
+                        accessibilityLabel={t('auth.login', translationLanguage)}
                     >
                         <Text className="text-base font-w-bold text-primary">
                             {t('auth.login', translationLanguage)}

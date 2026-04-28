@@ -128,7 +128,7 @@ export default function OnboardingScreen() {
                         <Text className="text-border text-xl font-w-bold mb-1">
                           {t(levelKey, translationLanguage)}
                         </Text>
-                        <Text className="text-text-muted text-sm font-w-medium">
+                        <Text className="text-text-muted text-base font-w-medium">
                           {t(descKey, translationLanguage)}
                         </Text>
                       </View>

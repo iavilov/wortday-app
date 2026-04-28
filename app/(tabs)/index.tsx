@@ -1,4 +1,6 @@
 import { BrutalButton } from '@/components/ui/brutal-button';
+import { BrutalEmpty } from '@/components/ui/brutal-empty';
+import { BrutalCardSkeleton } from '@/components/ui/brutal-skeleton';
 import { BrutalTag } from '@/components/ui/brutal-tag';
 import { ContentContainer } from '@/components/ui/content-container';
 import { ScreenHeader } from '@/components/ui/screen-header';
@@ -12,10 +14,11 @@ import * as pronunciationService from '@/lib/pronunciation-service';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import * as Haptics from 'expo-haptics';
+import { useToast } from '@/store/toast-store';
 import { useRouter } from 'expo-router';
-import { Share2 } from 'lucide-react-native';
+import { GraduationCap, SearchX, Share2 } from 'lucide-react-native';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, Share, Text, View } from 'react-native';
+import { ScrollView, Share, Text, View } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
@@ -29,6 +32,7 @@ export default function Index() {
   const translationLanguage = useSettingsStore(s => s.translationLanguage);
   const languageLevel = useSettingsStore(s => s.languageLevel);
   const registrationDate = useSettingsStore(s => s.registrationDate);
+  const { show: showToast } = useToast();
 
   // Load today's word when component mounts OR when level/registration date changes
   // This ensures correct word is shown when switching between accounts
@@ -48,12 +52,9 @@ export default function Index() {
   if (isLoading) {
     return (
       <ScreenLayout>
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color={Colors.primary} />
-          <Text className="text-text-muted mt-4 font-w-medium">
-            {t('common.loading', translationLanguage)}
-          </Text>
-        </View>
+        <ContentContainer className="mt-6">
+          <BrutalCardSkeleton />
+        </ContentContainer>
       </ScreenLayout>
     );
   }
@@ -62,34 +63,14 @@ export default function Index() {
     return (
       <ScreenLayout>
         <View className="flex-1 justify-center items-center px-6">
-          <View
-            className="w-full p-6 items-center"
-            style={{
-              backgroundColor: Colors.surface,
-              borderWidth: 3,
-              borderColor: Colors.border,
-              borderRadius: borderRadius.LARGE,
-            }}
-          >
-            <Text className="text-2xl mb-2">🎓</Text>
-            <Text className="text-text-main font-w-bold text-xl text-center mb-3">
-              {t('home.exhaustedTitle', translationLanguage)}
-            </Text>
-            <Text className="text-text-muted font-w-medium text-base text-center mb-6">
-              {t('home.exhaustedSubtitle', translationLanguage)}
-            </Text>
-            <BrutalButton
-              onPress={() => router.push('/settings/level')}
-              borderRadius={borderRadius.MEDIUM}
-              borderWidth={3}
-              backgroundColor={Colors.primary}
-              contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 12 }}
-            >
-              <Text className="text-border font-w-bold uppercase text-sm">
-                {t('home.exhaustedChangeLevel', translationLanguage)}
-              </Text>
-            </BrutalButton>
-          </View>
+          <BrutalEmpty
+            Icon={GraduationCap}
+            iconBackground={Colors.primary}
+            title={t('home.exhaustedTitle', translationLanguage)}
+            description={t('home.exhaustedSubtitle', translationLanguage)}
+            actionLabel={t('home.exhaustedChangeLevel', translationLanguage)}
+            onAction={() => router.push('/settings/level')}
+          />
         </View>
       </ScreenLayout>
     );
@@ -98,10 +79,12 @@ export default function Index() {
   if (!todayWord) {
     return (
       <ScreenLayout>
-        <View className="flex-1 justify-center items-center p-6">
-          <Text className="text-text-main font-w-semibold text-lg">
-            {t('common.notFound', translationLanguage)}
-          </Text>
+        <View className="flex-1 justify-center items-center px-6">
+          <BrutalEmpty
+            Icon={SearchX}
+            iconBackground={Colors.accentYellow}
+            title={t('common.notFound', translationLanguage)}
+          />
         </View>
       </ScreenLayout>
     );
@@ -187,7 +170,14 @@ export default function Index() {
             content={content}
             translationLanguage={translationLanguage}
             isFavorite={favoriteIds.has(todayWord.id)}
-            onToggleFavorite={() => toggleFavorite(todayWord.id)}
+            onToggleFavorite={() => {
+              const wasFavorite = favoriteIds.has(todayWord.id);
+              toggleFavorite(todayWord.id);
+              showToast(
+                t(wasFavorite ? 'home.toastUnfavorited' : 'home.toastFavorited', translationLanguage),
+                'success',
+              );
+            }}
             onAudioPress={handleAudioPress}
             onSentenceAudioPress={handleSentenceAudioPress}
           // onShare is in header, so not passed here

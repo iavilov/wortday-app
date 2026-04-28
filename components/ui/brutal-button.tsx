@@ -1,7 +1,7 @@
 import { Border, Colors, borderRadius as tokensBorderRadius } from '@/constants/design-tokens';
 import * as Haptics from 'expo-haptics';
 import React from 'react';
-import { Platform, Pressable, View, ViewStyle } from 'react-native';
+import { Insets, Platform, Pressable, View, ViewStyle } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -24,6 +24,7 @@ export interface BrutalButtonProps {
     className?: string;
     disabled?: boolean;
     accessibilityLabel?: string;
+    hitSlop?: Insets | number;
 }
 
 /**
@@ -46,6 +47,7 @@ export const BrutalButton = ({
     className,
     disabled = false,
     accessibilityLabel,
+    hitSlop,
 }: BrutalButtonProps) => {
     const isPressedInternal = useSharedValue(0);
     const animationValue = useSharedValue(isActive ? 1 : 0);
@@ -136,6 +138,7 @@ export const BrutalButton = ({
                     onPressIn={handlePressIn}
                     onPressOut={handlePressOut}
                     disabled={disabled}
+                    hitSlop={hitSlop}
                     accessibilityLabel={accessibilityLabel}
                     accessibilityRole={accessibilityLabel ? 'button' : undefined}
                     style={[

@@ -8,6 +8,7 @@ import { getWordContent, t } from '@/lib/i18n-helpers';
 import * as pronunciationService from '@/lib/pronunciation-service';
 import * as wordService from '@/lib/word-service';
 import { useSettingsStore } from '@/store/settings-store';
+import { useToast } from '@/store/toast-store';
 import { useWordStore } from '@/store/word-store';
 import { Word } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
@@ -24,6 +25,7 @@ export default function WordDetailPage() {
   const translationLanguage = useSettingsStore(s => s.translationLanguage);
   const toggleFavorite = useWordStore(s => s.toggleFavorite);
   const isFavorite = useWordStore(s => s.isFavorite);
+  const { show: showToast } = useToast();
   const [word, setWord] = useState<Word | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -146,7 +148,14 @@ export default function WordDetailPage() {
               content={content}
               translationLanguage={translationLanguage}
               isFavorite={isFavorite(word.id)}
-              onToggleFavorite={() => toggleFavorite(word.id)}
+              onToggleFavorite={() => {
+                const wasFavorite = isFavorite(word.id);
+                toggleFavorite(word.id);
+                showToast(
+                  t(wasFavorite ? 'home.toastUnfavorited' : 'home.toastFavorited', translationLanguage),
+                  'success',
+                );
+              }}
               onAudioPress={handleAudioPress}
               onSentenceAudioPress={handleSentenceAudioPress}
               onShare={onShare}

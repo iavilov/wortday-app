@@ -343,11 +343,11 @@ export function setupAuthListener() {
 
   const {
     data: { subscription },
-  } = supabase.auth.onAuthStateChange(async (event, session) => {
+  } = supabase.auth.onAuthStateChange((event, session) => {
     console.log('[Auth Event]:', event);
 
     switch (event) {
-      case 'SIGNED_IN':
+      case 'SIGNED_IN': {
         // Only show loader if not already authenticated (prevent loader on token refresh)
         const currentState = useAuthStore.getState();
         const isReauth = currentState.isAuthenticated && currentState.session !== null;
@@ -358,44 +358,46 @@ export function setupAuthListener() {
 
         setSession(session);
 
-        try {
-          await fetchProfile(); // Wait for profile fetch
+        // Defer Supabase calls outside the auth-lock to avoid deadlock.
+        setTimeout(async () => {
+          try {
+            await fetchProfile();
 
-          // Sync user-specific data after auth
-          const wordStore = (await import('@/store/word-store')).useWordStore.getState();
-          await wordStore.syncFavoritesFromDB();
-          console.log('[Auth] Synced user data after sign-in');
+            const wordStore = (await import('@/store/word-store')).useWordStore.getState();
+            await wordStore.syncFavoritesFromDB();
+            console.log('[Auth] Synced user data after sign-in');
 
-          // If the user already opted into notifications on another device,
-          // re-register this device's token + timezone so server cron can
-          // reach them here too.
-          const profile = useAuthStore.getState().profile;
-          if (profile?.notifications_enabled) {
-            const { registerPushToken } = await import('@/lib/push-notifications-service');
-            registerPushToken();
+            const profile = useAuthStore.getState().profile;
+            if (profile?.notifications_enabled) {
+              const { registerPushToken } = await import('@/lib/push-notifications-service');
+              registerPushToken();
+            }
+          } catch (error) {
+            console.error('[Auth] Failed to fetch profile on SIGNED_IN:', error);
+          } finally {
+            setLoading(false);
           }
-        } catch (error) {
-          console.error('[Auth] Failed to fetch profile on SIGNED_IN:', error);
-        } finally {
-          setLoading(false); // Always hide loader in finally block
-        }
+        }, 0);
         break;
+      }
 
       case 'SIGNED_OUT':
         setSession(null);
         setProfile(null);
         setLoading(false);
 
-        // Clear stores on any sign-out (including natural session expiry)
-        try {
-          const { useWordStore } = await import('@/store/word-store');
-          const { useSettingsStore } = await import('@/store/settings-store');
-          useWordStore.getState().reset();
-          useSettingsStore.getState().reset();
-          console.log('[Auth] Cleared stores on SIGNED_OUT event');
-        } catch (error) {
-          console.error('[Auth] Failed to clear stores on SIGNED_OUT:', error);
-        }
+        // Defer dynamic imports + store resets outside the auth-lock.
+        setTimeout(async () => {
+          try {
+            const { useWordStore } = await import('@/store/word-store');
+            const { useSettingsStore } = await import('@/store/settings-store');
+            useWordStore.getState().reset();
+            useSettingsStore.getState().reset();
+            console.log('[Auth] Cleared stores on SIGNED_OUT event');
+          } catch (error) {
+            console.error('[Auth] Failed to clear stores on SIGNED_OUT:', error);
+          }
+        }, 0);
         break;
 
       case 'TOKEN_REFRESHED':
@@ -405,29 +407,32 @@ export function setupAuthListener() {
 
       case 'USER_UPDATED':
         setSession(session);
-        try {
-          await fetchProfile();
-        } catch (error) {
-          console.error('[Auth] Failed to fetch profile on USER_UPDATED:', error);
-        }
+        setTimeout(async () => {
+          try {
+            await fetchProfile();
+          } catch (error) {
+            console.error('[Auth] Failed to fetch profile on USER_UPDATED:', error);
+          }
+        }, 0);
         break;
 
       case 'INITIAL_SESSION':
         if (session) {
           setLoading(true);
           setSession(session);
-          try {
-            await fetchProfile();
+          setTimeout(async () => {
+            try {
+              await fetchProfile();
 
-            // Sync user-specific data after initial session
-            const wordStore = (await import('@/store/word-store')).useWordStore.getState();
-            await wordStore.syncFavoritesFromDB();
-            console.log('[Auth] Synced user data after initial session');
-          } catch (error) {
-            console.error('[Auth] Failed to fetch profile on INITIAL_SESSION:', error);
-          } finally {
-            setLoading(false); // Always hide loader in finally block
-          }
+              const wordStore = (await import('@/store/word-store')).useWordStore.getState();
+              await wordStore.syncFavoritesFromDB();
+              console.log('[Auth] Synced user data after initial session');
+            } catch (error) {
+              console.error('[Auth] Failed to fetch profile on INITIAL_SESSION:', error);
+            } finally {
+              setLoading(false);
+            }
+          }, 0);
         }
         break;
     }

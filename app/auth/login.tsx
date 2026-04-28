@@ -243,9 +243,11 @@ export default function LoginScreen() {
                         borderWidth={0}
                         shadowOffset={0}
                         backgroundColor="transparent"
-                        style={{ alignSelf: 'flex-start', marginBottom: 20 }}
+                        style={{ alignSelf: 'flex-start', marginBottom: 12 }}
+                        pressableStyle={{ paddingVertical: 12, paddingHorizontal: 4, minHeight: 44 }}
+                        accessibilityLabel={t('auth.forgotPassword', translationLanguage)}
                     >
-                        <Text className="text-sm font-w-bold text-text-muted">
+                        <Text className="text-base font-w-bold text-text-muted">
                             {t('auth.forgotPassword', translationLanguage)}
                         </Text>
                     </BrutalButton>
@@ -313,6 +315,8 @@ export default function LoginScreen() {
                         borderWidth={0}
                         shadowOffset={0}
                         backgroundColor="transparent"
+                        pressableStyle={{ paddingVertical: 12, paddingHorizontal: 8, minHeight: 44 }}
+                        accessibilityLabel={t('auth.createAccount', translationLanguage)}
                     >
                         <Text className="text-base font-w-bold text-primary">
                             {t('auth.createAccount', translationLanguage)}

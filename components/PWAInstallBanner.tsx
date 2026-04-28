@@ -100,14 +100,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: palette.gray[600],
   },
   instructions: {
-    fontSize: 14,
+    fontSize: 15,
     color: palette.ink,
     marginTop: 8,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   button: {
     backgroundColor: palette.primary,

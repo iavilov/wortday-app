@@ -1,4 +1,6 @@
-import { palette } from './colors';
+import { palette, role } from './colors';
+
+export { role };
 
 export const articleColors = {
   der: {
@@ -75,6 +77,7 @@ export const Colors = {
   accentBlue: palette.blue,
 
   destructive: palette.destructive,
+  destructiveSoft: palette.destructiveSoft,
 
   lightGreen: palette.lightGreen,
   lightBlue: palette.lightBlue,
@@ -144,7 +147,57 @@ export const borderRadius = {
   MEDIUM: 12,
   LARGE: 20,
   ROUND: 999,
+  TAG: 4,
+  BTN: 12,
+  CARD: 20,
+  PILL: 999,
 };
+
+export const fontSize = {
+  micro: 11,
+  caption: 13,
+  body: 16,
+  bodyLg: 17,
+  h3: 20,
+  h2: 24,
+  h1: 32,
+  display: 56,
+} as const;
+
+export const lineHeight = {
+  tight: 1.1,
+  snug: 1.25,
+  normal: 1.5,
+  relaxed: 1.6,
+} as const;
+
+export const spacing = {
+  '0.5': 2,
+  '1': 4,
+  '2': 8,
+  '3': 12,
+  '4': 16,
+  '5': 20,
+  '6': 24,
+  '8': 32,
+  '10': 40,
+  '12': 48,
+  '16': 64,
+} as const;
+
+export const zIndex = {
+  base: 0,
+  card: 10,
+  sticky: 20,
+  tabBar: 30,
+  modal: 40,
+  toast: 50,
+} as const;
+
+export const touchTarget = {
+  min: 44,
+  comfortable: 48,
+} as const;
 
 export const borderWidth = {
   DEFAULT: '2px',

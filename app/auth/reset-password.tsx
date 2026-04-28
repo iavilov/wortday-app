@@ -172,11 +172,12 @@ export default function ResetPasswordScreen() {
                         shadowOffset={0}
                         backgroundColor="transparent"
                         style={{ width: '100%' }}
-                        contentContainerStyle={{ paddingVertical: 8 }}
+                        contentContainerStyle={{ paddingVertical: 12, minHeight: 44 }}
+                        accessibilityLabel={t('auth.backToLogin', translationLanguage)}
                     >
                         <View className="flex-row items-center justify-center">
                             <ArrowLeft size={16} color={Colors.textMuted} strokeWidth={2.5} style={{ marginRight: 6 }} />
-                            <Text className="text-sm font-w-bold text-text-muted">
+                            <Text className="text-base font-w-bold text-text-muted">
                                 {t('auth.backToLogin', translationLanguage)}
                             </Text>
                         </View>

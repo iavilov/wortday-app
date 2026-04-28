@@ -130,7 +130,7 @@ export default function LevelScreen() {
                         borderRadius: borderRadius.MEDIUM,
                     }}
                 >
-                    <BrutalText className="text-text-muted text-sm font-w-medium text-center leading-relaxed">
+                    <BrutalText className="text-text-muted text-base font-w-medium text-center leading-relaxed">
                         {t('settings.levelDescription', translationLanguage)}
                     </BrutalText>
                 </View>

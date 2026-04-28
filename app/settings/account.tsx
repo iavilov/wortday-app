@@ -73,11 +73,11 @@ export default function AccountScreen() {
                     className="bg-white border-3 border-ink rounded-brutal p-6 shadow-brutal w-full items-center"
                     style={{ borderColor: Colors.border }}
                 >
-                    <User size={48} color={Colors.gray400} />
+                    <User size={48} color={Colors.gray500} strokeWidth={2.5} />
                     <Text className="text-lg font-w-semibold mt-4" style={{ color: Colors.textMain }}>
                         {t('account.notLoggedIn', translationLanguage)}
                     </Text>
-                    <Text className="text-sm text-center mt-2 mb-4" style={{ color: Colors.textMuted }}>
+                    <Text className="text-base text-center mt-2 mb-4" style={{ color: Colors.textMuted }}>
                         {t('account.signIn', translationLanguage)}
                     </Text>
                     <BrutalButton
@@ -113,7 +113,7 @@ export default function AccountScreen() {
                     padding: 20,
                     marginBottom: 24,
                     width: '100%',
-                    ...createBrutalShadow(4, Colors.border),
+                    ...createBrutalShadow(6, Colors.border),
                 }}
             >
                 <Text
@@ -146,23 +146,24 @@ export default function AccountScreen() {
             {/* 2. LOGOUT BUTTON */}
             <BrutalButton
                 onPress={handleSignOut}
-                backgroundColor={Colors.accentYellow}
+                backgroundColor={Colors.surface}
                 borderColor={Colors.border}
                 borderWidth={Border.primary}
-                borderRadius={borderRadius.LARGE}
-                shadowOffset={4}
+                borderRadius={borderRadius.MEDIUM}
+                shadowOffset={2}
                 disabled={isLoading}
+                accessibilityLabel={t('account.signOut', translationLanguage)}
                 style={{ width: '100%', marginBottom: 16 }}
                 pressableStyle={{
-                    paddingVertical: 16,
+                    paddingVertical: 14,
                     paddingHorizontal: 20,
                     width: '100%',
                 }}
             >
                 <View className="flex-row items-center justify-center gap-2">
-                    <LogOut size={20} color={Colors.border} strokeWidth={2.5} />
+                    <LogOut size={18} color={Colors.border} strokeWidth={2.5} />
                     <Text
-                        className="font-w-bold text-base uppercase"
+                        className="font-w-semibold text-base"
                         style={{ color: Colors.textMain }}
                     >
                         {t('account.signOut', translationLanguage)}
@@ -187,9 +188,9 @@ export default function AccountScreen() {
                 }}
             >
                 <View className="flex-row items-center justify-center gap-2">
-                    <Trash2 size={16} color={Colors.destructive} strokeWidth={2} />
+                    <Trash2 size={16} color={Colors.destructive} strokeWidth={2.5} />
                     <Text
-                        className="font-w-medium text-sm"
+                        className="font-w-medium text-base"
                         style={{ color: Colors.destructive }}
                     >
                         {t('account.deleteAccount', translationLanguage)}
