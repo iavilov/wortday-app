@@ -109,15 +109,22 @@ async function uploadIfMissing(filename: string, text: string): Promise<'uploade
 async function main() {
   await ensureBucket();
 
-  const { data: words, error } = await supabase
-    .from('words')
-    .select('id, word_de, article, content')
-    .order('level')
-    .order('sequence_number')
-    .range(0, 99999);
+  const PAGE_SIZE = 1000;
+  const words: WordRow[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from('words')
+      .select('id, word_de, article, content')
+      .order('level')
+      .order('sequence_number')
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    words.push(...(data as WordRow[]));
+    if (data.length < PAGE_SIZE) break;
+  }
 
-  if (error) throw error;
-  if (!words || words.length === 0) {
+  if (words.length === 0) {
     console.log('No words found in DB');
     return;
   }
