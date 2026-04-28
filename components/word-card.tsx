@@ -7,7 +7,7 @@ import { Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
 import { TranslationLanguage } from '@/lib/i18n-helpers';
 import { ARTICLE_COLORS, PART_OF_SPEECH_COLORS, Word } from '@/types/word';
-import { Heart, Share2 } from 'lucide-react-native';
+import { Heart, Share2, Volume2 } from 'lucide-react-native';
 import React from 'react';
 import { Text, View } from 'react-native';
 
@@ -28,6 +28,7 @@ interface WordCardProps {
     isFavorite: boolean;
     onToggleFavorite: () => void;
     onAudioPress: () => void;
+    onSentenceAudioPress?: () => void;
     onShare?: () => void;
 }
 
@@ -38,6 +39,7 @@ export const WordCard = ({
     isFavorite,
     onToggleFavorite,
     onAudioPress,
+    onSentenceAudioPress,
     onShare,
 }: WordCardProps) => {
     const article = word.article;
@@ -83,6 +85,7 @@ export const WordCard = ({
             <BrutalWordTitle
                 word={word.word_de}
                 onAudioPress={onAudioPress}
+                audioAccessibilityLabel={t('home.audioWordA11y', translationLanguage)}
             />
 
             <View className="flex-row items-center flex-wrap gap-2 mb-5">
@@ -162,6 +165,22 @@ export const WordCard = ({
                         left: 16,
                     }}
                 />
+
+                {onSentenceAudioPress && (
+                    <View style={{ position: 'absolute', top: -18, right: 12, zIndex: 10 }}>
+                        <BrutalButton
+                            onPress={onSentenceAudioPress}
+                            borderWidth={2}
+                            borderRadius={borderRadius.ROUND}
+                            backgroundColor={Colors.accentYellow}
+                            style={{ width: 36, height: 36 }}
+                            contentContainerStyle={{ height: '100%' }}
+                            accessibilityLabel={t('home.audioSentenceA11y', translationLanguage)}
+                        >
+                            <Volume2 size={16} color={Colors.border} strokeWidth={2.5} />
+                        </BrutalButton>
+                    </View>
+                )}
 
                 <HighlightedText
                     text={content.exampleSentence.de}

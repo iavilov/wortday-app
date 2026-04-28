@@ -42,7 +42,8 @@ export interface WordContent {
 }
 
 export interface WordMedia {
-  audio_path: string;
+  audio_word: string;
+  audio_sentence: string;
 }
 
 /**

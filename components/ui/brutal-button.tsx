@@ -23,6 +23,7 @@ export interface BrutalButtonProps {
     pressableStyle?: ViewStyle;
     className?: string;
     disabled?: boolean;
+    accessibilityLabel?: string;
 }
 
 /**
@@ -44,6 +45,7 @@ export const BrutalButton = ({
     pressableStyle,
     className,
     disabled = false,
+    accessibilityLabel,
 }: BrutalButtonProps) => {
     const isPressedInternal = useSharedValue(0);
     const animationValue = useSharedValue(isActive ? 1 : 0);
@@ -134,6 +136,8 @@ export const BrutalButton = ({
                     onPressIn={handlePressIn}
                     onPressOut={handlePressOut}
                     disabled={disabled}
+                    accessibilityLabel={accessibilityLabel}
+                    accessibilityRole={accessibilityLabel ? 'button' : undefined}
                     style={[
                         {
                             alignItems: 'center',

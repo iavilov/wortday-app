@@ -5,11 +5,13 @@ import { WordCard } from '@/components/word-card';
 import { Colors } from '@/constants/design-tokens';
 import { formatDate } from '@/lib/date-helpers';
 import { getWordContent, t } from '@/lib/i18n-helpers';
+import * as pronunciationService from '@/lib/pronunciation-service';
 import * as wordService from '@/lib/word-service';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import { Word } from '@/types/word';
 import { createBrutalShadow } from '@/utils/platform-styles';
+import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
@@ -91,6 +93,18 @@ export default function WordDetailPage() {
 
   const dateString = formatDate(new Date(), translationLanguage);
 
+  const handleAudioPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const wordText = pronunciationService.buildWordText(word.article, word.word_de);
+    pronunciationService.playPronunciation(word.media?.audio_word, wordText);
+  };
+
+  const handleSentenceAudioPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const sentence = pronunciationService.stripSentenceMarkdown(word.content.example_sentence.de);
+    pronunciationService.playPronunciation(word.media?.audio_sentence, sentence);
+  };
+
   const onShare = async () => {
     try {
       const shareTemplate = t('home.shareMessage', translationLanguage);
@@ -132,7 +146,8 @@ export default function WordDetailPage() {
               translationLanguage={translationLanguage}
               isFavorite={isFavorite(word.id)}
               onToggleFavorite={() => toggleFavorite(word.id)}
-              onAudioPress={() => console.log('Audio playback not implemented yet')}
+              onAudioPress={handleAudioPress}
+              onSentenceAudioPress={handleSentenceAudioPress}
               onShare={onShare}
             />
           </Animated.View>

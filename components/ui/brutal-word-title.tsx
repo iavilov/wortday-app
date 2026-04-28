@@ -7,9 +7,10 @@ import { Text, View } from 'react-native';
 interface BrutalWordTitleProps {
     word: string;
     onAudioPress?: () => void;
+    audioAccessibilityLabel?: string;
 }
 
-export const BrutalWordTitle = ({ word, onAudioPress }: BrutalWordTitleProps) => {
+export const BrutalWordTitle = ({ word, onAudioPress, audioAccessibilityLabel }: BrutalWordTitleProps) => {
     // Determine font size based on word length to prevent overflow
     const getFontSizeClass = (text: string) => {
         if (text.length > 18) return 'text-xl';
@@ -34,6 +35,7 @@ export const BrutalWordTitle = ({ word, onAudioPress }: BrutalWordTitleProps) =>
                 backgroundColor={Colors.accentYellow}
                 style={{ width: 48, height: 48 }}
                 contentContainerStyle={{ height: '100%' }}
+                accessibilityLabel={audioAccessibilityLabel}
             >
                 <Volume2 size={24} color={Colors.border} strokeWidth={2.5} />
             </BrutalButton>

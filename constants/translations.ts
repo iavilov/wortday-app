@@ -64,18 +64,6 @@ export const UI_TRANSLATIONS = {
             en: 'Word of the day: {word} - {translation}. Learn German with Wortday!',
             de: 'Wort des Tages: {word} - {translation}. Deutsch lernen mit Wortday!',
         },
-        audioComingSoon: {
-            ru: 'Произношение скоро появится',
-            uk: 'Вимова скоро з\'явиться',
-            en: 'Pronunciation coming soon',
-            de: 'Aussprache kommt bald',
-        },
-        audioComingSoonMessage: {
-            ru: 'Функция аудио произношения будет доступна в следующих обновлениях.',
-            uk: 'Функція аудіо вимови буде доступна в наступних оновленнях.',
-            en: 'Audio pronunciation will be available in upcoming releases.',
-            de: 'Audio-Aussprache wird in kommenden Versionen verfügbar sein.',
-        },
         exhaustedTitle: {
             ru: 'Ты прошёл все слова уровня',
             uk: 'Ти пройшов усі слова рівня',
@@ -93,6 +81,18 @@ export const UI_TRANSLATIONS = {
             uk: 'Змінити рівень',
             en: 'Change level',
             de: 'Niveau ändern',
+        },
+        audioWordA11y: {
+            ru: 'Прослушать произношение слова',
+            uk: 'Прослухати вимову слова',
+            en: 'Play word pronunciation',
+            de: 'Aussprache des Wortes anhören',
+        },
+        audioSentenceA11y: {
+            ru: 'Прослушать произношение примера',
+            uk: 'Прослухати вимову прикладу',
+            en: 'Play example pronunciation',
+            de: 'Aussprache des Beispiels anhören',
         },
     },
     history: {

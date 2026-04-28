@@ -8,13 +8,14 @@ import { Colors, borderRadius } from '@/constants/design-tokens';
 import { t } from '@/constants/translations';
 import { formatDate } from '@/lib/date-helpers';
 import { getWordContent } from '@/lib/i18n-helpers';
+import * as pronunciationService from '@/lib/pronunciation-service';
 import { useSettingsStore } from '@/store/settings-store';
 import { useWordStore } from '@/store/word-store';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { Share2 } from 'lucide-react-native';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Share, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Share, Text, View } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
@@ -120,10 +121,14 @@ export default function Index() {
 
   const handleAudioPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert(
-      t('home.audioComingSoon', translationLanguage),
-      t('home.audioComingSoonMessage', translationLanguage)
-    );
+    const wordText = pronunciationService.buildWordText(todayWord.article, todayWord.word_de);
+    pronunciationService.playPronunciation(todayWord.media?.audio_word, wordText);
+  };
+
+  const handleSentenceAudioPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const sentence = pronunciationService.stripSentenceMarkdown(todayWord.content.example_sentence.de);
+    pronunciationService.playPronunciation(todayWord.media?.audio_sentence, sentence);
   };
 
   return (
@@ -176,6 +181,7 @@ export default function Index() {
             isFavorite={favoriteIds.has(todayWord.id)}
             onToggleFavorite={() => toggleFavorite(todayWord.id)}
             onAudioPress={handleAudioPress}
+            onSentenceAudioPress={handleSentenceAudioPress}
           // onShare is in header, so not passed here
           />
         </ContentContainer>
